@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>نظام سكر المتكامل | م/ محمود سلامه</title>
+    <title>برنامج سكر للمبيعات والحسابات| م/ محمود سلامه</title>
     <style>
-        :root { --primary: #c2185b; --success: #2e7d32; --bg: #f8f9fa; --admin: #1565c0; }
+        :root { --primary: #c2185b; --success: #2e7d32; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .tabs { display: flex; gap: 8px; margin: 15px 0; }
@@ -12,139 +13,148 @@
         .tabs button.active { background: var(--primary); color: white; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
         .card { padding: 15px; border-radius: 10px; border: 1px solid #eee; background: white; cursor: pointer; text-align: center; font-weight: bold; transition: 0.2s; }
-        .card:hover { border-color: var(--primary); transform: translateY(-2px); }
         .cat-card { background: var(--primary); color: white; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         input, select { padding: 12px; width: 100%; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .admin-section { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px; border-right: 5px solid var(--admin); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; border: 1px solid #eee; text-align: center; }
-        .search-box { position: sticky; top: 0; background: white; z-index: 100; padding: 10px 0; }
+        .stock-info { background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; color: #1565c0; }
+        @media print { .no-print { display: none !important; } #printZone { display: block !important; } }
     </style>
 </head>
 <body>
 
-<div id="loader"><h2>جاري تجهيز نظام سكر...</h2><p>تطوير م/ محمود سلامه</p></div>
+<div id="loader"><h2>جاري المعالجة...</h2><p>برمجة م/ محمود سلامه</p></div>
 
 <div id="loginPage" class="container" style="margin-top: 50px; text-align: center;">
     <h1 style="color:var(--primary)">نظام سكر 🍬</h1>
-    <select id="userSelect"><option value="">--- اختر المستخدم ---</option></select>
+    <select id="userSelect"><option value="">--- جاري التحميل ---</option></select>
     <input type="password" id="userPass" placeholder="كلمة المرور">
-    <button onclick="handleLogin()" style="background:var(--primary); color:white; width:100%; padding:15px; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">دخول النظام</button>
+    <button onclick="handleLogin()" style="background:var(--primary); color:white; width:100%; padding:15px; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">دخول</button>
 </div>
 
 <div id="mainApp" style="display: none;">
     <div class="container">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #eee; padding-bottom:10px;">
-            <button onclick="location.reload()" style="background:#0288d1; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔄 مزامنة</button>
+            <button onclick="syncData()" style="background:#0288d1; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔄 مزامنة</button>
             <h3 id="branchInfo" style="color:var(--primary); margin:0;"></h3>
             <button onclick="logout()">خروج</button>
         </div>
 
-        <div class="tabs">
+        <div class="tabs no-print">
             <button id="t-pos" class="active" onclick="switchTab('pos')">الكاشير</button>
             <button id="t-stock" onclick="switchTab('stock')">المخزون</button>
             <button id="t-admin" style="display:none" onclick="switchTab('admin')">الإدارة</button>
         </div>
 
         <div id="s-pos">
-            <div class="search-box">
-                <input type="text" id="productSearch" placeholder="🔍 ابحث عن اسم المنتج..." oninput="filterProducts(this.value)">
-            </div>
+            <input type="text" id="pSearch" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts(this.value)">
+            <div id="catGrid" class="grid" style="margin-top:10px;"></div>
+            <div id="prodGrid" class="grid" style="display:none; margin-top:10px;"></div>
+            <button id="btnBack" onclick="showCats()" style="display:none; width:100%; margin:10px 0; padding:10px; background:#777; color:white; border:none;">🔙 عودة</button>
             
-            <div id="catGrid" class="grid"></div>
-            <div id="prodGrid" class="grid" style="display:none"></div>
-            <button id="btnBack" onclick="showCats()" style="display:none; width:100%; margin:10px 0; padding:10px; background:#777; color:white; border:none; border-radius:8px;">🔙 العودة للأقسام</button>
-            
-            <table id="cartTable" style="display:none">
+            <table id="cartTable" style="display:none; width:100%; margin-top:15px;">
                 <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>❌</th></tr></thead>
                 <tbody id="cartBody"></tbody>
             </table>
-            <div id="finalArea" style="display:none; margin-top:15px; text-align:left;">
+            <div id="finalArea" style="display:none; margin-top:15px;">
                 <h2 style="color:var(--primary)">الإجمالي: <span id="finalTotal">0</span> ج.م</h2>
                 <button onclick="submitOrder()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:10px; font-weight:bold;">تأكيد وطباعة ✅</button>
             </div>
         </div>
 
         <div id="s-stock" style="display:none">
-            <div class="admin-section">
-                <h3>📦 إضافة كميات للمخزون</h3>
-                <select id="stockItemSelect"></select>
-                <input type="number" id="stockQty" placeholder="الكمية المضافة">
-                <button onclick="updateStockInDB()" style="background:var(--admin); color:white; width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer;">إضافة للمخزون</button>
+            <div style="background:#f0f4f8; padding:15px; border-radius:10px;">
+                <h3>📦 إضافة مخزون وارد</h3>
+                <select id="stockItemSelect" onchange="showCurrentQty(this.value)">
+                    <option value="">--- اختر الصنف ---</option>
+                </select>
+                <div id="currentQtyBox" class="stock-info" style="display:none"></div>
+                <input type="number" id="stockQty" placeholder="الكمية المراد إضافتها">
+                <button onclick="updateStock()" style="background:#1565c0; color:white; width:100%; padding:15px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">إضافة للمخزون الآن</button>
             </div>
         </div>
 
         <div id="s-admin" style="display:none">
-            <div class="admin-section">
-                <h3>📊 التقارير والأدوات</h3>
-                <div id="topSalesDisplay"></div>
-                <hr>
-                <h4>👤 إضافة مستخدم جديد</h4>
-                <input type="text" id="nuName" placeholder="الاسم">
-                <input type="text" id="nuPass" placeholder="الباسورد">
-                <input type="text" id="nuSuper" placeholder="باسورد المشرف">
-                <select id="nuRole"><option value="بائع">بائع</option><option value="مشرف">مشرف/إدارة</option></select>
-                <button onclick="addUser()" style="background:var(--success); color:white; width:100%; padding:10px; border:none; border-radius:8px;">حفظ المستخدم</button>
+            <div style="background:#fff3e0; padding:15px; border-radius:10px;">
+                <h3>📊 الأكثر مبيعاً:</h3>
+                <div id="topSales"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbztOtuv8AYDMGwE9_LDfpH6fGkxZRe8IsoIrcAZ-9pP2jgVP0-4lu-gnmzFYSKP2GaRFw/exec"; 
-    let db = { products: [], users: [], stats: [] };
+    const API = "https://script.google.com/macros/s/AKfycbwEC7MQ7Tu3oJdlGROq_EPhj3VunewGIpUl1JvklFynmx-GbauyNjn941hraKJaU9wMFQ/exec"; 
+    let db = { products: [], users: [], stock: [], stats: [] };
     let cart = []; let currentBranch = ""; let superP = "";
 
-    async function init() {
-        try {
-            const r = await fetch(API + "?action=getInitialData");
-            db = await r.json();
-            const sel = document.getElementById("userSelect");
-            const stockSel = document.getElementById("stockItemSelect");
-            
-            db.users.forEach(u => sel.innerHTML += `<option value="${u.branch}">${u.branch}</option>`);
-            db.products.forEach(p => stockSel.innerHTML += `<option value="${p.name}">${p.name}</option>`);
-
-            if(localStorage.getItem("sugarBranch")) {
-                currentBranch = localStorage.getItem("sugarBranch");
-                let u = db.users.find(x => x.branch == currentBranch);
-                if(u) loginOK(u.role, u.superPass);
-            }
-            document.getElementById("loader").style.display = "none";
-        } catch(e) { alert("خطأ في المزامنة"); }
+    async function syncData() {
+        document.getElementById("loader").style.display = "flex";
+        const r = await fetch(API + "?action=getInitialData");
+        db = await r.json();
+        const sel = document.getElementById("userSelect");
+        const sSel = document.getElementById("stockItemSelect");
+        
+        sel.innerHTML = '<option value="">--- اختر المستخدم ---</option><option value="الإدارة العامة">👑 الإدارة العامة</option>';
+        db.users.forEach(u => sel.innerHTML += `<option value="${u.branch}">${u.branch}</option>`);
+        
+        sSel.innerHTML = '<option value="">--- اختر الصنف ---</option>';
+        db.products.forEach(p => sSel.innerHTML += `<option value="${p.name}">${p.name}</option>`);
+        
+        document.getElementById("loader").style.display = "none";
     }
 
     function handleLogin() {
         const u = document.getElementById("userSelect").value;
         const p = document.getElementById("userPass").value;
+        if(u === "الإدارة العامة" && p === "0000") { // باسورد الإدارة
+            currentBranch = "الإدارة"; loginOK("مشرف", "0000"); return;
+        }
         const user = db.users.find(x => x.branch === u && x.pass === p);
-        if(user) { 
-            currentBranch = u; localStorage.setItem("sugarBranch", u);
-            loginOK(user.role, user.superPass);
-        } else alert("بيانات خطأ");
+        if(user) { currentBranch = u; loginOK(user.role, user.superPass); } 
+        else alert("بيانات خطأ!");
     }
 
     function loginOK(role, sPass) {
         superP = sPass;
         document.getElementById("loginPage").style.display = "none";
         document.getElementById("mainApp").style.display = "block";
-        document.getElementById("branchInfo").innerText = "فرع: " + currentBranch;
-        if(role === "مشرف" || currentBranch === "الإدارة") {
+        document.getElementById("branchInfo").innerText = "المستخدم: " + currentBranch;
+        if(role === "مشرف") {
             document.getElementById("t-admin").style.display = "block";
-            document.getElementById("topSalesDisplay").innerHTML = "<h4>الأكثر مبيعاً:</h4>" + db.stats.map(x=>`<div>⭐ ${x}</div>`).join("");
+            document.getElementById("topSales").innerHTML = db.stats.map(x=>`<div>⭐ ${x}</div>`).join("");
         }
         showCats();
     }
 
-    // وظيفة البحث عن المنتجات
-    function filterProducts(query) {
-        if(!query) { showCats(); return; }
+    function showCurrentQty(itemName) {
+        if(!itemName) { document.getElementById("currentQtyBox").style.display="none"; return; }
+        // تجميع الكميات من شيت المخزون لهذا الصنف في هذا الفرع
+        const total = db.stock.filter(s => s.item === itemName && s.branch === currentBranch)
+                              .reduce((acc, curr) => acc + parseFloat(curr.qty || 0), 0);
+        const box = document.getElementById("currentQtyBox");
+        box.innerText = "الرصيد الحالي في الفرع: " + total;
+        box.style.display = "block";
+    }
+
+    async function updateStock() {
+        const item = document.getElementById("stockItemSelect").value;
+        const qty = document.getElementById("stockQty").value;
+        if(!item || !qty) return alert("اكمل البيانات");
+        
+        document.getElementById("loader").style.display = "flex";
+        await fetch(API, {method: "POST", body: JSON.stringify({action: "updateStock", branch: currentBranch, itemName: item, quantity: qty})});
+        
+        alert("تمت إضافة المخزون بنجاح ✅");
+        document.getElementById("stockQty").value = "";
+        await syncData(); // تحديث البيانات في الخلفية بدون خروج
+    }
+
+    function filterProducts(q) {
+        if(!q) { showCats(); return; }
         document.getElementById("catGrid").style.display = "none";
         document.getElementById("btnBack").style.display = "block";
         const grid = document.getElementById("prodGrid"); grid.style.display = "grid"; grid.innerHTML = "";
-        
-        db.products.filter(p => p.name.includes(query)).forEach(p => {
+        db.products.filter(p => p.name.includes(q)).forEach(p => {
             const d = document.createElement("div"); d.className = "card";
             d.innerHTML = `${p.name}<br><small>${p.price}ج</small>`;
             d.onclick = () => addToCart(p); grid.appendChild(d);
@@ -152,7 +162,6 @@
     }
 
     function showCats() {
-        document.getElementById("productSearch").value = "";
         document.getElementById("prodGrid").style.display = "none";
         document.getElementById("btnBack").style.display = "none";
         const grid = document.getElementById("catGrid"); grid.style.display = "grid"; grid.innerHTML = "";
@@ -176,8 +185,7 @@
 
     function addToCart(p) {
         let q = prompt(`كمية ${p.name}:`, "1"); if(!q) return;
-        let pr = p.type == "weight" ? (p.price/1000*q) : (p.price*q);
-        cart.push({name: p.name, qty: q, total: pr});
+        cart.push({name: p.name, qty: q, total: (p.price * q)});
         renderCart();
     }
 
@@ -185,38 +193,19 @@
         const b = document.getElementById("cartBody"); b.innerHTML = ""; let t = 0;
         cart.forEach((i, idx) => {
             t += i.total;
-            b.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.total.toFixed(2)}</td><td onclick="removeCart(${idx})" style="color:red;cursor:pointer">❌</td></tr>`;
+            b.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.total}</td><td onclick="cart.splice(${idx},1);renderCart()" style="color:red;cursor:pointer">❌</td></tr>`;
         });
         document.getElementById("cartTable").style.display = cart.length ? "table" : "none";
         document.getElementById("finalArea").style.display = cart.length ? "block" : "none";
         document.getElementById("finalTotal").innerText = t.toFixed(2);
     }
 
-    function removeCart(idx) {
-        if(prompt("باسورد المشرف:") === superP) { cart.splice(idx,1); renderCart(); }
-        else alert("خطأ!");
-    }
-
     async function submitOrder() {
         document.getElementById("loader").style.display = "flex";
         const inv = "INV-" + Date.now().toString().slice(-6);
         await fetch(API, {method: "POST", body: JSON.stringify({action: "saveOrder", order: { date: new Date().toLocaleString('ar-EG'), branch: currentBranch, details: cart.map(i=>`${i.name}(${i.qty})`).join("+"), total: document.getElementById("finalTotal").innerText, invoice: inv, isoDate: new Date().toISOString() }})});
+        alert("تم حفظ الطلب بنجاح ✅");
         location.reload();
-    }
-
-    async function updateStockInDB() {
-        const item = document.getElementById("stockItemSelect").value;
-        const qty = document.getElementById("stockQty").value;
-        if(!qty) return alert("ادخل الكمية");
-        document.getElementById("loader").style.display = "flex";
-        await fetch(API, {method: "POST", body: JSON.stringify({action: "updateStock", branch: currentBranch, itemName: item, quantity: qty})});
-        alert("تم تحديث المخزون"); location.reload();
-    }
-
-    async function addUser() {
-        const newUser = { branch: document.getElementById("nuName").value, pass: document.getElementById("nuPass").value, super: document.getElementById("nuSuper").value, role: document.getElementById("nuRole").value };
-        await fetch(API, {method: "POST", body: JSON.stringify({action: "addUser", newUser: newUser})});
-        alert("تم الحفظ"); location.reload();
     }
 
     function switchTab(t) {
@@ -227,8 +216,7 @@
     }
 
     function logout() { localStorage.clear(); location.reload(); }
-    window.onload = init;
+    window.onload = syncData;
 </script>
 </body>
 </html>
-
