@@ -1,21 +1,25 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام سكر V12 | م/ محمود سلامه</title>
+    <title>برنامج سكر للمبيعات | م/ محمود سلامه</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
-        :root { --primary: #c2185b; --success: #2e7d32; --bg: #f8f9fa; --offline: #ff9800; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .status-bar { padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
-        .online { background: #e8f5e9; color: #2e7d32; }
-        .offline { background: #fff3e0; color: #ef6c00; }
-        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        .card { padding: 20px; border-radius: 12px; border: 1px solid #eee; background: white; text-align: center; font-weight: bold; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        :root { --primary: #c2185b; --success: #2e7d32; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 10px solid var(--primary); }
+        .btn { padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .tabs { display: flex; gap: 10px; margin: 15px 0; }
+        .tabs button { flex: 1; padding: 15px; border: none; border-radius: 12px; background: #eee; font-weight: bold; }
+        .tabs button.active { background: var(--primary); color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+        .card { padding: 25px 15px; border-radius: 15px; border: 1px solid #eee; background: white; text-align: center; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .stock-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 1px solid #eee; }
+        input, select { padding: 16px; width: 100%; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         @media print { .no-print { display: none !important; } #printZone { display: block !important; } }
     </style>
 </head>
@@ -23,105 +27,145 @@
 
 <div id="loader"><h2>جاري المزامنة...</h2><p>تطوير م/ محمود سلامه</p></div>
 
-<div id="mainApp" class="container">
-    <div class="nav no-print" style="display:flex; justify-content:space-between; align-items:center;">
-        <div id="netStatus" class="status-bar online">● متصل بالإنترنت</div>
-        <h3 id="branchInfo" style="color:var(--primary); margin:0;">سكر V12 🍬</h3>
-        <button onclick="logout()" class="btn" style="background:none;">خروج</button>
-    </div>
+<div id="loginPage" class="container" style="margin-top: 50px; text-align: center;">
+    <h1 style="color:var(--primary)">نظام سكر 🍬</h1>
+    <p>بإشراف م/ محمود سلامه</p>
+    <select id="userSelect"><option value="">--- جاري التحميل ---</option></select>
+    <input type="password" id="userPass" placeholder="كلمة المرور">
+    <button class="btn btn-primary" onclick="handleLogin()">دخول النظام</button>
+</div>
 
-    <button id="syncBtn" class="btn no-print" style="width:100%; background:#0288d1; color:white; margin:10px 0; display:none;" onclick="pushOfflineData()">🔄 يوجد بيانات غير مرفوعة.. اضغط للمزامنة</button>
+<div id="mainApp" style="display: none;">
+    <div class="container no-print">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <button class="btn" style="background:#0288d1; color:white; padding:8px 15px; border-radius:8px;" onclick="syncData()">🔄 مزامنة فوري</button>
+            <h3 id="branchInfo" style="color:var(--primary); margin:0;"></h3>
+            <button class="btn" style="background:#eee; padding:8px 15px; border-radius:8px;" onclick="logout()">خروج</button>
+        </div>
 
-    <div id="loginSection" style="text-align:center; padding:20px;">
-        <select id="userSelect" style="padding:15px; width:100%; border-radius:10px;"><option>جاري التحميل...</option></select>
-        <input type="password" id="userPass" placeholder="كلمة المرور" style="padding:15px; width:100%; margin:10px 0; border-radius:10px; border:1px solid #ddd;">
-        <button onclick="handleLogin()" class="btn" style="background:var(--primary); color:white; width:100%;">دخول</button>
-    </div>
-
-    <div id="appContent" style="display:none;">
-        <div class="tabs no-print" style="display:flex; gap:10px; margin:15px 0;">
-            <button class="btn" style="flex:1; background:var(--primary); color:white;" onclick="switchTab('pos')">البيع</button>
-            <button class="btn" style="flex:1; background:#eee;" onclick="switchTab('stock')">المخزون</button>
+        <div class="tabs">
+            <button id="t-pos" class="active" onclick="switchTab('pos')">🛒 بيع</button>
+            <button id="t-stock" onclick="switchTab('stock')">📦 مخزون</button>
+            <button id="t-admin" style="display:none" onclick="switchTab('admin')">⚙️ الإدارة</button>
         </div>
 
         <div id="s-pos">
-            <input type="text" id="pSearch" placeholder="🔍 بحث عن منتج..." oninput="filterProducts(this.value)" style="padding:15px; width:100%; border-radius:10px; border:1px solid #ddd; margin-bottom:10px;">
-            <div id="catGrid" class="grid"></div>
-            <div id="prodGrid" class="grid" style="display:none"></div>
-            <div id="cartArea" style="margin-top:20px; display:none;">
+            <input type="text" id="pSearch" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts(this.value)">
+            <div id="catGrid" class="grid" style="margin-top:10px;"></div>
+            <div id="prodGrid" class="grid" style="display:none; margin-top:10px;"></div>
+            <button id="btnBack" class="btn" onclick="showCats()" style="display:none; width:100%; margin:10px 0; background:#999; color:white;">🔙 عودة</button>
+            <div id="cartArea" style="display:none; margin-top:20px; border-top:2px solid #eee; padding-top:20px;">
                 <div id="cartItems"></div>
-                <h2>الإجمالي: <span id="finalTotal">0</span> ج.م</h2>
-                <button onclick="submitOrder()" class="btn" style="background:var(--success); color:white; width:100%;">تأكيد وطباعة ✅</button>
+                <h2 style="text-align:left; color:var(--primary)">الإجمالي: <span id="finalTotal">0</span> ج.م</h2>
+                <button class="btn" style="background:var(--success); color:white; width:100%; font-size:20px" onclick="submitOrder()">تأكيد وطباعة ✅</button>
             </div>
         </div>
-        
+
         <div id="s-stock" style="display:none">
             <div id="stockList"></div>
         </div>
+
+        <div id="s-admin" style="display:none">
+            <div style="background:#e3f2fd; padding:15px; border-radius:15px;">
+                <h3>⚙️ لوحة التحكم</h3>
+                <p>مرحباً بك في لوحة إدارة المهندس محمود سلامه</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="printZone" style="display:none; text-align:center; width:280px; margin:0 auto;">
+        <h2 style="margin:0;">حلواني بندق</h2><hr>
+        <p id="p-branch"></p><p id="p-inv"></p>
+        <div id="p-items" style="text-align:right;"></div><hr>
+        <h2 id="p-total"></h2>
+        <div id="qrcode" style="display:flex; justify-content:center; margin:15px 0;"></div>
+        <p style="font-size:10px;">تطوير م/ محمود سلامه</p>
     </div>
 </div>
 
-<div id="printZone" style="display:none; text-align:center; width:280px; margin:0 auto;">
-    <h2>حلواني بندق</h2><hr>
-    <p id="p-branch"></p><p id="p-inv"></p>
-    <div id="p-items" style="text-align:right;"></div><hr>
-    <h2 id="p-total"></h2>
-    <div id="qrcode" style="display:flex; justify-content:center;"></div>
-    <p>تطوير م/ محمود سلامه</p>
-</div>
-
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbw6eFJV_xy9h4pFcpjQS_9y-fBdjt-Ro22mGlI5XORAYqlzdm2s_BiFiENZLA5xgx6xqA/exec"; 
+    const API = "https://script.google.com/macros/s/AKfycbzV5lRR-zVTVB3KuqFMTmSCIeKG6mV8tW2XsWLwrcrmIe1PsrLiJ3bnaH-eYS1WloMQYg/exec"; 
     let db = { products: [], users: [], stock: [] };
-    let cart = []; let userObj = null;
+    let cart = []; let currentBranch = ""; let superP = "";
 
-    // دالة فحص الإنترنت
-    window.addEventListener('online', () => {
-        updateStatus(true);
-        pushOfflineData();
-    });
-    window.addEventListener('offline', () => updateStatus(false));
-
-    function updateStatus(isOnline) {
-        const el = document.getElementById("netStatus");
-        el.className = "status-bar " + (isOnline ? "online" : "offline");
-        el.innerText = isOnline ? "● متصل بالإنترنت" : "● وضع الأوفلاين (النت مقطوع)";
-    }
-
-    async function syncDB() {
+    async function syncData() {
+        document.getElementById("loader").style.display = "flex";
         try {
             const r = await fetch(API + "?action=getInitialData");
             db = await r.json();
-            localStorage.setItem("sugar_db", JSON.stringify(db));
-            renderUsers();
-        } catch(e) {
-            db = JSON.parse(localStorage.getItem("sugar_db") || "{}");
-            renderUsers();
-        }
-    }
-
-    function renderUsers() {
-        const sel = document.getElementById("userSelect");
-        sel.innerHTML = '<option value="">--- اختر المستخدم ---</option>';
-        db.users.forEach(u => sel.innerHTML += `<option value="${u.branch}">${u.branch}</option>`);
+            const sel = document.getElementById("userSelect");
+            sel.innerHTML = '<option value="">--- اختر المستخدم ---</option><option value="الإدارة">👑 الإدارة العامة</option>';
+            db.users.forEach(u => sel.innerHTML += `<option value="${u.branch}">${u.branch}</option>`);
+            document.getElementById("loader").style.display = "none";
+        } catch(e) { alert("خطأ في الاتصال!"); }
     }
 
     function handleLogin() {
         const u = document.getElementById("userSelect").value;
         const p = document.getElementById("userPass").value;
+        if(u === "الإدارة" && p === "0000") { currentBranch = "الإدارة"; loginOK("مشرف", "0000"); return; }
         const user = db.users.find(x => x.branch === u && x.pass === p);
-        if(user) {
-            userObj = user;
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("appContent").style.display = "block";
-            document.getElementById("branchInfo").innerText = user.branch;
-            showCats();
-            renderStock();
-            pushOfflineData();
-        } else alert("خطأ!");
+        if(user) { currentBranch = u; loginOK(user.role, user.superPass); } 
+        else alert("خطأ في البيانات!");
     }
 
-    // البيع والمخزون
+    function loginOK(role, sPass) {
+        superP = sPass;
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("branchInfo").innerText = currentBranch;
+        if(role === "مشرف" || currentBranch === "الإدارة") document.getElementById("t-admin").style.display = "block";
+        showCats(); renderStock();
+    }
+
+    function renderStock() {
+        const box = document.getElementById("stockList"); box.innerHTML = "<h3>أرصدة الفرع</h3>";
+        db.products.forEach(p => {
+            const qty = db.stock.filter(s => s.item === p.name && s.branch === currentBranch)
+                                .reduce((acc, curr) => acc + parseFloat(curr.qty || 0), 0);
+            box.innerHTML += `<div class="stock-row"><span>${p.name}</span><div style="display:flex; gap:10px; align-items:center;"><span style="font-weight:bold; color:var(--primary)">${qty}</span><button onclick="updateStockInDB('${p.name}', 1)" style="padding:5px 10px;">+</button></div></div>`;
+        });
+    }
+
+    async function updateStockInDB(name, val) {
+        document.getElementById("loader").style.display = "flex";
+        await fetch(API, {method: "POST", body: JSON.stringify({action: "updateStock", branch: currentBranch, itemName: name, quantity: val})});
+        await syncData(); renderStock();
+    }
+
+    // وظائف الكاشير
+    function filterProducts(q) {
+        if(!q) { showCats(); return; }
+        document.getElementById("catGrid").style.display = "none";
+        document.getElementById("btnBack").style.display = "block";
+        const grid = document.getElementById("prodGrid"); grid.style.display = "grid"; grid.innerHTML = "";
+        db.products.filter(p => p.name.includes(q)).forEach(p => {
+            const d = document.createElement("div"); d.className = "card"; d.innerHTML = `${p.name}<br><small>${p.price}ج</small>`;
+            d.onclick = () => addToCart(p); grid.appendChild(d);
+        });
+    }
+
+    function showCats() {
+        document.getElementById("prodGrid").style.display = "none";
+        document.getElementById("btnBack").style.display = "none";
+        const grid = document.getElementById("catGrid"); grid.style.display = "grid"; grid.innerHTML = "";
+        const cats = [...new Set(db.products.map(p => p.cat))];
+        cats.forEach(c => {
+            const d = document.createElement("div"); d.className = "card cat-card"; d.innerText = c;
+            d.onclick = () => showProds(c); grid.appendChild(d);
+        });
+    }
+
+    function showProds(cat) {
+        document.getElementById("catGrid").style.display = "none";
+        document.getElementById("btnBack").style.display = "block";
+        const grid = document.getElementById("prodGrid"); grid.style.display = "grid"; grid.innerHTML = "";
+        db.products.filter(p => p.cat === cat).forEach(p => {
+            const d = document.createElement("div"); d.className = "card"; d.innerHTML = `${p.name}<br><small>${p.price}ج</small>`;
+            d.onclick = () => addToCart(p); grid.appendChild(d);
+        });
+    }
+
     function addToCart(p) {
         let q = prompt(`كمية ${p.name}:`, "1"); if(!q) return;
         cart.push({name: p.name, qty: q, total: (p.price * q)});
@@ -131,71 +175,43 @@
     function renderCart() {
         document.getElementById("cartArea").style.display = cart.length ? "block" : "none";
         const items = document.getElementById("cartItems"); items.innerHTML = "";
-        let t = 0; cart.forEach(i => { t += i.total; items.innerHTML += `<div>${i.name} (${i.qty}) - ${i.total}ج</div>`; });
+        let t = 0; cart.forEach((i, idx) => {
+            t += i.total;
+            items.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>${i.name} (${i.qty})</span><span>${i.total} ج.م <button onclick="cart.splice(${idx},1);renderCart()" style="color:red; background:none; border:none;">❌</button></span></div>`;
+        });
         document.getElementById("finalTotal").innerText = t.toFixed(2);
     }
 
     async function submitOrder() {
+        document.getElementById("loader").style.display = "flex";
         const inv = "INV-" + Date.now().toString().slice(-6);
-        const order = { 
-            date: new Date().toLocaleString('ar-EG'), branch: userObj.branch, 
-            details: cart.map(i=>`${i.name}(${i.qty})`).join("+"), 
-            total: document.getElementById("finalTotal").innerText, invoice: inv, user: userObj.branch 
-        };
-
-        // حفظ محلي فوراً
-        const offlineOrders = JSON.parse(localStorage.getItem("offline_orders") || "[]");
-        offlineOrders.push(order);
-        localStorage.setItem("offline_orders", JSON.stringify(offlineOrders));
-
-        // محاولة رفع البيانات
-        pushOfflineData();
-
-        // طباعة الكيو آر (تتم حتى لو النت قاطع)
-        printBill(order);
-    }
-
-    async function pushOfflineData() {
-        if (!navigator.onLine) return;
-        const orders = JSON.parse(localStorage.getItem("offline_orders") || "[]");
-        const stock = JSON.parse(localStorage.getItem("offline_stock") || "[]");
+        const total = document.getElementById("finalTotal").innerText;
+        await fetch(API, {method: "POST", body: JSON.stringify({action: "saveOrder", order: { date: new Date().toLocaleString('ar-EG'), branch: currentBranch, details: cart.map(i=>`${i.name}(${i.qty})`).join("+"), total: total, invoice: inv, isoDate: new Date().toISOString() }})});
         
-        if (orders.length === 0 && stock.length === 0) {
-            document.getElementById("syncBtn").style.display = "none";
-            return;
-        }
-
-        try {
-            const res = await fetch(API, { 
-                method: "POST", 
-                body: JSON.stringify({ action: "syncOfflineData", orders: orders, stockUpdates: stock }) 
-            });
-            if (await res.text() === "Sync_OK") {
-                localStorage.setItem("offline_orders", "[]");
-                localStorage.setItem("offline_stock", "[]");
-                document.getElementById("syncBtn").style.display = "none";
-            }
-        } catch(e) {
-            document.getElementById("syncBtn").style.display = "block";
-        }
-    }
-
-    function printBill(order) {
-        document.getElementById("p-branch").innerText = "فرع: " + order.branch;
-        document.getElementById("p-inv").innerText = "فاتورة: " + order.invoice;
+        document.getElementById("p-branch").innerText = "فرع: " + currentBranch;
+        document.getElementById("p-inv").innerText = "فاتورة: " + inv;
         document.getElementById("p-items").innerHTML = cart.map(i=>`<div>${i.name} x ${i.qty}</div>`).join("");
-        document.getElementById("p-total").innerText = order.total + " ج.م";
+        document.getElementById("p-total").innerText = total + " ج.م";
         
         document.getElementById("qrcode").innerHTML = "";
-        var qr = qrcode(0, 'M'); qr.addData(order.invoice); qr.make();
+        var qr = qrcode(0, 'M'); qr.addData(inv); qr.make();
         document.getElementById("qrcode").innerHTML = qr.createImgTag(5);
         
+        document.getElementById("loader").style.display = "none";
         window.print();
-        cart = []; renderCart();
+        location.reload();
     }
 
-    // ... دوال البحث والأقسام والمخزون المعتادة ...
-    window.onload = syncDB;
+    function switchTab(t) {
+        ["pos", "stock", "admin"].forEach(s => document.getElementById("s-"+s).style.display = "none");
+        ["t-pos", "t-stock", "t-admin"].forEach(s => document.getElementById(s).classList.remove("active"));
+        document.getElementById("s-"+t).style.display = "block";
+        document.getElementById("t-"+t).classList.add("active");
+    }
+
+    function logout() { localStorage.clear(); location.reload(); }
+    window.onload = syncData;
 </script>
 </body>
 </html>
+
