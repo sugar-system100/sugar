@@ -956,7 +956,7 @@ body::before,body::after{display:none!important;content:none!important}
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbygOuhbzmYajiXy54CPvaMSZ_WY-NC5iT_pGWj9XkJv-v_PIyy4d0zskKxGT6YKV_97qQ/exec";
+const API = "https://script.google.com/macros/s/AKfycbykvI_pZRw2BEO0kSGzVq48Ku5X3FPDsrI_S5X43yM8wm7oQ0R9JUN0XZI0xU0c723Gvg/exec";
 let db={products:[],users:[],stock:[],sales:[],crmOrders:[]},cart=[],crmCart=[],userObj=null,printingInProgress=false,selectedProduct=null,preparedOrder=null;
 function showLoader(show,text='جاري التحميل...'){const l=document.getElementById('loader');l.querySelector('h2').innerText=text;l.style.display=show?'flex':'none'}
 function showToast(msg,isError=false){const t=document.getElementById('toast');t.innerText=msg;t.style.background=isError?'#b91c1c':'#222';t.style.display='block';clearTimeout(showToast._timer);showToast._timer=setTimeout(()=>t.style.display='none',3500)}
