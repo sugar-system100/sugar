@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>سكر V22 FINAL | م/ محمود سلامه</title>
+  <title>سكر الاصدار 33 FINAL | م/ محمود سلامه</title>
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js">
 (function(){
   window.renderCrmCart = function(){
@@ -475,6 +475,39 @@
   };
 })();
 
+
+(function(){
+  window.updatePosVisibility = function(){
+    const logged = !!userObj;
+    const pos = document.getElementById('s-pos');
+    const top = document.getElementById('posTopActions');
+    if(pos) pos.style.display = logged ? 'block' : 'none';
+    if(top) top.style.display = logged ? 'flex' : 'none';
+  };
+
+  const oldShow = window.showSection;
+  window.showSection = function(id){
+    if(oldShow) oldShow(id);
+    updatePosVisibility();
+  };
+
+  const oldLogin = window.login;
+  window.login = async function(){
+    await oldLogin();
+    setTimeout(updatePosVisibility, 50);
+  };
+
+  const oldLogout = window.logout;
+  window.logout = function(){
+    if(oldLogout) oldLogout();
+    setTimeout(updatePosVisibility, 50);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updatePosVisibility, 100);
+  });
+})();
+
 </script>
   <style>
     :root{--primary:#b3125d;--primary2:#d81b60;--secondary:#6a1b9a;--success:#2e7d32;--danger:#c62828;--info:#1565c0;--crm:#00897b;--bg:#f7f3f6;--surface:#fff;--surface2:#fff8fb;--text:#23151c;--muted:#6b7280;--border:#ead5df;--shadow:0 12px 30px rgba(90,20,55,.12)}
@@ -498,7 +531,7 @@
   </style>
 </head>
 <body>
-<div id="loader"><h2>جاري تجهيز سكر V22...</h2><p>النسخة النهائية المجمعة</p></div>
+<div id="loader"><h2>جاري تجهيز سكر الاصدار 33...</h2><p>النسخة النهائية المجمعة</p></div>
 <div id="toast"></div>
 <div id="qtyModalBackdrop" class="modal-backdrop no-print">
   <div class="modal-box">
@@ -517,7 +550,7 @@
 </div>
 
 <div id="loginPage" class="container" style="margin-top:40px;text-align:center">
-  <h1 style="color:var(--primary)">نظام سكر V22 🍬</h1>
+  <h1 style="color:var(--primary)">برنامج سكر الاصدار 33 🍬</h1>
   <p style="color:#6b7280">نسخة نهائية شاملة كل الإصلاحات</p>
   <label for="userSelect">اختر الفرع أو المستخدم</label>
   <select id="userSelect"><option value="">--- جاري التحميل ---</option></select>
@@ -620,7 +653,7 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbwH5XVXY7HbAsHljhyZ4e5lJ0xBXCxP0jPQkUxG0mjW3Xz_VwOoSjiq38XNnKkRbeEs4w/exec";
+const API = "https://script.google.com/macros/s/AKfycbxFCXWoEuCTkWJPsCmN_PLBYRUGUdcqlbf5HMiUAekXbZc9rXUbMxENU1WRLqMBEix3/exec";
 let db={products:[],users:[],stock:[],sales:[],crmOrders:[]},cart=[],crmCart=[],userObj=null,printingInProgress=false,selectedProduct=null,preparedOrder=null;
 function showLoader(show,text='جاري التحميل...'){const l=document.getElementById('loader');l.querySelector('h2').innerText=text;l.style.display=show?'flex':'none'}
 function showToast(msg,isError=false){const t=document.getElementById('toast');t.innerText=msg;t.style.background=isError?'#b91c1c':'#222';t.style.display='block';clearTimeout(showToast._timer);showToast._timer=setTimeout(()=>t.style.display='none',3500)}
@@ -1352,10 +1385,43 @@ window.onload=()=>{syncData().then(()=>tryAutoLogin());const t=new Date(),yyyy=t
   };
 })();
 
+
+(function(){
+  window.updatePosVisibility = function(){
+    const logged = !!userObj;
+    const pos = document.getElementById('s-pos');
+    const top = document.getElementById('posTopActions');
+    if(pos) pos.style.display = logged ? 'block' : 'none';
+    if(top) top.style.display = logged ? 'flex' : 'none';
+  };
+
+  const oldShow = window.showSection;
+  window.showSection = function(id){
+    if(oldShow) oldShow(id);
+    updatePosVisibility();
+  };
+
+  const oldLogin = window.login;
+  window.login = async function(){
+    await oldLogin();
+    setTimeout(updatePosVisibility, 50);
+  };
+
+  const oldLogout = window.logout;
+  window.logout = function(){
+    if(oldLogout) oldLogout();
+    setTimeout(updatePosVisibility, 50);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updatePosVisibility, 100);
+  });
+})();
+
 </script>
 </body>
 </html<div id="s-pos" style="display:none">
-  <div class="top-actions" style="margin-bottom:12px">
+  <div id="posTopActions" class="top-actions" style="margin-bottom:12px;display:none">
     <button class="btn btn-info" onclick="syncData()">🔄 مزامنة</button>
     <button class="btn btn-success" onclick="newCustomer()">👤 عميل نقدي / فاتورة جديدة</button>
     <button class="btn btn-light" onclick="logout()">خروج</button>
