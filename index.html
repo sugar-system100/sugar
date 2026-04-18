@@ -667,6 +667,43 @@
   });
 })();
 
+
+(function(){
+  window.db = window.db || {users:[],products:[],stock:[],orders:[],customers:[],crmOrders:[]};
+  window.safeBoot = function(){
+    const sel = document.getElementById('branchSelect') || document.querySelector('select');
+    function setLoading(msg){ if(sel && sel.options.length<=1){ sel.innerHTML = `<option value="">${msg}</option>`; } }
+    function fillFromDb(){
+      try{
+        const branches = [...new Set((db.users||[]).map(u => u.branch).filter(Boolean))];
+        if(sel){
+          sel.innerHTML = '<option value="">اختر الفرع أو المستخدم</option>' + branches.map(b=>`<option value="${b}">${b}</option>`).join('');
+        }
+      }catch(e){ console.error(e); }
+    }
+    setLoading('جاري تحميل البيانات...');
+    if(!(typeof google !== 'undefined' && google.script && google.script.run)){
+      setLoading('فشل الاتصال بـ Apps Script');
+      return;
+    }
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(!res){ setLoading('لم تصل بيانات'); return; }
+        window.db = res;
+        fillFromDb();
+        if(typeof syncData === 'function'){
+          try{ syncData(); }catch(e){ console.error(e); }
+        }
+      })
+      .withFailureHandler(function(err){
+        console.error(err);
+        setLoading('تعذر تحميل البيانات');
+      })
+      .getData();
+  };
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(safeBoot, 300); });
+})();
+
 </script>
   <style>
     :root{--primary:#b3125d;--primary2:#d81b60;--secondary:#6a1b9a;--success:#2e7d32;--danger:#c62828;--info:#1565c0;--crm:#00897b;--bg:#f7f3f6;--surface:#fff;--surface2:#fff8fb;--text:#23151c;--muted:#6b7280;--border:#ead5df;--shadow:0 12px 30px rgba(90,20,55,.12)}
@@ -819,7 +856,7 @@ body::before,body::after{display:none!important;content:none!important}
   <h1 style="color:var(--primary)">برنامج سكر الاصدار 33 🍬</h1>
   <p style="color:#6b7280">نسخة نهائية شاملة كل الإصلاحات</p>
   <label for="userSelect">اختر الفرع أو المستخدم</label>
-  <select id="userSelect"><option value="">--- جاري التحميل ---</option></select>
+  <select id="userSelect"><option value="">--- جاري تحميل البيانات...</option></select>
   <label for="userPass">كلمة المرور</label>
   <input id="userPass" type="password" placeholder="أدخل كلمة المرور">
   <button class="btn btn-primary btn-block" onclick="handleLogin()">دخول النظام</button>
@@ -919,7 +956,7 @@ body::before,body::after{display:none!important;content:none!important}
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxgm0AUSVSE5dwr9dTTc-dj7zjTQBd1PZKzmINMSxUomX4RufPnaoMq4vehLctd5JIsxg/exec";
+const API = "https://script.google.com/macros/s/AKfycbygOuhbzmYajiXy54CPvaMSZ_WY-NC5iT_pGWj9XkJv-v_PIyy4d0zskKxGT6YKV_97qQ/exec";
 let db={products:[],users:[],stock:[],sales:[],crmOrders:[]},cart=[],crmCart=[],userObj=null,printingInProgress=false,selectedProduct=null,preparedOrder=null;
 function showLoader(show,text='جاري التحميل...'){const l=document.getElementById('loader');l.querySelector('h2').innerText=text;l.style.display=show?'flex':'none'}
 function showToast(msg,isError=false){const t=document.getElementById('toast');t.innerText=msg;t.style.background=isError?'#b91c1c':'#222';t.style.display='block';clearTimeout(showToast._timer);showToast._timer=setTimeout(()=>t.style.display='none',3500)}
@@ -1948,6 +1985,43 @@ body::before,body::after{display:none!important;content:none!important}
       if(sel && sel.options.length<=1) __forceLoadBranches();
     }, 1500);
   });
+})();
+
+
+(function(){
+  window.db = window.db || {users:[],products:[],stock:[],orders:[],customers:[],crmOrders:[]};
+  window.safeBoot = function(){
+    const sel = document.getElementById('branchSelect') || document.querySelector('select');
+    function setLoading(msg){ if(sel && sel.options.length<=1){ sel.innerHTML = `<option value="">${msg}</option>`; } }
+    function fillFromDb(){
+      try{
+        const branches = [...new Set((db.users||[]).map(u => u.branch).filter(Boolean))];
+        if(sel){
+          sel.innerHTML = '<option value="">اختر الفرع أو المستخدم</option>' + branches.map(b=>`<option value="${b}">${b}</option>`).join('');
+        }
+      }catch(e){ console.error(e); }
+    }
+    setLoading('جاري تحميل البيانات...');
+    if(!(typeof google !== 'undefined' && google.script && google.script.run)){
+      setLoading('فشل الاتصال بـ Apps Script');
+      return;
+    }
+    google.script.run
+      .withSuccessHandler(function(res){
+        if(!res){ setLoading('لم تصل بيانات'); return; }
+        window.db = res;
+        fillFromDb();
+        if(typeof syncData === 'function'){
+          try{ syncData(); }catch(e){ console.error(e); }
+        }
+      })
+      .withFailureHandler(function(err){
+        console.error(err);
+        setLoading('تعذر تحميل البيانات');
+      })
+      .getData();
+  };
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(safeBoot, 300); });
 })();
 
 </script>
