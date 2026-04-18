@@ -919,7 +919,7 @@ body::before,body::after{display:none!important;content:none!important}
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbwcg3_2nQ1YIDX6VBJx822prL8ncZ_u2cgFzQ1Bf2IXijCUKkoDklPvdTtEgvStFQt2sw/exec";
+const API = "https://script.google.com/macros/s/AKfycbxgm0AUSVSE5dwr9dTTc-dj7zjTQBd1PZKzmINMSxUomX4RufPnaoMq4vehLctd5JIsxg/exec";
 let db={products:[],users:[],stock:[],sales:[],crmOrders:[]},cart=[],crmCart=[],userObj=null,printingInProgress=false,selectedProduct=null,preparedOrder=null;
 function showLoader(show,text='جاري التحميل...'){const l=document.getElementById('loader');l.querySelector('h2').innerText=text;l.style.display=show?'flex':'none'}
 function showToast(msg,isError=false){const t=document.getElementById('toast');t.innerText=msg;t.style.background=isError?'#b91c1c':'#222';t.style.display='block';clearTimeout(showToast._timer);showToast._timer=setTimeout(()=>t.style.display='none',3500)}
@@ -1983,4 +1983,3 @@ body::before,body::after{display:none!important;content:none!important}
     </div>
   </div>
 </div>
->
