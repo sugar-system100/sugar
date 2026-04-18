@@ -4,7 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>سكر V22 FINAL | م/ محمود سلامه</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js">
+(function(){
+  window.renderCrmCart = function(){
+    const box = document.getElementById('crmCartItems');
+    const totalEl = document.getElementById('crmFinalTotal');
+    if(!box || !totalEl) return;
+    if(!crmCart.length){
+      box.innerHTML = '<div style="color:#6b7280">لا توجد أصناف مضافة.</div>';
+      totalEl.innerText = '0';
+      return;
+    }
+    box.innerHTML = crmCart.map((i,idx)=>`<div class="cart-item"><span>${escapeHtml(i.name)} × ${i.qty}</span><div class="row-flex"><b>${(i.total||0).toFixed(2)} ج</b><button class="btn btn-danger btn-sm" onclick="removeCrmItem(${idx})">حذف</button></div></div>`).join('');
+    totalEl.innerText = crmCart.reduce((a,b)=>a+parseFloat(b.total||0),0).toFixed(2);
+  };
+
+  window.removeCrmItem = function(idx){
+    crmCart.splice(idx,1);
+    renderCrmCart();
+  };
+
+  window.clearCrmCart = function(){
+    crmCart = [];
+    renderCrmCart();
+    showToast('تم مسح سلة خدمة العملاء');
+  };
+
+  window.submitCrmOrder = async function(){
+    if(!isCrmUser()) return showToast('هذه الشاشة لخدمة العملاء فقط', true);
+    const branch = (document.getElementById('crmBranch')?.value || '').trim();
+    const customer = (document.getElementById('crmCustomerName')?.value || '').trim();
+    const phone = (document.getElementById('crmCustomerPhone')?.value || '').trim();
+    const address = (document.getElementById('crmAddress')?.value || '').trim();
+    const notes = (document.getElementById('crmNotes')?.value || '').trim();
+    const total = parseFloat(document.getElementById('crmFinalTotal')?.innerText || 0);
+    if(!branch) return showToast('اختر الفرع أولًا', true);
+    if(!customer) return showToast('اكتب اسم العميل', true);
+    if(!phone) return showToast('اكتب رقم الهاتف', true);
+    if(!address) return showToast('اكتب العنوان', true);
+    if(!crmCart.length) return showToast('أضف منتجات للسلة أولًا', true);
+    showLoader(true,'جاري إرسال أوردر خدمة العملاء...');
+    try{
+      await apiPost({action:'saveCrmOrder',order:{branch,customer,phone,address,notes,items:crmCart.map(i=>`${i.name}(${i.qty})`).join(' + '),total,createdBy:userObj.branch}});
+      showToast('تم إرسال الأوردر للفرع');
+      crmCart = [];
+      renderCrmCart();
+      document.getElementById('crmCustomerName').value='';
+      document.getElementById('crmCustomerPhone').value='';
+      document.getElementById('crmAddress').value='';
+      document.getElementById('crmNotes').value='';
+      await syncData();
+    }catch(e){
+      showToast('فشل إرسال أوردر خدمة العملاء: ' + e.message, true);
+    }finally{
+      showLoader(false);
+    }
+  };
+})();
+
+</script>
   <style>
     :root{--primary:#b3125d;--primary2:#d81b60;--secondary:#6a1b9a;--success:#2e7d32;--danger:#c62828;--info:#1565c0;--crm:#00897b;--bg:#f7f3f6;--surface:#fff;--surface2:#fff8fb;--text:#23151c;--muted:#6b7280;--border:#ead5df;--shadow:0 12px 30px rgba(90,20,55,.12)}
     *{box-sizing:border-box} body{margin:0;padding:12px;background:linear-gradient(180deg,#fcf7fa 0%,#f5eef3 100%);color:var(--text);font-family:'Segoe UI',Tahoma,sans-serif;font-size:18px}
@@ -115,7 +173,7 @@
         <div class="row-flex"><div style="flex:1"><label>العنوان</label><textarea id="crmAddress"></textarea></div><div style="flex:1"><label>ملاحظات</label><textarea id="crmNotes"></textarea></div></div>
         <input id="crmSearch" type="text" placeholder="ابحث عن صنف..." oninput="renderCrmProducts(this.value)">
         <div id="crmProductsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:10px"></div>
-        <div class="report-box" style="margin-top:16px;background:#fff;border-right-color:var(--crm)"><h4>سلة خدمة العملاء</h4><div id="crmCartItems"></div><h3>الإجمالي: <span id="crmFinalTotal">0</span> ج.م</h3><div id="crmCartItems"></div><h3>الإجمالي: <span id="crmFinalTotal">0</span> ج.م</h3></div>
+        <div class="report-box" style="margin-top:16px;background:#fff;border-right-color:var(--crm)"><h4>سلة خدمة العملاء</h4><div id="crmCartItems"></div><h3>الإجمالي: <span id="crmFinalTotal">0</span> ج.م</h3></div>
       </div>
     </div>
 
@@ -407,6 +465,64 @@ window.onload=()=>{syncData().then(()=>tryAutoLogin());const t=new Date(),yyyy=t
     const modal = document.getElementById('orderPreviewModal');
     if(modal) modal.style.display='none';
     preparedOrder = null;
+  };
+})();
+
+
+(function(){
+  window.renderCrmCart = function(){
+    const box = document.getElementById('crmCartItems');
+    const totalEl = document.getElementById('crmFinalTotal');
+    if(!box || !totalEl) return;
+    if(!crmCart.length){
+      box.innerHTML = '<div style="color:#6b7280">لا توجد أصناف مضافة.</div>';
+      totalEl.innerText = '0';
+      return;
+    }
+    box.innerHTML = crmCart.map((i,idx)=>`<div class="cart-item"><span>${escapeHtml(i.name)} × ${i.qty}</span><div class="row-flex"><b>${(i.total||0).toFixed(2)} ج</b><button class="btn btn-danger btn-sm" onclick="removeCrmItem(${idx})">حذف</button></div></div>`).join('');
+    totalEl.innerText = crmCart.reduce((a,b)=>a+parseFloat(b.total||0),0).toFixed(2);
+  };
+
+  window.removeCrmItem = function(idx){
+    crmCart.splice(idx,1);
+    renderCrmCart();
+  };
+
+  window.clearCrmCart = function(){
+    crmCart = [];
+    renderCrmCart();
+    showToast('تم مسح سلة خدمة العملاء');
+  };
+
+  window.submitCrmOrder = async function(){
+    if(!isCrmUser()) return showToast('هذه الشاشة لخدمة العملاء فقط', true);
+    const branch = (document.getElementById('crmBranch')?.value || '').trim();
+    const customer = (document.getElementById('crmCustomerName')?.value || '').trim();
+    const phone = (document.getElementById('crmCustomerPhone')?.value || '').trim();
+    const address = (document.getElementById('crmAddress')?.value || '').trim();
+    const notes = (document.getElementById('crmNotes')?.value || '').trim();
+    const total = parseFloat(document.getElementById('crmFinalTotal')?.innerText || 0);
+    if(!branch) return showToast('اختر الفرع أولًا', true);
+    if(!customer) return showToast('اكتب اسم العميل', true);
+    if(!phone) return showToast('اكتب رقم الهاتف', true);
+    if(!address) return showToast('اكتب العنوان', true);
+    if(!crmCart.length) return showToast('أضف منتجات للسلة أولًا', true);
+    showLoader(true,'جاري إرسال أوردر خدمة العملاء...');
+    try{
+      await apiPost({action:'saveCrmOrder',order:{branch,customer,phone,address,notes,items:crmCart.map(i=>`${i.name}(${i.qty})`).join(' + '),total,createdBy:userObj.branch}});
+      showToast('تم إرسال الأوردر للفرع');
+      crmCart = [];
+      renderCrmCart();
+      document.getElementById('crmCustomerName').value='';
+      document.getElementById('crmCustomerPhone').value='';
+      document.getElementById('crmAddress').value='';
+      document.getElementById('crmNotes').value='';
+      await syncData();
+    }catch(e){
+      showToast('فشل إرسال أوردر خدمة العملاء: ' + e.message, true);
+    }finally{
+      showLoader(false);
+    }
   };
 })();
 
