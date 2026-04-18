@@ -627,6 +627,46 @@
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(__hardRefreshVisibility,100); setTimeout(__hardRefreshVisibility,500); setTimeout(__hardRefreshVisibility,1000); });
 })();
 
+
+(function(){
+  window.__forceLoadBranches = async function(){
+    try{
+      if(typeof google !== 'undefined' && google.script && google.script.run){
+        google.script.run
+          .withSuccessHandler(function(res){
+            try{
+              if(res && res.users){ db = res; }
+              if(typeof fillBranches === 'function') fillBranches();
+              const sel = document.getElementById('branchSelect') || document.querySelector('select');
+              if(sel && sel.options.length<=1 && db && db.users){
+                const branches=[...new Set((db.users||[]).map(u=>u.branch).filter(Boolean))];
+                sel.innerHTML='<option value="">اختر الفرع أو المستخدم</option>'+branches.map(b=>`<option value="${b}">${b}</option>`).join('');
+              }
+              if(typeof showToast === 'function') showToast('تم تحميل البيانات');
+            }catch(e){}
+          })
+          .withFailureHandler(function(err){ console.error(err); })
+          .getData();
+      }
+    }catch(e){console.error(e)}
+  };
+
+  const oldRestore = window.restoreSessionAndStart;
+  window.restoreSessionAndStart = async function(){
+    if(oldRestore) await oldRestore();
+    setTimeout(__forceLoadBranches, 200);
+    setTimeout(function(){ if(typeof syncData==='function') syncData(); }, 600);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(__forceLoadBranches, 300);
+    setTimeout(function(){
+      const sel = document.getElementById('branchSelect') || document.querySelector('select');
+      if(sel && sel.options.length<=1) __forceLoadBranches();
+    }, 1500);
+  });
+})();
+
 </script>
   <style>
     :root{--primary:#b3125d;--primary2:#d81b60;--secondary:#6a1b9a;--success:#2e7d32;--danger:#c62828;--info:#1565c0;--crm:#00897b;--bg:#f7f3f6;--surface:#fff;--surface2:#fff8fb;--text:#23151c;--muted:#6b7280;--border:#ead5df;--shadow:0 12px 30px rgba(90,20,55,.12)}
@@ -1870,6 +1910,46 @@ body::before,body::after{display:none!important;content:none!important}
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(__hardRefreshVisibility,100); setTimeout(__hardRefreshVisibility,500); setTimeout(__hardRefreshVisibility,1000); });
 })();
 
+
+(function(){
+  window.__forceLoadBranches = async function(){
+    try{
+      if(typeof google !== 'undefined' && google.script && google.script.run){
+        google.script.run
+          .withSuccessHandler(function(res){
+            try{
+              if(res && res.users){ db = res; }
+              if(typeof fillBranches === 'function') fillBranches();
+              const sel = document.getElementById('branchSelect') || document.querySelector('select');
+              if(sel && sel.options.length<=1 && db && db.users){
+                const branches=[...new Set((db.users||[]).map(u=>u.branch).filter(Boolean))];
+                sel.innerHTML='<option value="">اختر الفرع أو المستخدم</option>'+branches.map(b=>`<option value="${b}">${b}</option>`).join('');
+              }
+              if(typeof showToast === 'function') showToast('تم تحميل البيانات');
+            }catch(e){}
+          })
+          .withFailureHandler(function(err){ console.error(err); })
+          .getData();
+      }
+    }catch(e){console.error(e)}
+  };
+
+  const oldRestore = window.restoreSessionAndStart;
+  window.restoreSessionAndStart = async function(){
+    if(oldRestore) await oldRestore();
+    setTimeout(__forceLoadBranches, 200);
+    setTimeout(function(){ if(typeof syncData==='function') syncData(); }, 600);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(__forceLoadBranches, 300);
+    setTimeout(function(){
+      const sel = document.getElementById('branchSelect') || document.querySelector('select');
+      if(sel && sel.options.length<=1) __forceLoadBranches();
+    }, 1500);
+  });
+})();
+
 </script>
 </body>
 </html<div id="s-pos" style="display:none">
@@ -1903,3 +1983,4 @@ body::before,body::after{display:none!important;content:none!important}
     </div>
   </div>
 </div>
+>
