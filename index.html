@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>برنامج سكر الاصدار 33  - GitHub</title>
+<title>سكر V3</title>
 <style>
-:root{--primary:#bf1f64;--primary2:#eb2c7a;--mint:#d8f1ef;--green:#2e7d32;--blue:#2f7de1;--bg:#f8f1f5;--line:#ead7e1;--text:#222;--muted:#777;--card:#fff}
-*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
-body{margin:0;background:linear-gradient(180deg,#fbf6f8,#f4edf2);color:var(--text)}
-.wrap{max-width:1450px;margin:0 auto;padding:16px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 32px rgba(160,45,90,.08)}
+:root{--primary:#bf1f64;--primary2:#eb2c7a;--mint:#d8f1ef;--green:#2e7d32;--blue:#2f7de1;--bg:#f8f1f5;--line:#ead7e1;--text:#222;--muted:#777}
+*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif} body{margin:0;background:linear-gradient(180deg,#fbf6f8,#f4edf2);color:var(--text)} .wrap{max-width:1450px;margin:0 auto;padding:16px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 32px rgba(160,45,90,.08)}
 .login{max-width:760px;margin:18px auto;padding:18px 18px 22px;overflow:hidden}.bar{height:10px;background:linear-gradient(90deg,var(--primary),#d8588f);margin:-18px -18px 20px;border-radius:18px 18px 0 0}
 h1{margin:6px 0 10px;font-size:32px;color:#b02762}.sub{color:#8b8b8b;margin-bottom:14px}.field{margin-bottom:12px}label{display:block;margin:0 0 6px;font-weight:700;color:#6a2345}
 input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:16px}textarea{min-height:86px;resize:vertical}
@@ -24,222 +22,85 @@ input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--line);
 <div class="wrap">
   <div id="loginScreen" class="card login">
     <div class="bar"></div>
-    <h1>🍬 برنامج سكر الاصدار 33</h1>
-    <div class="sub">نسخة GitHub Pages متوافقة مع Apps Script</div>
-    <div class="field">
-      <label>اختر الفرع أو المستخدم</label>
-      <select id="branchSelect"><option>جاري تحميل البيانات...</option></select>
-    </div>
-    <div class="field">
-      <label>كلمة المرور</label>
-      <input id="passInput" type="password" placeholder="أدخل كلمة المرور">
-    </div>
+    <h1>🍬 برنامج سكر V3</h1>
+    <div class="sub">بوابة دخول احترافية حسب نوع المستخدم</div>
+    <div class="field"><label>نوع الدخول</label><select id="rolePortal" onchange="onPortalChange()"><option value="">اختر نوع الدخول</option><option value="salesAgent">مناديب البيع</option><option value="branchSupervisor">مشرفو الفروع</option><option value="crm">خدمة العملاء</option><option value="cashier">كاشير الفروع</option><option value="delivery">الدليفري</option><option value="admin">الإدارة</option></select></div>
+    <div class="field" id="branchWrap"><label>اختر الفرع</label><select id="branchSelect"><option>جاري تحميل البيانات...</option></select></div>
+    <div class="field hidden" id="userWrap"><label>اسم المستخدم</label><input id="userInput" placeholder="أدخل اسم المستخدم"></div>
+    <div class="field"><label>كلمة المرور</label><input id="passInput" type="password" placeholder="أدخل كلمة المرور"></div>
     <button class="btn btn-primary" style="width:100%" onclick="login()">دخول النظام</button>
     <div id="loginMsg" class="small" style="margin-top:10px"></div>
   </div>
 
   <div id="app" class="hidden">
-    <div class="topbar">
-      <div class="tabs" id="tabs"></div>
-      <div class="topbar">
-        <button class="btn btn-info" onclick="refreshData()">مزامنة</button>
-        <span class="pill mint" id="whoami"></span>
-        <button class="btn btn-light" onclick="logout()">خروج</button>
-      </div>
-    </div>
-
+    <div class="topbar"><div class="tabs" id="tabs"></div><div class="topbar"><span class="pill mint" id="whoami"></span><button class="btn btn-light" onclick="logout()">خروج</button></div></div>
     <div id="sec-pos" class="section active">
-      <div class="topbar">
-        <button class="btn btn-success" onclick="newSale()">فاتورة جديدة</button>
-        <button class="btn btn-mint" onclick="loadCrmCartToForm()">نقل إلى CRM</button>
-      </div>
+      <div id="cashierScanBox" class="card hidden" style="padding:16px;margin-bottom:12px"><h2>استلام QR للكاشير</h2><div class="two"><div class="field"><label>أدخل كود الطلب</label><input id="cashierQrInput" placeholder="مثال: Q-12345678"></div><div class="field"><label>&nbsp;</label><button class="btn btn-success" style="width:100%" onclick="loadQrOrder()">تحميل الطلب</button></div></div></div>
+      <div class="topbar"><button class="btn btn-success" onclick="newSale()">فاتورة جديدة</button><button class="btn btn-mint" onclick="loadCrmCartToForm()">نقل إلى CRM</button><button class="btn btn-info" onclick="refreshData()">مزامنة</button></div>
       <div class="grid">
-        <div class="panel">
-          <div class="ph">السلة</div>
-          <div style="padding:12px;border-bottom:1px solid #f0e4ea"><span class="pill mint">تعامل نقدي</span></div>
-          <div id="cartList" class="cart-list"></div>
-          <div class="totalbox">
-            <div class="two">
-              <div class="field"><label>رسوم التوصيل</label><input id="deliveryFee" type="number" value="0" min="0" step="0.01" oninput="renderCart()"></div>
-              <div class="field"><label>الخصم</label><input id="discountVal" type="number" value="0" min="0" step="0.01" oninput="renderCart()"></div>
-            </div>
-            <div class="small">Subtotal: <span id="subTotal">0</span> ج.م</div>
-            <div class="small">الصافي: <span id="netTotal">0</span> ج.م</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 12px"><strong>الإجمالي</strong><strong id="grandTotal">0 ج.م</strong></div>
-            <div class="topbar">
-              <button class="btn btn-danger" onclick="clearCart()">مسح السلة</button>
-              <button class="btn btn-success" onclick="submitOrder()">إتمام الأوردر</button>
-            </div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="ph">المنتجات</div>
-          <div class="search"><input id="searchInput" placeholder="ابحث عن منتج..." oninput="renderProducts()"></div>
-          <div class="products"><div id="productsGrid" class="pgrid"></div></div>
-        </div>
-        <div class="panel">
-          <div class="ph">المجموعات</div>
-          <div id="catsList" class="cats"></div>
-        </div>
+        <div class="panel"><div class="ph">السلة</div><div style="padding:12px;border-bottom:1px solid #f0e4ea"><span class="pill mint">تعامل نقدي</span></div><div id="cartList" class="cart-list"></div><div class="totalbox"><div class="two"><div class="field"><label>رسوم التوصيل</label><input id="deliveryFee" type="number" value="0" min="0" step="0.01" oninput="renderCart()"></div><div class="field"><label>الخصم</label><input id="discountVal" type="number" value="0" min="0" step="0.01" oninput="renderCart()"></div></div><div class="small">Subtotal: <span id="subTotal">0</span> ج.م</div><div class="small">الصافي: <span id="netTotal">0</span> ج.م</div><div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 12px"><strong>الإجمالي</strong><strong id="grandTotal">0 ج.م</strong></div><div class="topbar"><button class="btn btn-danger" onclick="clearCart()">مسح السلة</button><button class="btn btn-success" onclick="submitOrder()">إتمام الأوردر</button></div></div></div>
+        <div class="panel"><div class="ph">المنتجات</div><div class="search"><input id="searchInput" placeholder="ابحث عن منتج..." oninput="renderProducts()"></div><div class="products"><div id="productsGrid" class="pgrid"></div></div></div>
+        <div class="panel"><div class="ph">المجموعات</div><div id="catsList" class="cats"></div></div>
       </div>
     </div>
 
     <div id="sec-crm" class="section">
-      <div class="two">
-        <div class="card" style="padding:16px">
-          <h2>طلب خدمة العملاء</h2>
-          <div class="field"><label>اسم العميل</label><input id="crmCustomer"></div>
-          <div class="field"><label>الهاتف</label><input id="crmPhone"></div>
-          <div class="field"><label>العنوان</label><textarea id="crmAddress"></textarea></div>
-          <div class="field"><label>الأصناف</label><textarea id="crmItems" placeholder="مثال: جاتوه(1) + تورتة(1)"></textarea></div>
-          <div class="field"><label>اختر الفرع</label><select id="crmBranchSelect"></select></div>
-          <div class="two">
-            <div class="field"><label>الإجمالي</label><input id="crmTotal" type="number" min="0" step="0.01"></div>
-            <div class="field"><label>ملاحظات</label><input id="crmNotes"></div>
-          </div>
-          <button class="btn btn-success" onclick="saveCrm()">إرسال إلى الفرع</button>
-        </div>
-        <div class="card" style="padding:16px">
-          <h2>طلبات CRM</h2>
-          <div class="table-wrap"><table><thead><tr><th>الكود</th><th>الفرع</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="crmTable"></tbody></table></div>
-        </div>
-      </div>
+      <div class="two"><div class="card" style="padding:16px"><h2>طلب خدمة العملاء</h2><div class="field"><label>اسم العميل</label><input id="crmCustomer"></div><div class="field"><label>الهاتف</label><input id="crmPhone"></div><div class="field"><label>العنوان</label><textarea id="crmAddress"></textarea></div><div class="field"><label>الأصناف</label><textarea id="crmItems" placeholder="مثال: جاتوه(1) + تورتة(1)"></textarea></div><div class="field"><label>اختر الفرع</label><select id="crmBranchSelect"></select></div><div class="two"><div class="field"><label>الإجمالي</label><input id="crmTotal" type="number" min="0" step="0.01"></div><div class="field"><label>ملاحظات</label><input id="crmNotes"></div></div><button class="btn btn-success" onclick="saveCrm()">إرسال إلى الفرع</button></div><div class="card" style="padding:16px"><h2>طلبات CRM</h2><div class="table-wrap"><table><thead><tr><th>الكود</th><th>الفرع</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="crmTable"></tbody></table></div></div></div>
     </div>
 
-    <div id="sec-stock" class="section">
-      <div class="card" style="padding:16px">
-        <h2>المخزون - <span id="stockBranch"></span></h2>
-        <div class="table-wrap"><table><thead><tr><th>الصنف</th><th>الرصيد</th><th>إضافة</th></tr></thead><tbody id="stockTable"></tbody></table></div>
-        <div class="topbar" style="margin-top:12px">
-          <button class="btn btn-success" onclick="saveStockUpdates()">حفظ تحديث المخزون</button>
-          <button class="btn btn-info" onclick="exportStock()">تصدير مخزون</button>
-        </div>
-      </div>
-    </div>
+    <div id="sec-stock" class="section"><div class="card" style="padding:16px"><h2>المخزون - <span id="stockBranch"></span></h2><div class="table-wrap"><table><thead><tr><th>الصنف</th><th>الرصيد</th><th>إضافة</th></tr></thead><tbody id="stockTable"></tbody></table></div><div class="topbar" style="margin-top:12px"><button class="btn btn-success" onclick="saveStockUpdates()">حفظ تحديث المخزون</button><button class="btn btn-info" onclick="exportStock()">تصدير مخزون</button></div></div></div>
 
-    <div id="sec-products" class="section">
-      <div class="two">
-        <div class="card" style="padding:16px">
-          <h2>إضافة / تعديل منتج</h2>
-          <div class="field"><label>الاسم الحالي للتعديل</label><input id="prodOldName" placeholder="اتركه فارغًا عند الإضافة"></div>
-          <div class="field"><label>اسم المنتج</label><input id="prodName"></div>
-          <div class="field"><label>المجموعة</label><input id="prodCat"></div>
-          <div class="two">
-            <div class="field"><label>السعر</label><input id="prodPrice" type="number" min="0" step="0.01"></div>
-            <div class="field"><label>النوع</label><select id="prodType"><option>قطعة</option><option>كيلو</option></select></div>
-          </div>
-          <div class="topbar">
-            <button class="btn btn-success" onclick="saveProduct('add')">إضافة</button>
-            <button class="btn btn-info" onclick="saveProduct('update')">تعديل</button>
-          </div>
-        </div>
-        <div class="card" style="padding:16px">
-          <h2>المنتجات الحالية</h2>
-          <div class="table-wrap"><table><thead><tr><th>الاسم</th><th>المجموعة</th><th>السعر</th><th>النوع</th></tr></thead><tbody id="productsTable"></tbody></table></div>
-        </div>
-      </div>
-    </div>
+    <div id="sec-products" class="section"><div class="two"><div class="card" style="padding:16px"><h2>إضافة / تعديل منتج</h2><div class="field"><label>الاسم الحالي للتعديل</label><input id="prodOldName" placeholder="اتركه فارغًا عند الإضافة"></div><div class="field"><label>اسم المنتج</label><input id="prodName"></div><div class="field"><label>المجموعة</label><input id="prodCat"></div><div class="two"><div class="field"><label>السعر</label><input id="prodPrice" type="number" min="0" step="0.01"></div><div class="field"><label>النوع</label><select id="prodType"><option>قطعة</option><option>كيلو</option></select></div></div><div class="topbar"><button class="btn btn-success" onclick="saveProduct('add')">إضافة</button><button class="btn btn-info" onclick="saveProduct('update')">تعديل</button></div></div><div class="card" style="padding:16px"><h2>المنتجات الحالية</h2><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>المجموعة</th><th>السعر</th><th>النوع</th></tr></thead><tbody id="productsTable"></tbody></table></div></div></div></div>
 
-    <div id="sec-users" class="section">
-      <div class="two">
-        <div class="card" style="padding:16px">
-          <h2>إضافة / تعديل مستخدم</h2>
-          <div class="field"><label>اسم الفرع / المستخدم</label><input id="userBranch"></div>
-          <div class="two">
-            <div class="field"><label>كلمة المرور</label><input id="userPass"></div>
-            <div class="field"><label>سوبر باس</label><input id="userSuperPass"></div>
-          </div>
-          <div class="two">
-            <div class="field"><label>نوع النقطة</label><select id="userPointType"><option>فرع</option><option>خدمة العملاء</option><option>إدارة</option></select></div>
-            <div class="field"><label>الصلاحيات</label><input id="userPerms" value="canSell,canStock"></div>
-          </div>
-          <div class="topbar">
-            <button class="btn btn-success" onclick="saveUser('add')">إضافة</button>
-            <button class="btn btn-info" onclick="saveUser('addOrUpdate')">إضافة أو تحديث</button>
-            <button class="btn btn-danger" onclick="deleteUserRow()">حذف</button>
-          </div>
-        </div>
-        <div class="card" style="padding:16px">
-          <h2>المستخدمون</h2>
-          <div class="table-wrap"><table><thead><tr><th>الفرع</th><th>النوع</th><th>الصلاحيات</th></tr></thead><tbody id="usersTable"></tbody></table></div>
-        </div>
-      </div>
-    </div>
+    <div id="sec-users" class="section"><div class="two"><div class="card" style="padding:16px"><h2>إضافة / تعديل مستخدم</h2><div class="field"><label>اسم الفرع / المستخدم</label><input id="userBranch"></div><div class="two"><div class="field"><label>كلمة المرور</label><input id="userPass"></div><div class="field"><label>سوبر باس</label><input id="userSuperPass"></div></div><div class="two"><div class="field"><label>نوع النقطة</label><select id="userPointType"><option>مندوب بيع</option><option>مشرف فرع</option><option>خدمة العملاء</option><option>كاشير</option><option>الدليفري</option><option>إدارة</option></select></div><div class="field"><label>الصلاحيات</label><input id="userPerms" value="canSell,canStock"></div></div><div class="topbar"><button class="btn btn-success" onclick="saveUser('add')">إضافة</button><button class="btn btn-info" onclick="saveUser('update')">تعديل</button><button class="btn btn-danger" onclick="deleteUserRow()">حذف</button></div></div><div class="card" style="padding:16px"><h2>المستخدمون</h2><div class="table-wrap"><table><thead><tr><th>الفرع</th><th>النوع</th><th>الصلاحيات</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div></div>
 
-    <div id="sec-reports" class="section">
-      <div class="card" style="padding:16px">
-        <h2>التقارير</h2>
-        <div class="two">
-          <div class="field"><label>التاريخ</label><input id="repDate" type="date"></div>
-          <div class="field"><label>الوردية</label><select id="repShift"><option>الكل</option><option>صباحية</option><option>مسائية</option></select></div>
-        </div>
-        <div class="topbar">
-          <button class="btn btn-info" onclick="exportSales()">تصدير المبيعات</button>
-          <button class="btn btn-light" onclick="refreshData()">تحديث البيانات</button>
-        </div>
-        <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>التاريخ</th><th>الفرع</th><th>التفاصيل</th><th>الإجمالي</th><th>الفاتورة</th></tr></thead><tbody id="salesTable"></tbody></table></div>
-      </div>
-    </div>
+    <div id="sec-reports" class="section"><div class="card" style="padding:16px"><h2>التقارير</h2><div class="two"><div class="field"><label>التاريخ</label><input id="repDate" type="date"></div><div class="field"><label>الوردية</label><select id="repShift"><option>الكل</option><option>صباحية</option><option>مسائية</option></select></div></div><div class="topbar"><button class="btn btn-info" onclick="exportSales()">تصدير المبيعات</button><button class="btn btn-light" onclick="refreshData()">تحديث البيانات</button></div><div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>التاريخ</th><th>الفرع</th><th>التفاصيل</th><th>الإجمالي</th><th>الفاتورة</th></tr></thead><tbody id="salesTable"></tbody></table></div></div></div>
   </div>
 </div>
-
-<div id="qtyModal" class="modal">
-  <div class="modal-card">
-    <h2 id="qtyTitle">أدخل الكمية</h2>
-    <input id="qtyInput" type="number" min="1" step="1" value="1">
-    <div class="small" id="qtyHint" style="margin-top:8px">مثال: 1 أو 2 أو 3</div>
-    <div class="topbar" style="margin-top:12px">
-      <button class="btn btn-light" onclick="closeQty()">إلغاء</button>
-      <button class="btn btn-success" onclick="confirmQty()">تأكيد</button>
-    </div>
-  </div>
-</div>
-
+<div id="qtyModal" class="modal"><div class="modal-card"><h2 id="qtyTitle">أدخل الكمية</h2><input id="qtyInput" type="number" min="1" step="1" value="1"><div class="small" id="qtyHint" style="margin-top:8px">مثال: 1 أو 2 أو 3</div><div class="topbar" style="margin-top:12px"><button class="btn btn-light" onclick="closeQty()">إلغاء</button><button class="btn btn-success" onclick="confirmQty()">تأكيد</button></div></div></div>
 <div id="toast" class="toast"></div>
-
 <script>
-let rawData = null, db = {products:[], users:[], stock:[], sales:[], crmOrders:[]}, currentUser = null, currentCat = 'الكل', cart = [], pendingProduct = null, stockUpdates = [];
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyX0z1tkF-51EFsBsu2M_QVat5YU7ZbbH5h6ZeyO_S-u3zW2dVVhkmMLPZ-MDP_ZASFnQ/exec';
-const money = n => (Number(n || 0)).toFixed(2);
-const toast = msg => { const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); };
-const esc = s => String(s ?? '').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const isWeight = p => String(p.type || '').trim() === 'كيلو';
-function getScriptUrl(){ return String(SCRIPT_URL || '').trim(); }
-function saveScriptUrl(){ return getScriptUrl(); }
-function setLoginMsg(m){ document.getElementById('loginMsg').textContent = m || ''; }
-function jsonp(action, params={}){ return new Promise((resolve,reject)=>{ const base = saveScriptUrl(); if(!base) return reject(new Error('أدخل رابط Apps Script أولاً')); const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*1000); window[cb]=data=>{ try{ delete window[cb]; script.remove(); if(data && data.ok===false) reject(new Error(data.error||'فشل')); else resolve(data); }catch(e){reject(e);} }; const qs=new URLSearchParams({action, callback:cb, ...params}); const script=document.createElement('script'); script.src=base+(base.includes('?')?'&':'?')+qs.toString(); script.onerror=()=>{ try{ delete window[cb]; }catch(e){} reject(new Error('فشل الاتصال بالسكربت')); }; document.body.appendChild(script); }); }
-function postForm(action, payload={}){ return new Promise((resolve,reject)=>{ const base = saveScriptUrl(); if(!base) return reject(new Error('أدخل رابط Apps Script أولاً')); const iframe=document.createElement('iframe'); const frame='frm_'+Date.now(); iframe.name=frame; iframe.style.display='none'; document.body.appendChild(iframe); const form=document.createElement('form'); form.method='POST'; form.action=base; form.target=frame; form.style.display='none'; const input=document.createElement('input'); input.name='payload'; input.value=JSON.stringify({action, ...payload}); form.appendChild(input); document.body.appendChild(form); let done=false; const finish=()=>{ if(done) return; done=true; setTimeout(()=>{ form.remove(); iframe.remove(); resolve({ok:true}); },200); }; iframe.onload=()=>setTimeout(finish,300); form.submit(); setTimeout(finish,1400); }); }
-function normalizeData(res){ rawData=res; db.products=(res.products||[]).map(r=>({name:r[0], cat:r[1], price:Number(r[2]||0), type:r[3]||'قطعة'})); db.users=res.users||[]; db.stock=(res.stock||[]).map(r=>({branch:r[0], item:r[1], qty:Number(r[2]||0)})); db.sales=(res.sales||[]).map(r=>({date:r[0], branch:r[1], details:r[2], total:Number(r[3]||0), invoice:r[4], isoDate:r[5], shift:r[6]})); db.crmOrders=(res.crmOrders||[]).map(r=>({id:r[0], created:r[1], branch:r[2], customer:r[3], phone:r[4], address:r[5], items:r[6], total:Number(r[7]||0), notes:r[8], status:r[9], by:r[10], branchStatus:r[11]||'مرسل', updatedAt:r[12]||'', branchNote:r[13]||''})); }
+let rawData=null, db={products:[],users:[],stock:[],sales:[],crmOrders:[],qrOrders:[]}, currentUser=null, currentCat='الكل', cart=[], pendingProduct=null, stockUpdates=[];
+const money=n=>(Number(n||0)).toFixed(2); const toast=msg=>{ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }; const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); const isWeight=p=>String(p.type||'').trim()==='كيلو';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycby1C3yrXjVtlfNOq6SCrJpAy9El5IE0TxLppWW1Xh0Vp8geX9t08nXsoKKa172cf2694g/exec';
+function getScriptUrl(){ return String(SCRIPT_URL||'').trim(); }
+function jsonp(action, params={}){ return new Promise((resolve,reject)=>{ const base=getScriptUrl(); if(!base||base.includes('PASTE_YOUR')) return reject(new Error('ضع رابط Apps Script داخل SCRIPT_URL')); const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*1000); window[cb]=data=>{ try{ delete window[cb]; script.remove(); if(data && data.ok===false) reject(new Error(data.error||'فشل')); else resolve(data); }catch(e){reject(e);} }; const qs=new URLSearchParams({action, callback:cb, ...params}); const script=document.createElement('script'); script.src=base+(base.includes('?')?'&':'?')+qs.toString(); script.onerror=()=>{ try{ delete window[cb]; }catch(e){} reject(new Error('فشل الاتصال بالسكربت')); }; document.body.appendChild(script); }); }
+function postForm(action, payload={}){ return new Promise((resolve,reject)=>{ const base=getScriptUrl(); if(!base||base.includes('PASTE_YOUR')) return reject(new Error('ضع رابط Apps Script داخل SCRIPT_URL')); const iframe=document.createElement('iframe'); const frame='frm_'+Date.now(); iframe.name=frame; iframe.style.display='none'; document.body.appendChild(iframe); const form=document.createElement('form'); form.method='POST'; form.action=base; form.target=frame; form.style.display='none'; const input=document.createElement('input'); input.name='payload'; input.value=JSON.stringify({action,...payload}); form.appendChild(input); document.body.appendChild(form); let done=false; const finish=()=>{ if(done) return; done=true; setTimeout(()=>{ form.remove(); iframe.remove(); resolve({ok:true}); },200); }; iframe.onload=()=>setTimeout(finish,300); form.submit(); setTimeout(finish,1400); }); }
+function normalizeData(res){ rawData=res; db.products=(res.products||[]).map(r=>({name:r[0],cat:r[1],price:Number(r[2]||0),type:r[3]||'قطعة'})); db.users=res.users||[]; db.stock=(res.stock||[]).map(r=>({branch:r[0],item:r[1],qty:Number(r[2]||0)})); db.sales=(res.sales||[]).map(r=>({date:r[0],branch:r[1],details:r[2],total:Number(r[3]||0),invoice:r[4],isoDate:r[5],shift:r[6]})); db.crmOrders=(res.crmOrders||[]).map(r=>({id:r[0],created:r[1],branch:r[2],customer:r[3],phone:r[4],address:r[5],items:r[6],total:Number(r[7]||0),notes:r[8],status:r[9],by:r[10],branchStatus:r[11]||'مرسل',updatedAt:r[12]||'',branchNote:r[13]||''})); db.qrOrders=(res.qrOrders||[]).map(r=>({code:r[0],date:r[1],by:r[2],branch:r[3],items:r[4],total:Number(r[5]||0),discount:Number(r[6]||0),delivery:Number(r[7]||0),status:r[8],cashier:r[9],closedAt:r[10]})); }
+function portalTypeToPointType(v){ return ({salesAgent:'مندوب بيع',branchSupervisor:'مشرف فرع',crm:'خدمة العملاء',cashier:'كاشير',delivery:'الدليفري',admin:'إدارة'})[v] || ''; }
+function onPortalChange(){ const role=document.getElementById('rolePortal').value; const needUser=(role==='crm'||role==='admin'); document.getElementById('userWrap').classList.toggle('hidden',!needUser); document.getElementById('branchWrap').classList.toggle('hidden',needUser); fillBranches(); }
+function fillBranches(){ const sel=document.getElementById('branchSelect'); const role=document.getElementById('rolePortal')?document.getElementById('rolePortal').value:''; let users=db.users; if(role==='salesAgent') users=db.users.filter(u=>u.pointType==='مندوب بيع'); else if(role==='branchSupervisor') users=db.users.filter(u=>u.pointType==='مشرف فرع'); else if(role==='cashier') users=db.users.filter(u=>u.pointType==='كاشير'); else if(role==='delivery') users=db.users.filter(u=>u.pointType==='الدليفري'); else users=db.users.filter(u=>['مندوب بيع','مشرف فرع','كاشير','الدليفري'].includes(u.pointType)); sel.innerHTML='<option value="">اختر الفرع</option>'+users.map(u=>`<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join(''); const crmSel=document.getElementById('crmBranchSelect'); if(crmSel){ const branches=db.users.filter(u=>['مندوب بيع','مشرف فرع','كاشير','الدليفري'].includes(u.pointType)); crmSel.innerHTML='<option value="">اختر الفرع</option>'+branches.map(u=>`<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join(''); } }
 async function boot(){ try{ const res=await jsonp('getInitialData'); normalizeData(res); fillBranches(); setLoginMsg('تم تحميل البيانات'); restoreSession(); }catch(err){ document.getElementById('branchSelect').innerHTML='<option value="">فشل تحميل البيانات</option>'; setLoginMsg(err.message); } }
-function fillBranches(){ const sel=document.getElementById('branchSelect'); sel.innerHTML='<option value="">اختر الفرع أو المستخدم</option>'+db.users.map(u=>`<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join(''); const crmSel=document.getElementById('crmBranchSelect'); if(crmSel){ const branches=db.users.filter(u=>u.pointType==='فرع'); crmSel.innerHTML='<option value="">اختر الفرع</option>'+branches.map(u=>`<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join(''); } }
+function setLoginMsg(m){ document.getElementById('loginMsg').textContent = m || ''; }
 function hasPerm(p){ return currentUser && Array.isArray(currentUser.permissions) && currentUser.permissions.includes(p); }
-function login(){ const branch=document.getElementById('branchSelect').value; const pass=document.getElementById('passInput').value; const user=db.users.find(u=>u.branch===branch&&(u.pass===pass||u.superPass===pass)); if(!user) return toast('بيانات الدخول غير صحيحة'); currentUser=user; localStorage.setItem('SOKAR_USER',JSON.stringify(user)); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('whoami').textContent=`${user.branch} - ${user.pointType}`; buildTabs(); if(user.pointType==='خدمة العملاء') showSection('crm'); else showSection('pos'); renderAll(); }
+function login(){ const role=document.getElementById('rolePortal').value; const branch=document.getElementById('branchSelect').value; const username=document.getElementById('userInput').value.trim(); const pass=document.getElementById('passInput').value; const expected=portalTypeToPointType(role); let user=null; if(role==='crm'||role==='admin'){ user=db.users.find(u=>u.pointType===expected && u.branch===username && (u.pass===pass||u.superPass===pass)); } else { user=db.users.find(u=>u.pointType===expected && u.branch===branch && (u.pass===pass||u.superPass===pass)); } if(!user) return toast('بيانات الدخول غير صحيحة'); currentUser=user; currentUser.portalRole=role; localStorage.setItem('SOKAR_USER',JSON.stringify(user)); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('whoami').textContent=`${user.branch} - ${user.pointType}`; buildTabs(); if(user.pointType==='خدمة العملاء') showSection('crm'); else showSection('pos'); renderAll(); }
 function restoreSession(){ try{ const u=JSON.parse(localStorage.getItem('SOKAR_USER')||'null'); if(!u) return; currentUser=u; document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('whoami').textContent=`${u.branch} - ${u.pointType}`; buildTabs(); if(u.pointType==='خدمة العملاء') showSection('crm'); else showSection('pos'); renderAll(); }catch(e){} }
 function logout(){ currentUser=null; localStorage.removeItem('SOKAR_USER'); document.getElementById('app').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
-function buildTabs(){ const tabs=[]; const pt=String((currentUser&&currentUser.pointType)||'').trim(); if(pt==='فرع'){ tabs.push(['pos','البيع']); tabs.push(['reports','التقارير']); } else if(pt==='خدمة العملاء'){ tabs.push(['crm','خدمة العملاء']); tabs.push(['products','المنتجات']); } else if(pt==='إدارة'){ tabs.push(['pos','البيع']); tabs.push(['crm','خدمة العملاء']); tabs.push(['stock','المخزون']); tabs.push(['products','المنتجات']); tabs.push(['users','المستخدمون']); tabs.push(['reports','التقارير']); } document.getElementById('tabs').innerHTML=tabs.map(([id,label])=>`<button class="tab" id="tab-${id}" onclick="showSection('${id}')">${label}</button>`).join(''); }
-function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById('sec-'+id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); const tab=document.getElementById('tab-'+id); if(tab) tab.classList.add('active'); if(id==='stock') renderStock(); if(id==='reports') renderSales(); if(id==='crm') renderCrmTable(); }
+function buildTabs(){ const tabs=[]; const pt=String((currentUser&&currentUser.pointType)||'').trim(); if(pt==='مندوب بيع'){ tabs.push(['pos','اختيار المنتجات']); } else if(pt==='كاشير'){ tabs.push(['pos','الكاشير']); tabs.push(['reports','التقارير']); } else if(pt==='مشرف فرع'){ tabs.push(['pos','البيع']); tabs.push(['stock','المخزون']); tabs.push(['reports','التقارير']); } else if(pt==='الدليفري'){ tabs.push(['crm','الطلبات']); tabs.push(['reports','التقارير']); } else if(pt==='خدمة العملاء'){ tabs.push(['crm','خدمة العملاء']); tabs.push(['products','المنتجات']); } else if(pt==='إدارة'){ tabs.push(['pos','البيع']); tabs.push(['crm','خدمة العملاء']); tabs.push(['stock','المخزون']); tabs.push(['products','المنتجات']); tabs.push(['users','المستخدمون']); tabs.push(['reports','التقارير']); } document.getElementById('tabs').innerHTML=tabs.map(([id,label])=>`<button class="tab" id="tab-${id}" onclick="showSection('${id}')">${label}</button>`).join(''); const cashierBox=document.getElementById('cashierScanBox'); if(cashierBox) cashierBox.classList.toggle('hidden', !(pt==='كاشير'||pt==='إدارة')); }
+function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); const sec=document.getElementById('sec-'+id); if(sec) sec.classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); const tab=document.getElementById('tab-'+id); if(tab) tab.classList.add('active'); if(id==='stock') renderStock(); if(id==='reports') renderSales(); if(id==='crm') renderCrmTable(); }
 function renderAll(){ renderCats(); renderProducts(); renderCart(); renderProductsTable(); renderUsersTable(); renderCrmTable(); renderSales(); }
 function renderCats(){ const cats=['الكل',...new Set(db.products.map(p=>p.cat).filter(Boolean))]; document.getElementById('catsList').innerHTML=cats.map(c=>`<div class="cat ${c===currentCat?'active':''}" onclick="currentCat='${esc(c)}';renderCats();renderProducts()"><span>${esc(c)}</span><span>‹</span></div>`).join(''); }
 function stockFor(item){ const branch=currentUser?currentUser.branch:''; const row=db.stock.find(s=>s.branch===branch&&s.item===item); return row?Number(row.qty||0):0; }
 function renderProducts(){ const q=document.getElementById('searchInput').value.trim(); let rows=[...db.products]; if(currentCat!=='الكل') rows=rows.filter(p=>p.cat===currentCat); if(q) rows=rows.filter(p=>p.name.includes(q)||p.cat.includes(q)); document.getElementById('productsGrid').innerHTML=rows.map(p=>`<div class="product" onclick="askQty('${esc(p.name)}')"><div class="name">${esc(p.name)}</div><div class="meta">${money(p.price)} ج${isWeight(p)?' / كجم':''}</div><div class="meta">متوفر: ${stockFor(p.name)}</div></div>`).join('')||'<div class="small">لا توجد منتجات</div>'; }
 function askQty(name){ const p=db.products.find(x=>x.name===name); if(!p) return; pendingProduct=p; document.getElementById('qtyTitle').textContent=isWeight(p)?`أدخل الوزن بالجرام - ${p.name}`:`أدخل الكمية - ${p.name}`; document.getElementById('qtyInput').value=isWeight(p)?1000:1; document.getElementById('qtyInput').step=isWeight(p)?50:1; document.getElementById('qtyInput').min=isWeight(p)?50:1; document.getElementById('qtyHint').textContent=isWeight(p)?'مثال: 100 أو 250 أو 500 أو 1000 جرام':'مثال: 1 أو 2 أو 3'; document.getElementById('qtyModal').style.display='flex'; }
 function closeQty(){ document.getElementById('qtyModal').style.display='none'; pendingProduct=null; }
-function confirmQty(){ const editIdx=document.getElementById('qtyModal').dataset.editIndex; const qty=Number(document.getElementById('qtyInput').value||0); if(qty<=0) return; if(editIdx!==''){ const item=cart[Number(editIdx)]; if(item){ const chargeQty=isWeight(item)?qty/1000:qty; item.qty=qty; item.chargeQty=chargeQty; item.total=chargeQty*item.price; } document.getElementById('qtyModal').dataset.editIndex=''; closeQty(); renderCart(); return; } if(!pendingProduct) return; const chargeQty=isWeight(pendingProduct)?qty/1000:qty; const ex=cart.find(i=>i.name===pendingProduct.name); if(ex){ ex.qty+=qty; ex.chargeQty+=chargeQty; ex.total=ex.chargeQty*ex.price; } else cart.push({name:pendingProduct.name,type:pendingProduct.type,price:pendingProduct.price,qty,chargeQty,total:pendingProduct.price*chargeQty}); closeQty(); renderCart(); }
-document.getElementById('qtyModal').dataset.editIndex=''; document.getElementById('qtyModal').addEventListener('click',e=>{ if(e.target.id==='qtyModal') closeQty(); });
+function confirmQty(){ const qty=Number(document.getElementById('qtyInput').value||0); if(!pendingProduct||qty<=0) return; const chargeQty=isWeight(pendingProduct)?qty/1000:qty; const ex=cart.find(i=>i.name===pendingProduct.name); if(ex){ ex.qty+=qty; ex.chargeQty+=chargeQty; ex.total=ex.chargeQty*ex.price; } else cart.push({name:pendingProduct.name,type:pendingProduct.type,price:pendingProduct.price,qty,chargeQty,total:pendingProduct.price*chargeQty}); closeQty(); renderCart(); }
+document.getElementById('qtyModal').addEventListener('click',e=>{ if(e.target.id==='qtyModal') closeQty(); });
 function qtyText(i){ return isWeight(i)?`${i.qty} جم`:`${i.qty}`; }
 function cartSubtotal(){ return cart.reduce((a,b)=>a+Number(b.total||0),0); }
 function cartNet(){ return Math.max(0, cartSubtotal()+Number(document.getElementById('deliveryFee').value||0)-Number(document.getElementById('discountVal').value||0)); }
 function renderCart(){ const box=document.getElementById('cartList'); if(!cart.length) box.innerHTML='<div class="small" style="padding:16px">السلة فارغة</div>'; else box.innerHTML=cart.map((i,idx)=>`<div class="cart-row"><div><div><strong>${esc(i.name)}</strong></div><div class="small">${qtyText(i)}</div></div><div style="text-align:left"><div><strong>${money(i.total)} ج</strong></div><div class="small"><a href="#" onclick="editCart(${idx});return false;">تعديل</a> | <a href="#" onclick="delCart(${idx});return false;">حذف</a></div></div></div>`).join(''); document.getElementById('subTotal').textContent=money(cartSubtotal()); document.getElementById('netTotal').textContent=money(cartNet()); document.getElementById('grandTotal').textContent=money(cartNet())+' ج.م'; }
-function editCart(idx){ const item=cart[idx]; if(!item) return; pendingProduct=db.products.find(p=>p.name===item.name)||item; document.getElementById('qtyTitle').textContent=`تعديل - ${item.name}`; document.getElementById('qtyInput').value=item.qty; document.getElementById('qtyInput').step=isWeight(item)?50:1; document.getElementById('qtyInput').min=isWeight(item)?50:1; document.getElementById('qtyHint').textContent=isWeight(item)?'الكمية بالجرام':'الكمية بالعدد'; document.getElementById('qtyModal').dataset.editIndex=idx; document.getElementById('qtyModal').style.display='flex'; }
+function editCart(idx){ const item=cart[idx]; if(!item) return; pendingProduct=db.products.find(p=>p.name===item.name)||item; document.getElementById('qtyTitle').textContent=`تعديل - ${item.name}`; document.getElementById('qtyInput').value=item.qty; document.getElementById('qtyInput').step=isWeight(item)?50:1; document.getElementById('qtyInput').min=isWeight(item)?50:1; document.getElementById('qtyHint').textContent=isWeight(item)?'الكمية بالجرام':'الكمية بالعدد'; document.getElementById('qtyModal').style.display='flex'; document.getElementById('qtyModal').dataset.editIndex=idx; }
 function delCart(idx){ cart.splice(idx,1); renderCart(); }
 function clearCart(){ cart=[]; renderCart(); }
 function newSale(){ cart=[]; document.getElementById('deliveryFee').value=0; document.getElementById('discountVal').value=0; renderCart(); }
-async function submitOrder(){ if(!currentUser) return; if(!cart.length) return toast('السلة فارغة'); const now=new Date(); const order={date:now.toLocaleDateString('ar-EG'),branch:currentUser.branch,details:cart.map(i=>`${i.name}(${i.qty})`).join(' + '),total:cartNet(),invoice:'INV-'+Date.now().toString().slice(-6),isoDate:now.toISOString(),shift:now.getHours()<16?'صباحية':'مسائية'}; try{ await postForm('saveOrder',{order}); toast('تم حفظ الفاتورة'); await refreshData(); newSale(); }catch(err){ toast(err.message); } }
-function loadCrmCartToForm(){ if(!cart.length) return toast('السلة فارغة'); document.getElementById('crmItems').value=cart.map(i=>`${i.name}(${i.qty})`).join(' + '); document.getElementById('crmTotal').value=money(cartNet()); showSection('crm'); }
+async function submitOrder(){ if(!currentUser) return; if(!cart.length) return toast('السلة فارغة'); const now=new Date(); const order={date:now.toLocaleDateString('ar-EG'),branch:currentUser.branch,details:cart.map(i=>`${i.name}(${i.qty})`).join(' + '),total:cartNet(),invoice:'INV-'+Date.now().toString().slice(-6),isoDate:now.toISOString(),shift:now.getHours()<16?'صباحية':'مسائية'}; if(currentUser.pointType==='مندوب بيع'){ const res=await postForm('saveQrOrder',{order:{by:'مندوب بيع',branch:currentUser.branch,items:order.details,total:order.total,discount:Number(document.getElementById('discountVal').value||0),delivery:Number(document.getElementById('deliveryFee').value||0)}}); document.getElementById('qrPreview').textContent='QR CODE: '+res.code; document.getElementById('qrCodeText').value=res.code; document.getElementById('qrSaleBox').classList.remove('hidden'); toast('تم إنشاء QR'); return; } try{ await postForm('saveOrder',{order}); toast('تم حفظ الفاتورة'); await refreshData(); newSale(); }catch(err){ toast(err.message); } }
+function hideQrBox(){ document.getElementById('qrSaleBox').classList.add('hidden'); }
+async function loadQrOrder(){ const code=document.getElementById('cashierQrInput').value.trim(); if(!code) return toast('أدخل كود الطلب'); try{ const res=await jsonp('getQrOrder',{code}); if(!res.ok) return toast(res.error||'غير موجود'); const o=res.order; cart=[]; String(o.items||'').split(' + ').forEach(part=>{ const m=String(part).match(/^(.*)\(([\d.]+)\)$/); if(!m) return; const p=db.products.find(x=>x.name.trim()===String(m[1]).trim()); if(!p) return; const qty=Number(m[2]||0); const chargeQty=isWeight(p)?qty/1000:qty; cart.push({name:p.name,type:p.type,price:p.price,qty,chargeQty,total:p.price*chargeQty}); }); document.getElementById('deliveryFee').value=o.delivery||0; document.getElementById('discountVal').value=o.discount||0; renderCart(); toast('تم تحميل الطلب'); }catch(err){ toast(err.message); } }
 async function saveCrm(){ const order={branch:document.getElementById('crmBranchSelect').value,customer:document.getElementById('crmCustomer').value,phone:document.getElementById('crmPhone').value,address:document.getElementById('crmAddress').value,items:document.getElementById('crmItems').value,total:Number(document.getElementById('crmTotal').value||0),notes:document.getElementById('crmNotes').value,createdBy:currentUser?currentUser.branch:'خدمة العملاء'}; if(!order.branch) return toast('اختر الفرع أولاً'); try{ await postForm('saveCrmOrder',{order}); toast('تم إرسال الأوردر إلى الفرع'); await refreshData(); }catch(err){ toast(err.message); } }
-function renderCrmTable(){ let rows=db.crmOrders; const pt=String((currentUser&&currentUser.pointType)||'').trim(); if(pt==='خدمة العملاء'){ rows=db.crmOrders; } else if(pt==='فرع'){ rows=db.crmOrders.filter(r=>r.branch===currentUser.branch); } document.getElementById('crmTable').innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer)}</td><td>${money(r.total)}</td><td>${esc(r.branchStatus||r.status)}</td><td>${pt==='فرع'?`<button class="btn btn-light" onclick="acceptCrm('${esc(r.id)}')">استلام</button>`:`<button class="btn btn-light" onclick="markCrm('${esc(r.id)}')">تحديث</button>`}</td></tr>`).join(''); }
+function renderCrmTable(){ let rows=db.crmOrders; const pt=String((currentUser&&currentUser.pointType)||'').trim(); if(pt==='خدمة العملاء'){ rows=db.crmOrders; } else if(pt==='مشرف فرع' || pt==='كاشير' || pt==='مندوب بيع'){ rows=db.crmOrders.filter(r=>r.branch===currentUser.branch); } else if(pt==='الدليفري'){ rows=db.crmOrders; } document.getElementById('crmTable').innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer)}</td><td>${money(r.total)}</td><td>${esc(r.branchStatus||r.status)}</td><td>${pt==='مشرف فرع'||pt==='كاشير'||pt==='الدليفري'?`<button class="btn btn-light" onclick="acceptCrm('${esc(r.id)}')">استلام</button>`:`<button class="btn btn-light" onclick="markCrm('${esc(r.id)}')">تحديث</button>`}</td></tr>`).join(''); }
 async function markCrm(id){ const status=prompt('اكتب الحالة الجديدة','جاري التجهيز'); if(!status) return; try{ await postForm('updateCrmOrderStatus',{id,status,by:currentUser?currentUser.branch:''}); await refreshData(); }catch(err){ toast(err.message); } }
-async function acceptCrm(id){ try{ await postForm('acceptCrmOrder',{id,branch:currentUser?currentUser.branch:'',by:currentUser?currentUser.branch:''}); toast('تم استلام الأوردر من الفرع وتم إخطار خدمة العملاء'); await refreshData(); }catch(err){ toast(err.message); } }
+async function acceptCrm(id){ try{ await postForm('acceptCrmOrder',{id,branch:currentUser?currentUser.branch:'',by:currentUser?currentUser.branch:''}); toast('تم استلام الأوردر'); await refreshData(); }catch(err){ toast(err.message); } }
 function renderStock(){ document.getElementById('stockBranch').textContent=currentUser?currentUser.branch:''; const rows=db.products.map(p=>({name:p.name,qty:stockFor(p.name)})); document.getElementById('stockTable').innerHTML=rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.qty}</td><td><input type="number" min="0" step="0.01" onchange="setStockUpdate('${esc(r.name)}',this.value)"></td></tr>`).join(''); }
 function setStockUpdate(name,val){ const qty=Number(val||0); stockUpdates=stockUpdates.filter(x=>x.item!==name); if(qty>0) stockUpdates.push({item:name,qty}); }
 async function saveStockUpdates(){ if(!currentUser) return; if(!stockUpdates.length) return toast('لا توجد تحديثات'); try{ await postForm('bulkStockUpdate',{branch:currentUser.branch,updates:stockUpdates}); stockUpdates=[]; toast('تم تحديث المخزون'); await refreshData(); }catch(err){ toast(err.message); } }
@@ -248,7 +109,7 @@ async function saveProduct(mode){ const product={oldName:document.getElementById
 function renderUsersTable(){ document.getElementById('usersTable').innerHTML=db.users.map(u=>`<tr><td>${esc(u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc((u.permissions||[]).join(','))}</td></tr>`).join(''); }
 async function saveUser(mode){ const user={branch:document.getElementById('userBranch').value,pass:document.getElementById('userPass').value,superPass:document.getElementById('userSuperPass').value,pointType:document.getElementById('userPointType').value,permissions:document.getElementById('userPerms').value}; try{ await postForm('manageUser',{mode,user}); toast('تم حفظ المستخدم'); await refreshData(); }catch(err){ toast(err.message); } }
 async function deleteUserRow(){ const branch=document.getElementById('userBranch').value; if(!branch) return toast('اكتب الفرع أولاً'); try{ await postForm('deleteUser',{branch}); toast('تم حذف المستخدم'); await refreshData(); }catch(err){ toast(err.message); } }
-function renderSales(){ const rows=currentUser?db.sales.filter(s=>currentUser.pointType==='إدارة'?true:s.branch===currentUser.branch):db.sales; document.getElementById('salesTable').innerHTML=rows.slice().reverse().map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.branch)}</td><td>${esc(r.details)}</td><td>${money(r.total)}</td><td>${esc(r.invoice)}</td></tr>`).join(''); if(currentUser&&currentUser.pointType==='فرع'){ const btn=document.querySelector('#sec-stock .btn-success'); if(btn) btn.style.display='inline-block'; } }
+function renderSales(){ const rows=currentUser?db.sales.filter(s=>currentUser.pointType==='إدارة'?true:s.branch===currentUser.branch):db.sales; document.getElementById('salesTable').innerHTML=rows.slice().reverse().map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.branch)}</td><td>${esc(r.details)}</td><td>${money(r.total)}</td><td>${esc(r.invoice)}</td></tr>`).join(''); }
 async function exportSales(){ try{ const res=await jsonp('exportSales',{branch:currentUser?currentUser.branch:'الكل',date:document.getElementById('repDate').value,shift:document.getElementById('repShift').value}); if(res.url) window.open(res.url,'_blank'); }catch(err){ toast(err.message); } }
 async function exportStock(){ try{ const res=await jsonp('exportStock',{branch:currentUser?currentUser.branch:'الكل'}); if(res.url) window.open(res.url,'_blank'); }catch(err){ toast(err.message); } }
 async function refreshData(){ try{ const res=await jsonp('getInitialData'); normalizeData(res); fillBranches(); renderAll(); toast('تمت المزامنة'); }catch(err){ toast(err.message); } }
