@@ -3,8 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>سكّر 33 · نظام مبيعات احترافي + CRM</title>
+  <title>سكّر 33 · نظام مبيعات متكامل</title>
+  
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  
+  <!-- HTML5 QR Scanner -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+
   <style>
     :root {
       --primary: #b81b5c;
@@ -29,98 +38,119 @@
     body { background: var(--bg); color: var(--text); line-height: 1.5; }
     button, input, select, textarea { font-size: 1rem; border-radius: 14px; }
     button { cursor: pointer; background: none; border: none; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); }
-    input, select, textarea { border: 1.5px solid var(--border); padding: 12px 16px; background: var(--surface); outline: none; transition: var(--transition); width: 100%; }
+    input, select, textarea { border: 1.5px solid var(--border); padding: 12px 16px; background: var(--surface); outline: none; width: 100%; }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(184, 27, 92, 0.08); }
 
     .app-wrapper { display: flex; min-height: 100vh; }
+    
+    /* Sidebar */
     .sidebar { width: 280px; background: var(--surface); border-left: 1px solid var(--border); padding: 24px 12px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; box-shadow: var(--shadow); }
     .logo-area { padding: 8px 16px 24px; text-align: center; border-bottom: 2px solid var(--primary-soft); }
     .logo-icon { font-size: 40px; color: var(--primary); }
-    .logo-text { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--primary), #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo-text { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--primary), #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .nav-menu { flex: 1; margin: 20px 0; }
-    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin: 6px 0; border-radius: 18px; color: var(--text-muted); font-weight: 600; transition: var(--transition); cursor:pointer; width:100%; text-align:right; }
+    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin: 6px 0; border-radius: 18px; color: var(--text-muted); font-weight: 600; cursor: pointer; width: 100%; text-align: right; transition: var(--transition); }
     .nav-item i { width: 24px; font-size: 1.3rem; }
     .nav-item:hover { background: var(--primary-soft); color: var(--primary); }
     .nav-item.active { background: var(--primary); color: white; box-shadow: 0 8px 14px -6px rgba(184, 27, 92, 0.3); }
     .user-badge { margin-top: auto; background: var(--blue-soft); padding: 16px; border-radius: 22px; }
-    .user-badge i { color: var(--blue); margin-left: 8px; }
-    .logout-btn { width:100%; margin-top:10px; background:#fff; border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:14px; }
-    .logout-btn:hover { background:#f7f1f4; }
+    .logout-btn { width: 100%; margin-top: 10px; background: #fff; border: 1px solid var(--border); padding: 10px 14px; border-radius: 14px; }
 
+    /* Main Content */
     .main-content { flex: 1; padding: 24px 32px; max-width: calc(100% - 280px); }
-    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; gap:12px; flex-wrap:wrap; }
-    .page-title { font-size: 28px; font-weight: 700; color: #2c1b24; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; gap: 12px; flex-wrap: wrap; }
+    .page-title { font-size: 28px; font-weight: 700; color: #2c1b24; display: flex; align-items: center; gap: 10px; }
     .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-    .btn { padding: 12px 24px; border-radius: 40px; font-weight: 700; box-shadow: var(--shadow); border: 1px solid transparent; }
+    .btn { padding: 12px 24px; border-radius: 40px; font-weight: 700; box-shadow: var(--shadow); border: 1px solid transparent; transition: var(--transition); }
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:hover { background: #9f1650; transform: scale(0.98); }
     .btn-accent { background: var(--accent); color: white; }
     .btn-outline { background: white; border-color: var(--border); color: var(--text); }
     .btn-outline:hover { background: #f5f0f2; }
+    .btn-danger { background: #d32f2f; color: white; }
     .btn-icon { padding: 12px 16px; }
 
+    /* Cards & Grid */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     .grid-3 { display: grid; grid-template-columns: 300px 1fr 320px; gap: 20px; }
     .card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 700; font-size: 1.2rem; gap:12px; flex-wrap:wrap; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 700; font-size: 1.2rem; gap: 12px; flex-wrap: wrap; }
 
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; padding: 4px; }
+    /* Products Grid */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; padding: 4px; }
     .product-card { background: #fdfbfc; border: 1px solid var(--border); border-radius: 20px; padding: 16px 8px; text-align: center; cursor: pointer; transition: var(--transition); }
     .product-card:hover { background: var(--primary-soft); border-color: var(--primary); transform: translateY(-3px); }
-    .product-name { font-weight: 700; margin-bottom: 6px; }
+    .product-name { font-weight: 700; margin-bottom: 6px; font-size: 0.95rem; }
     .product-meta { font-size: 0.8rem; color: var(--text-muted); }
-    .stock-badge { background: #e8f0fe; padding: 2px 8px; border-radius: 30px; font-size: 0.75rem; display:inline-block; margin-top:6px; }
+    .stock-badge { background: #e8f0fe; padding: 2px 8px; border-radius: 30px; font-size: 0.75rem; display: inline-block; margin-top: 6px; }
 
+    /* Cart */
     .cart-items { max-height: 340px; overflow-y: auto; }
-    .cart-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--border); gap:10px; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); gap: 10px; }
+    .cart-row-actions { display: flex; gap: 8px; }
     .total-section { border-top: 2px solid var(--border); margin-top: 12px; padding-top: 16px; }
     .pill { background: var(--accent-soft); color: #0b5e38; padding: 8px 18px; border-radius: 40px; font-weight: 700; }
 
+    /* Tables */
     .table-wrapper { overflow-x: auto; border-radius: 20px; }
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: right; padding: 14px 12px; background: #f5edf1; color: #441c2e; font-weight: 700; }
+    th { text-align: right; padding: 14px 12px; background: #f5edf1; color: #441c2e; font-weight: 700; white-space: nowrap; }
     td { padding: 14px 12px; border-bottom: 1px solid var(--border); }
-
-    .badge { background: #e4e7eb; padding: 6px 12px; border-radius: 30px; font-size: 0.8rem; display:inline-block; }
+    .badge { background: #e4e7eb; padding: 6px 12px; border-radius: 30px; font-size: 0.8rem; display: inline-block; cursor: pointer; }
     .badge-success { background: #d1fae5; color: #065f46; }
 
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 999; }
-    .modal-card { background: white; width: 420px; max-width: 94%; border-radius: 32px; padding: 28px; box-shadow: 0 30px 50px rgba(0,0,0,0.2); }
+    /* Modals */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
+    .modal-card { background: white; width: 450px; max-width: 94%; border-radius: 32px; padding: 28px; box-shadow: 0 30px 50px rgba(0,0,0,0.2); }
     .toast { position: fixed; bottom: 24px; left: 24px; background: #1e1e2a; color: white; padding: 14px 28px; border-radius: 60px; font-weight: 500; z-index: 9999; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
     .hidden { display: none !important; }
     .section { display: none; }
     .section.active { display: block; }
 
+    /* Scanner */
+    #qrScannerContainer { width: 100%; max-width: 400px; margin: 0 auto; border-radius: 20px; overflow: hidden; }
+    #qrReader { width: 100%; }
+
+    /* Responsive */
     @media (max-width: 1000px) {
       .sidebar { width: 90px; padding: 16px 6px; }
       .sidebar .logo-text, .sidebar .nav-item span, .user-badge span { display: none; }
       .nav-item { justify-content: center; }
       .main-content { max-width: calc(100% - 90px); padding: 16px; }
       .grid-3, .grid-2 { grid-template-columns: 1fr; }
-      .logout-btn { padding:10px; }
     }
   </style>
 </head>
 <body>
 <div class="app-wrapper">
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="logo-area">
       <i class="fas fa-candy-cane logo-icon"></i>
       <div class="logo-text">سكّر 33</div>
-      <div style="font-size: 12px; color: var(--text-muted);">نظام احترافي</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">نظام احترافي</div>
     </div>
     <div class="nav-menu" id="navMenu"></div>
-    <div class="user-badge" id="userBadge">
-      <div><i class="fas fa-user-circle"></i> <span id="whoami">زائر</span></div>
+    <div class="user-badge">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <i class="fas fa-user-circle" style="font-size: 24px;"></i>
+        <span id="whoami" style="font-weight: 700;">زائر</span>
+      </div>
+      <div id="shiftStatus" style="font-size: 13px; margin-bottom: 8px;"></div>
       <button class="logout-btn hidden" id="logoutBtn" onclick="logout()"><i class="fas fa-right-from-bracket"></i><span>تسجيل خروج</span></button>
     </div>
   </div>
 
+  <!-- Main Content -->
   <div class="main-content">
+    <!-- Login Screen -->
     <div id="loginScreen" style="max-width:500px; margin: 80px auto;">
       <div class="card" style="padding: 32px;">
-        <div style="text-align:center; margin-bottom:30px;"><i class="fas fa-lock" style="font-size:48px; color:var(--primary);"></i><h2 style="margin:12px 0">تسجيل الدخول</h2></div>
+        <div style="text-align:center; margin-bottom:30px;">
+          <i class="fas fa-lock" style="font-size:48px; color:var(--primary);"></i>
+          <h2 style="margin:12px 0">تسجيل الدخول</h2>
+        </div>
         <div style="margin-bottom:20px">
           <label>الفرع / المستخدم</label>
           <select id="branchSelect" style="margin-top:6px;"><option>جاري التحميل...</option></select>
@@ -134,142 +164,157 @@
       </div>
     </div>
 
+    <!-- App Sections -->
     <div id="appSections" class="hidden">
-      <div id="sec-pos" class="section active">
-        <div class="top-bar">
-          <div class="page-title"><i class="fas fa-cash-register" style="margin-left:10px; color:var(--primary);"></i>نقطة البيع</div>
-          <div class="action-buttons">
-            <button class="btn btn-outline" onclick="newSale()"><i class="fas fa-plus-circle"></i> فاتورة جديدة</button>
-            <button class="btn btn-accent" onclick="loadCrmCartToForm()"><i class="fas fa-headset"></i> تحويل لـ CRM</button>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="card">
-            <div class="card-header"><span><i class="fas fa-shopping-basket"></i> السلة</span> <span class="pill">نقدي</span></div>
-            <div id="cartList" class="cart-items"></div>
-            <div class="total-section">
-              <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <div style="flex:1"><label>توصيل</label><input id="deliveryFee" type="number" value="0" min="0" step="0.5" oninput="renderCart()"></div>
-                <div style="flex:1"><label>خصم</label><input id="discountVal" type="number" value="0" min="0" step="0.5" oninput="renderCart()"></div>
-              </div>
-              <div style="display:flex; justify-content:space-between; margin: 10px 0;"><span>المجموع الفرعي</span><span id="subTotal">0</span></div>
-              <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:800;"><span>الإجمالي</span><span id="grandTotal">0 ج.م</span></div>
-              <div style="display:flex; gap:8px; margin-top:20px;">
-                <button class="btn btn-outline" style="flex:1" onclick="clearCart()"><i class="fas fa-trash"></i> مسح</button>
-                <button class="btn btn-primary" style="flex:2" onclick="submitOrder()"><i class="fas fa-check-circle"></i> إتمام الدفع</button>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><span><i class="fas fa-cubes"></i> المنتجات</span>
-              <input type="text" id="searchInput" placeholder="🔍 بحث..." style="width:180px; padding:8px;" oninput="renderProducts()">
-            </div>
-            <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;" id="catsList"></div>
-            <div id="productsGrid" class="product-grid"></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><i class="fas fa-chart-simple"></i> ملخص سريع</div>
-            <div style="text-align:center; padding:12px;"><span id="quickStats">اختر منتجات</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="sec-crm" class="section">
-        <div class="top-bar"><div class="page-title"><i class="fas fa-users"></i> خدمة العملاء CRM</div></div>
-        <div class="grid-2">
-          <div class="card">
-            <h3 style="margin-bottom:20px;"><i class="fas fa-pen"></i> طلب جديد / تعديل</h3>
-            <div style="display:grid; gap:12px;">
-              <input id="crmCustomer" placeholder="اسم العميل">
-              <input id="crmPhone" placeholder="الهاتف">
-              <textarea id="crmAddress" placeholder="العنوان" rows="2"></textarea>
-              <textarea id="crmItems" placeholder="الأصناف: جاتوه(1) + تورتة(1)" rows="2"></textarea>
-              <select id="crmBranchSelect"><option>اختر الفرع</option></select>
-              <div style="display:flex; gap:8px;"><input id="crmTotal" type="number" placeholder="الإجمالي" step="0.5"><input id="crmNotes" placeholder="ملاحظات"></div>
-              <button class="btn btn-primary" onclick="saveCrm()"><i class="fas fa-paper-plane"></i> إرسال للفرع</button>
-            </div>
-          </div>
-          <div class="card">
-            <h3><i class="fas fa-list-ul"></i> طلبات CRM</h3>
-            <div class="table-wrapper"><table><thead><tr><th>كود</th><th>الفرع</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="crmTable"></tbody></table></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="sec-stock" class="section">
-        <div class="top-bar"><div class="page-title"><i class="fas fa-warehouse"></i> المخزون - <span id="stockBranch"></span></div>
-          <div><button class="btn btn-accent" onclick="exportStock()"><i class="fas fa-download"></i> تصدير</button></div>
-        </div>
-        <div class="card">
-          <div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد الحالي</th><th>آخر تحديث</th><th>تحديث الكمية</th></tr></thead><tbody id="stockTable"></tbody></table></div>
-          <div style="margin-top:24px;"><button class="btn btn-primary" onclick="saveStockUpdates()"><i class="fas fa-save"></i> حفظ تغييرات المخزون</button></div>
-        </div>
-      </div>
-
-      <div id="sec-products" class="section">
-        <div class="top-bar"><div class="page-title"><i class="fas fa-tags"></i> إدارة المنتجات</div></div>
-        <div class="grid-2">
-          <div class="card">
-            <h3>إضافة / تعديل</h3>
-            <input id="prodOldName" placeholder="الاسم القديم (للتعديل)">
-            <input id="prodName" placeholder="اسم المنتج" style="margin:10px 0">
-            <input id="prodCat" placeholder="المجموعة (مثال: كيك)">
-            <div style="display:flex; gap:8px; margin:10px 0"><input id="prodPrice" type="number" placeholder="السعر" step="0.5"><select id="prodType"><option>قطعة</option><option>كيلو</option></select></div>
-            <div style="display:flex; gap:8px"><button class="btn btn-outline" onclick="saveProduct('add')"><i class="fas fa-plus"></i> إضافة</button><button class="btn btn-primary" onclick="saveProduct('update')"><i class="fas fa-pen"></i> تعديل</button></div>
-          </div>
-          <div class="card"><div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>مجموعة</th><th>سعر</th><th>وحدة</th></tr></thead><tbody id="productsTable"></tbody></table></div></div>
-        </div>
-      </div>
-
-      <div id="sec-users" class="section">
-        <div class="grid-2">
-          <div class="card"><h3>إدارة المستخدمين</h3><input id="userBranch" placeholder="اسم الفرع/المستخدم"><div style="display:flex; gap:6px; margin:10px 0"><input id="userPass" placeholder="كلمة مرور البائع" type="password"><input id="userSuperPass" placeholder="كلمة مرور المشرف"></div><select id="userPointType"><option>فرع</option><option>خدمة العملاء</option><option>إدارة</option></select><input id="userPerms" value="canSell,canStock" placeholder="صلاحيات/ملاحظات" style="margin:10px 0"><label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="userActive" checked> نشط</label><div style="margin-top:12px;"><button class="btn btn-primary" onclick="saveUser('addOrUpdate')">حفظ</button><button class="btn btn-outline" onclick="deleteUserRow()">حذف</button></div></div>
-          <div class="card"><div class="table-wrapper"><table><thead><tr><th>الفرع</th><th>النوع</th><th>ملاحظات/صلاحيات</th><th>نشط</th></tr></thead><tbody id="usersTable"></tbody></table></div></div>
-        </div>
-      </div>
-
-      <div id="sec-reports" class="section">
-        <div class="top-bar"><div class="page-title"><i class="fas fa-chart-bar"></i> تقارير المبيعات</div>
-          <div><button class="btn btn-primary" onclick="exportSales()"><i class="fas fa-file-export"></i> تصدير المبيعات</button></div>
-        </div>
-        <div class="card">
-          <div style="display:flex; gap:12px; margin-bottom:20px;"><input type="date" id="repDate"><select id="repShift"><option>الكل</option><option>صباحية</option><option>مسائية</option></select></div>
-          <div class="table-wrapper"><table><thead><tr><th>كود البيع</th><th>التاريخ</th><th>الفرع</th><th>العميل</th><th>قناة</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody id="salesTable"></tbody></table></div>
-        </div>
-      </div>
+      <!-- POS Section (مندوب / كاشير) -->
+      <div id="sec-pos" class="section active"></div>
+      
+      <!-- CRM Section -->
+      <div id="sec-crm" class="section"></div>
+      
+      <!-- Stock Section -->
+      <div id="sec-stock" class="section"></div>
+      
+      <!-- Products Management Section -->
+      <div id="sec-products" class="section"></div>
+      
+      <!-- Users Management Section -->
+      <div id="sec-users" class="section"></div>
+      
+      <!-- Reports Section -->
+      <div id="sec-reports" class="section"></div>
     </div>
   </div>
 </div>
 
+<!-- Quantity Modal -->
 <div class="modal" id="qtyModal">
   <div class="modal-card">
     <h2 id="qtyTitle">الكمية</h2>
-    <input id="qtyInput" type="number" min="1" step="1" value="1" style="margin:16px 0;">
+    <input id="qtyInput" type="number" min="0.05" step="0.05" value="1" style="margin:16px 0;">
     <div id="qtyHint" style="margin-bottom:16px; color:var(--text-muted);"></div>
-    <div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQty()">إلغاء</button><button class="btn btn-primary" onclick="confirmQty()">تأكيد</button></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeQty()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmQty()">تأكيد</button>
+    </div>
   </div>
 </div>
+
+<!-- QR Code Modal -->
+<div class="modal" id="qrModal">
+  <div class="modal-card" style="text-align:center;">
+    <h2><i class="fas fa-qrcode"></i> رمز الطلب</h2>
+    <div id="qrCodeContainer" style="margin:20px 0; min-height:250px; display:flex; justify-content:center; align-items:center;"></div>
+    <p style="margin-bottom:16px; font-weight:700; font-size:1.2rem;" id="qrOrderId"></p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeQrModal()">إغلاق</button>
+      <button class="btn btn-primary" style="flex:1" onclick="printQR()"><i class="fas fa-print"></i> طباعة</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="modal" id="qrScannerModal">
+  <div class="modal-card" style="width:500px;">
+    <h2 style="text-align:center; margin-bottom:16px;"><i class="fas fa-camera"></i> مسح QR</h2>
+    <div id="qrScannerContainer">
+      <div id="qrReader" style="width:100%;"></div>
+    </div>
+    <p style="text-align:center; margin:12px 0;">أو</p>
+    <input type="text" id="manualQrInput" placeholder="أدخل كود الطلب يدويًا" style="margin-bottom:12px;">
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeQrScanner()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="loadManualQR()">تحميل الطلب</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shift Modal -->
+<div class="modal" id="shiftModal">
+  <div class="modal-card">
+    <h2><i class="fas fa-clock"></i> إدارة الوردية</h2>
+    <div id="shiftInfo" style="margin:16px 0; padding:12px; background:var(--bg); border-radius:16px;"></div>
+    <div id="shiftActions"></div>
+  </div>
+</div>
+
+<!-- Supervisor Modal -->
+<div class="modal" id="supervisorModal">
+  <div class="modal-card">
+    <h2><i class="fas fa-user-shield"></i> صلاحية المشرف</h2>
+    <p style="margin:16px 0;">أدخل كلمة مرور المشرف لتفعيل الخصم</p>
+    <input id="superPassInput" type="password" placeholder="كلمة المرور">
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeSupervisorModal()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="verifySupervisorForDiscount()">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <script>
 (function(){
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZs6HMTHi-0VQAxXcCUv5GGFKkI5ex08-iKVp-MG-_poY9B3LbXzmN5UgzS3DRxTDetg/exec';
+  'use strict';
 
-  let db = { products: [], users: [], stock: [], sales: [], crmOrders: [] };
-  let currentUser = null, currentCat = 'الكل', cart = [], pendingProduct = null, stockUpdates = [];
+  // ---------- CONFIGURATION ----------
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXnucGWGsTmfkl8Y6zApJXlwtdHBBP11PyNlL-eV2_CAlxZdqR5qNkZd850MeBYPp-yA/exec';  // ⚠️ استبدل برابط النشر
 
+  // ---------- GLOBAL STATE ----------
+  let db = {
+    products: [],
+    users: [],
+    stock: [],
+    sales: [],
+    crmOrders: [],
+    qrOrders: [],
+    shifts: []
+  };
+  
+  let currentUser = null;
+  let currentCat = 'الكل';
+  let cart = [];
+  let pendingProduct = null;
+  let pendingEditIndex = -1;
+  let stockUpdates = [];
+  let currentShift = null;
+  let discountEnabled = false;
+  let currentQROrderId = null;
+  let html5QrScanner = null;
+  let selectedBranchForCRM = '';
+  let notificationInterval = null;
+
+  // ---------- UTILITIES ----------
   const money = n => (Number(n || 0)).toFixed(2);
-  const toast = msg => {
+  const toast = (msg, isError = false) => {
     const t = document.getElementById('toast');
-    t.textContent = msg || '';
+    t.textContent = msg;
+    t.style.background = isError ? '#d32f2f' : '#1e1e2a';
     t.style.display = 'block';
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => t.style.display = 'none', 2800);
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => t.style.display = 'none', 3500);
   };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const jsq = s => String(s ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
-  const isWeight = p => String(p.unit || p.type || '').trim() === 'كيلو';
+  const isWeight = p => String(p.unit || '').trim() === 'كيلو';
+  
+  let audioCtx = null;
+  function playBeep() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    } catch(e) {}
+  }
 
+  // ---------- API COMMUNICATION ----------
   function jsonp(action, params = {}) {
     return new Promise((resolve, reject) => {
       const base = SCRIPT_URL;
@@ -305,7 +350,7 @@
         try { delete window[cb]; } catch(e) {}
         if (script.parentNode) script.parentNode.removeChild(script);
         reject(new Error('انتهت مهلة الاتصال'));
-      }, 12000);
+      }, 15000);
     });
   }
 
@@ -344,37 +389,111 @@
 
       iframe.onload = () => fin();
       form.submit();
-      setTimeout(fin, 1500);
+      setTimeout(fin, 3000);
     });
   }
 
+  // ---------- DATA NORMALIZATION ----------
   function normalizeData(res) {
-    db.products = (res.products || []).map(r => ({ name: String(r[0] ?? '').trim(), cat: String(r[1] ?? '').trim(), price: +r[2] || 0, unit: String(r[3] ?? 'قطعة').trim() }));
-    db.users = (res.users || []).map(r => ({
-      branch: String(r[0] ?? '').trim(),
-      pass: String(r[1] ?? '').trim(),
-      superPass: String(r[2] ?? '').trim(),
-      pointType: String(r[3] ?? '').trim(),
-      notes: String(r[4] ?? '').trim(),
-      active: r[5] === true || String(r[5] ?? '').trim().toUpperCase() === 'TRUE'
+    db.products = (res.products || []).map(r => ({
+      name: String(r[0] || '').trim(),
+      cat: String(r[1] || '').trim(),
+      price: +r[2] || 0,
+      unit: String(r[3] || 'قطعة').trim()
     }));
-    db.stock = (res.stock || []).map(r => ({ branch: String(r[0] ?? '').trim(), item: String(r[1] ?? '').trim(), qty: +r[2] || 0, lastUpdate: String(r[3] ?? '') }));
-    db.sales = (res.sales || []).map(r => ({ saleId: r[0], date: r[1], branch: r[2], customer: r[3], phone: r[4], channel: r[5], status: r[6], subtotal: +r[7] || 0, discount: +r[8] || 0, delivery: +r[9] || 0, total: +r[10] || 0, cashier: r[11], notes: r[12] }));
-    db.crmOrders = (res.crmOrders || []).map(r => ({ id: r[0], createdAt: r[1], branch: r[2], customer: r[3], phone: r[4], address: r[5], items: r[6], total: +r[7] || 0, notes: r[8], status: r[9], createdBy: r[10] }));
+    
+    db.users = (res.users || []).map(r => ({
+      branch: String(r[0] || '').trim(),
+      pass: String(r[1] || '').trim(),
+      superPass: String(r[2] || '').trim(),
+      pointType: String(r[3] || '').trim(),
+      notes: String(r[4] || '').trim(),
+      active: r[5] === true || String(r[5] || '').toUpperCase() === 'TRUE'
+    }));
+    
+    db.stock = (res.stock || []).map(r => ({
+      branch: String(r[0] || '').trim(),
+      item: String(r[1] || '').trim(),
+      qty: +r[2] || 0,
+      lastUpdate: String(r[3] || '')
+    }));
+    
+    db.sales = (res.sales || []).map(r => ({
+      saleId: r[0],
+      date: r[1],
+      branch: r[2],
+      customer: r[3],
+      phone: r[4],
+      channel: r[5],
+      status: r[6],
+      subtotal: +r[7] || 0,
+      discount: +r[8] || 0,
+      delivery: +r[9] || 0,
+      total: +r[10] || 0,
+      cashier: r[11],
+      notes: r[12],
+      shiftId: r[13]
+    }));
+    
+    db.crmOrders = (res.crmOrders || []).map(r => ({
+      id: r[0],
+      createdAt: r[1],
+      branch: r[2],
+      customer: r[3],
+      phone: r[4],
+      address: r[5],
+      items: r[6],
+      total: +r[7] || 0,
+      notes: r[8],
+      status: r[9],
+      createdBy: r[10]
+    }));
+    
+    db.qrOrders = (res.qrOrders || []).map(r => {
+      let items = [];
+      try { items = JSON.parse(r[4] || '[]'); } catch(e) { items = []; }
+      return {
+        id: r[0],
+        date: r[1],
+        creator: r[2],
+        branch: r[3],
+        items: items,
+        subtotal: +r[5] || 0,
+        discount: +r[6] || 0,
+        delivery: +r[7] || 0,
+        total: +r[8] || 0,
+        status: r[9],
+        cashier: r[10],
+        closedAt: r[11]
+      };
+    });
+    
+    db.shifts = (res.shifts || []).map(r => ({
+      id: r[0],
+      branch: r[1],
+      cashier: r[2],
+      openTime: r[3],
+      closeTime: r[4],
+      totalSales: +r[5] || 0,
+      status: r[6]
+    }));
   }
 
-  async function refreshData() {
+  async function refreshData(silent = false) {
     try {
       const res = await jsonp('getInitialData');
       normalizeData(res);
       fillBranches();
       renderAll();
-      toast('تمت المزامنة');
-    } catch (e) {
-      toast(e.message || 'تعذر تحميل البيانات');
+      if (!silent) toast('تم تحديث البيانات');
+      return true;
+    } catch(e) {
+      if (!silent) toast(e.message, true);
+      return false;
     }
   }
 
+  // ---------- AUTH ----------
   async function boot() {
     try {
       document.getElementById('loginMsg').textContent = 'جاري الاتصال...';
@@ -383,238 +502,824 @@
       fillBranches();
       document.getElementById('loginMsg').textContent = '';
       restoreSession();
-    } catch (e) {
-      document.getElementById('branchSelect').innerHTML = '<option>فشل التحميل</option>';
-      document.getElementById('loginMsg').textContent = e.message || 'تعذر الاتصال بالسكربت';
-      console.error('BOOT ERROR:', e);
+    } catch(e) {
+      document.getElementById('branchSelect').innerHTML = '<option>❌ فشل التحميل</option>';
+      document.getElementById('loginMsg').textContent = e.message;
     }
   }
 
   function fillBranches() {
     const sel = document.getElementById('branchSelect');
-    sel.innerHTML = '<option value="">اختر الفرع</option>' + db.users.filter(u => u.active === true).map(u => `<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join('');
-
+    const activeUsers = db.users.filter(u => u.active === true);
+    sel.innerHTML = '<option value="">اختر الفرع / المستخدم</option>' + 
+      activeUsers.map(u => `<option value="${esc(u.branch)}">${esc(u.branch)} (${esc(u.pointType)})</option>`).join('');
+    
     const crmSel = document.getElementById('crmBranchSelect');
-    if (crmSel) crmSel.innerHTML = '<option>اختر الفرع</option>' + db.users.filter(u => u.pointType === 'فرع' && u.active === true).map(u => `<option>${esc(u.branch)}</option>`).join('');
+    if (crmSel) {
+      const branches = [...new Set(db.users.filter(u => u.active && (u.pointType === 'فرع' || u.pointType === 'مندوب_بيع' || u.pointType === 'كاشير')).map(u => u.branch))];
+      crmSel.innerHTML = '<option value="">اختر الفرع</option>' + 
+        branches.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+    }
   }
 
   function login() {
     const branch = String(document.getElementById('branchSelect').value || '').trim();
     const pass = String(document.getElementById('passInput').value || '').trim();
-    const user = db.users.find(u => u.active === true && u.branch === branch && (u.pass === pass || u.superPass === pass));
-    if (!user) return toast('بيانات خاطئة أو الحساب غير نشط');
+    
+    const user = db.users.find(u => 
+      u.active === true && 
+      u.branch === branch && 
+      (u.pass === pass || u.superPass === pass)
+    );
+    
+    if (!user) {
+      toast('بيانات الدخول غير صحيحة أو الحساب غير نشط', true);
+      return;
+    }
+    
     currentUser = user;
     localStorage.setItem('SOKAR_USER', JSON.stringify(user));
+    
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appSections').classList.remove('hidden');
     document.getElementById('logoutBtn').classList.remove('hidden');
+    
     updateUIForUser();
+    startNotificationPolling();
   }
 
   function restoreSession() {
     try {
       const u = JSON.parse(localStorage.getItem('SOKAR_USER'));
       if (u) {
-        currentUser = u;
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appSections').classList.remove('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
-        updateUIForUser();
+        const stillExists = db.users.some(usr => usr.branch === u.branch && usr.active);
+        if (stillExists) {
+          currentUser = u;
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('appSections').classList.remove('hidden');
+          document.getElementById('logoutBtn').classList.remove('hidden');
+          updateUIForUser();
+          startNotificationPolling();
+        } else {
+          localStorage.removeItem('SOKAR_USER');
+        }
       }
-    } catch (e) {}
+    } catch(e) {}
   }
 
   function logout() {
+    if (notificationInterval) clearInterval(notificationInterval);
     currentUser = null;
     localStorage.removeItem('SOKAR_USER');
     location.reload();
   }
 
   function updateUIForUser() {
-    document.getElementById('whoami').textContent = currentUser.branch;
+    document.getElementById('whoami').textContent = `${currentUser.branch} (${currentUser.pointType})`;
     buildNav();
     renderAll();
+    
     const pt = currentUser.pointType;
-    if (pt === 'خدمة العملاء') showSection('crm');
-    else showSection('pos');
+    if (pt === 'مندوب_بيع' || pt === 'كاشير' || pt === 'فرع') {
+      showSection('pos');
+    } else if (pt === 'خدمة العملاء') {
+      showSection('crm');
+    } else if (pt === 'إدارة') {
+      showSection('pos');
+    }
+    
+    loadCurrentShift();
   }
 
   function buildNav() {
     const nav = document.getElementById('navMenu');
     const pt = currentUser?.pointType || '';
     let items = [];
-    if (pt === 'فرع') items = [['pos','نقطة البيع','cash-register'], ['reports','تقارير','chart-bar']];
-    else if (pt === 'خدمة العملاء') items = [['crm','CRM','headset'], ['products','المنتجات','tags']];
-    else if (pt === 'إدارة') items = [['pos','بيع','cash-register'],['crm','CRM','headset'],['stock','مخزون','warehouse'],['products','منتجات','tags'],['users','مستخدمين','user-cog'],['reports','تقارير','chart-pie']];
-    nav.innerHTML = items.map(([id,label,icon]) => `<button type="button" class="nav-item" data-sec="${id}" onclick="showSection('${id}')"><i class="fas fa-${icon}"></i><span>${label}</span></button>`).join('');
+    
+    if (pt === 'مندوب_بيع') {
+      items = [['pos', 'نقطة البيع', 'cash-register']];
+    } else if (pt === 'كاشير') {
+      items = [['pos', 'نقطة البيع', 'cash-register']];
+    } else if (pt === 'خدمة العملاء') {
+      items = [
+        ['crm', 'خدمة العملاء', 'headset'],
+        ['products', 'المنتجات', 'tags']
+      ];
+    } else if (pt === 'إدارة') {
+      items = [
+        ['pos', 'نقطة البيع', 'cash-register'],
+        ['crm', 'CRM', 'headset'],
+        ['stock', 'المخزون', 'warehouse'],
+        ['products', 'المنتجات', 'tags'],
+        ['users', 'المستخدمون', 'user-cog'],
+        ['reports', 'التقارير', 'chart-pie']
+      ];
+    } else if (pt === 'فرع') {
+      items = [
+        ['pos', 'نقطة البيع', 'cash-register'],
+        ['reports', 'تقارير', 'chart-bar']
+      ];
+    }
+    
+    nav.innerHTML = items.map(([id, label, icon]) => 
+      `<div class="nav-item" data-sec="${id}" onclick="showSection('${id}')">
+        <i class="fas fa-${icon}"></i><span>${label}</span>
+      </div>`
+    ).join('');
   }
 
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     const sec = document.getElementById('sec-' + id);
     if (sec) sec.classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('data-sec') === id));
-    if (id === 'stock') renderStock();
-    if (id === 'reports') renderSales();
-    if (id === 'crm') renderCrmTable();
-    if (id === 'products') renderProductsTable();
-    if (id === 'users') renderUsersTable();
+    
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-sec') === id);
+    });
+    
+    if (id === 'pos') renderPOS();
+    else if (id === 'crm') renderCRM();
+    else if (id === 'stock') renderStock();
+    else if (id === 'products') renderProductsManagement();
+    else if (id === 'users') renderUsersManagement();
+    else if (id === 'reports') renderReports();
   }
 
-  function stockFor(item) {
-    const row = db.stock.find(s => s.branch === currentUser?.branch && s.item === item);
+  // ---------- STOCK HELPER ----------
+  function stockFor(item, branch = null) {
+    const b = branch || currentUser?.branch;
+    if (!b) return 0;
+    const row = db.stock.find(s => s.branch === b && s.item === item);
     return row ? row.qty : 0;
+  }
+
+  // ---------- POS RENDERING ----------
+  function renderPOS() {
+    const sec = document.getElementById('sec-pos');
+    const pt = currentUser?.pointType || '';
+    const isSalesman = pt === 'مندوب_بيع' || pt === 'فرع';
+    const isCashier = pt === 'كاشير';
+    
+    sec.innerHTML = `
+      <div class="top-bar">
+        <div class="page-title">
+          <i class="fas fa-cash-register" style="color:var(--primary);"></i>
+          ${isSalesman ? 'مندوب البيع' : 'الكاشير'} - ${esc(currentUser.branch)}
+        </div>
+        <div class="action-buttons">
+          ${isSalesman ? `
+            <button class="btn btn-outline" onclick="newSale()"><i class="fas fa-plus-circle"></i> فاتورة جديدة</button>
+          ` : ''}
+          ${isCashier ? `
+            <button class="btn btn-accent" onclick="openQRScanner()"><i class="fas fa-qrcode"></i> مسح QR</button>
+          ` : ''}
+          <button class="btn btn-outline" onclick="showShiftModal()"><i class="fas fa-clock"></i> الوردية</button>
+          <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> تحديث</button>
+        </div>
+      </div>
+      <div class="grid-3">
+        <!-- Cart Panel -->
+        <div class="card">
+          <div class="card-header">
+            <span><i class="fas fa-shopping-basket"></i> السلة</span>
+            <span class="pill">${currentShift ? '🟢 وردية مفتوحة' : '⚪ لا توجد وردية'}</span>
+          </div>
+          <div id="cartList" class="cart-items"></div>
+          <div class="total-section">
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+              <div style="flex:1"><label>توصيل</label><input id="deliveryFee" type="number" value="0" min="0" step="0.5" oninput="renderCart()"></div>
+              <div style="flex:1"><label>خصم</label>
+                <input id="discountVal" type="number" value="0" min="0" step="0.5" oninput="renderCart()" 
+                  ${!discountEnabled && isCashier ? 'readonly onclick="requestDiscountSupervisor()"' : ''}>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin:10px 0;">
+              <span>المجموع الفرعي</span><span id="subTotal">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:800;">
+              <span>الإجمالي</span><span id="grandTotal">0 ج.م</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:20px;">
+              <button class="btn btn-outline" style="flex:1" onclick="clearCart()"><i class="fas fa-trash"></i> مسح</button>
+              ${isSalesman ? `
+                <button class="btn btn-primary" style="flex:2" onclick="createQROrder()">
+                  <i class="fas fa-qrcode"></i> إنشاء QR
+                </button>
+              ` : ''}
+              ${isCashier ? `
+                <button class="btn btn-primary" style="flex:2" onclick="finalizeOrder()" ${!currentShift ? 'disabled' : ''}>
+                  <i class="fas fa-check-circle"></i> إتمام الدفع
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Products Panel -->
+        <div class="card">
+          <div class="card-header">
+            <span><i class="fas fa-cubes"></i> المنتجات</span>
+            <input type="text" id="searchInput" placeholder="🔍 بحث..." style="width:180px; padding:8px;" oninput="renderProducts()">
+          </div>
+          <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;" id="catsList"></div>
+          <div id="productsGrid" class="product-grid"></div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="card">
+          <div class="card-header"><i class="fas fa-chart-simple"></i> ملخص سريع</div>
+          <div style="text-align:center; padding:12px;">
+            <span id="quickStats">اختر منتجات</span>
+          </div>
+          ${isCashier && currentQROrderId ? `
+            <div style="margin-top:16px; padding:12px; background:var(--blue-soft); border-radius:16px;">
+              <i class="fas fa-ticket"></i> الطلب الحالي: <strong>${esc(currentQROrderId)}</strong>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    
+    renderCats();
+    renderProducts();
+    renderCart();
+    updateShiftDisplay();
   }
 
   function renderCats() {
     const box = document.getElementById('catsList');
     if (!box) return;
     const cats = ['الكل', ...new Set(db.products.map(p => p.cat).filter(Boolean))];
-    box.innerHTML = cats.map(c => `<span class="badge ${c === currentCat ? 'badge-success' : ''}" style="cursor:pointer" onclick="currentCat='${jsq(c)}';renderCats();renderProducts()">${esc(c)}</span>`).join('');
+    box.innerHTML = cats.map(c => 
+      `<span class="badge ${c === currentCat ? 'badge-success' : ''}" style="cursor:pointer" onclick="setCategory('${jsq(c)}')">${esc(c)}</span>`
+    ).join('');
+  }
+
+  function setCategory(cat) {
+    currentCat = cat;
+    renderCats();
+    renderProducts();
   }
 
   function renderProducts() {
-    const searchEl = document.getElementById('searchInput');
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
-    const q = String(searchEl?.value || '').trim();
-    const rows = db.products.filter(p => currentCat === 'الكل' || p.cat === currentCat).filter(p => !q || p.name.includes(q) || p.cat.includes(q));
-    grid.innerHTML = rows.map(p => `<div class="product-card" onclick="askQty('${jsq(p.name)}')"><div class="product-name">${esc(p.name)}</div><div class="product-meta">${money(p.price)} ج${isWeight(p)?'/كجم':''}</div><div class="stock-badge"><i class="fas fa-box"></i> ${stockFor(p.name)}</div></div>`).join('') || '<div>لا توجد منتجات</div>';
+    
+    const searchTerm = document.getElementById('searchInput')?.value.trim() || '';
+    let filtered = db.products.filter(p => currentCat === 'الكل' || p.cat === currentCat);
+    
+    if (searchTerm) {
+      filtered = filtered.filter(p => p.name.includes(searchTerm) || p.cat.includes(searchTerm));
+    }
+    
+    const branch = currentUser?.branch;
+    
+    grid.innerHTML = filtered.map(p => {
+      const st = stockFor(p.name, branch);
+      return `
+        <div class="product-card" onclick="askQty('${jsq(p.name)}')">
+          <div class="product-name">${esc(p.name)}</div>
+          <div class="product-meta">${money(p.price)} ج${isWeight(p) ? '/كجم' : ''}</div>
+          <div class="stock-badge"><i class="fas fa-box"></i> ${st}</div>
+        </div>
+      `;
+    }).join('') || '<div style="grid-column:1/-1; text-align:center; padding:20px;">لا توجد منتجات</div>';
+    
     const stats = document.getElementById('quickStats');
-    if (stats) stats.innerHTML = `${rows.length} منتج · المجموع: ${esc(currentCat)}`;
+    if (stats) stats.innerHTML = `${filtered.length} منتج · ${esc(currentCat)}`;
   }
 
   function askQty(name) {
     const p = db.products.find(x => x.name === name);
     if (!p) return;
+    
     pendingProduct = p;
+    pendingEditIndex = -1;
+    
     document.getElementById('qtyTitle').textContent = isWeight(p) ? `الوزن (جرام) - ${p.name}` : `الكمية - ${p.name}`;
     document.getElementById('qtyInput').value = isWeight(p) ? 1000 : 1;
     document.getElementById('qtyInput').step = isWeight(p) ? 50 : 1;
-    document.getElementById('qtyHint').textContent = isWeight(p) ? 'مثال: 250 أو 500' : 'عدد القطع';
+    document.getElementById('qtyInput').min = isWeight(p) ? 50 : 1;
+    document.getElementById('qtyHint').textContent = isWeight(p) ? 'أدخل الوزن بالجرام' : 'أدخل عدد القطع';
     document.getElementById('qtyModal').style.display = 'flex';
   }
 
   function closeQty() {
     document.getElementById('qtyModal').style.display = 'none';
     pendingProduct = null;
+    pendingEditIndex = -1;
   }
 
   function confirmQty() {
-    const qty = +document.getElementById('qtyInput').value;
-    if (qty <= 0 || !pendingProduct) return;
-    const charge = isWeight(pendingProduct) ? qty / 1000 : qty;
-    const exist = cart.find(i => i.name === pendingProduct.name);
-    if (exist) {
-      exist.qty += qty;
-      exist.chargeQty += charge;
-      exist.total = exist.chargeQty * exist.price;
+    let qty = parseFloat(document.getElementById('qtyInput').value);
+    if (isNaN(qty) || qty <= 0) return;
+    
+    if (!pendingProduct) return;
+    
+    const chargeQty = isWeight(pendingProduct) ? qty / 1000 : qty;
+    const total = chargeQty * pendingProduct.price;
+    
+    if (pendingEditIndex >= 0) {
+      const item = cart[pendingEditIndex];
+      if (item) {
+        item.qty = qty;
+        item.chargeQty = chargeQty;
+        item.total = total;
+      }
     } else {
-      cart.push({ name: pendingProduct.name, unit: pendingProduct.unit, price: pendingProduct.price, qty, chargeQty: charge, total: charge * pendingProduct.price });
+      const existing = cart.find(i => i.name === pendingProduct.name);
+      if (existing) {
+        existing.qty += qty;
+        existing.chargeQty += chargeQty;
+        existing.total = existing.chargeQty * existing.price;
+      } else {
+        cart.push({
+          name: pendingProduct.name,
+          unit: pendingProduct.unit,
+          price: pendingProduct.price,
+          qty: qty,
+          chargeQty: chargeQty,
+          total: total
+        });
+      }
     }
+    
     closeQty();
+    renderCart();
+  }
+
+  function editCartItem(index) {
+    const item = cart[index];
+    if (!item) return;
+    
+    const p = db.products.find(x => x.name === item.name);
+    if (!p) return;
+    
+    pendingProduct = p;
+    pendingEditIndex = index;
+    
+    document.getElementById('qtyTitle').textContent = `تعديل - ${p.name}`;
+    document.getElementById('qtyInput').value = item.qty;
+    document.getElementById('qtyInput').step = isWeight(p) ? 50 : 1;
+    document.getElementById('qtyInput').min = isWeight(p) ? 50 : 1;
+    document.getElementById('qtyHint').textContent = isWeight(p) ? 'الكمية بالجرام' : 'الكمية بالعدد';
+    document.getElementById('qtyModal').style.display = 'flex';
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
     renderCart();
   }
 
   function renderCart() {
     const box = document.getElementById('cartList');
     if (!box) return;
-    if (!cart.length) box.innerHTML = '<div style="padding:20px;text-align:center">السلة فارغة</div>';
-    else box.innerHTML = cart.map((i, idx) => `<div class="cart-row"><div><strong>${esc(i.name)}</strong><div class="product-meta">${isWeight(i)?i.qty+' جم':i.qty}</div></div><div><strong>${money(i.total)}</strong> <i class="fas fa-trash" style="cursor:pointer; color:#b0003a;" onclick="cart.splice(${idx},1);renderCart()"></i></div></div>`).join('');
+    
+    if (!cart.length) {
+      box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">السلة فارغة</div>';
+    } else {
+      box.innerHTML = cart.map((i, idx) => `
+        <div class="cart-row">
+          <div style="flex:1;">
+            <strong>${esc(i.name)}</strong>
+            <div class="product-meta">${isWeight(i) ? i.qty + ' جم' : i.qty} × ${money(i.price)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <strong>${money(i.total)} ج</strong>
+            <div class="cart-row-actions">
+              <i class="fas fa-edit" style="cursor:pointer; color:var(--blue);" onclick="editCartItem(${idx})"></i>
+              <i class="fas fa-trash" style="cursor:pointer; color:#d32f2f;" onclick="removeFromCart(${idx})"></i>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
     const sub = cart.reduce((a, b) => a + b.total, 0);
-    const fee = +document.getElementById('deliveryFee').value || 0;
-    const disc = +document.getElementById('discountVal').value || 0;
-    document.getElementById('subTotal').textContent = money(sub);
-    document.getElementById('grandTotal').textContent = money(Math.max(0, sub + fee - disc)) + ' ج.م';
-  }
-
-  function clearCart() { cart = []; renderCart(); }
-  function newSale() { cart = []; document.getElementById('deliveryFee').value = 0; document.getElementById('discountVal').value = 0; renderCart(); }
-
-  async function submitOrder() {
-    if (!cart.length) return toast('السلة فارغة');
-    const sub = cart.reduce((a, b) => a + b.total, 0);
-    const fee = +document.getElementById('deliveryFee').value || 0;
-    const disc = +document.getElementById('discountVal').value || 0;
+    const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
+    const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
     const total = Math.max(0, sub + fee - disc);
-    const sale = { saleId: 'SALE-' + Date.now().toString(36), date: new Date().toLocaleDateString('ar-EG'), branch: currentUser.branch, customer: 'عميل نقدي', phone: '', channel: 'نقطة بيع', status: 'مكتمل', subtotal: sub, discount: disc, delivery: fee, total: total, cashier: currentUser.branch, notes: cart.map(i => `${i.name}(${i.qty})`).join(' + ') };
-    try { await postForm('saveOrder', { order: sale }); toast('تم حفظ الفاتورة'); await refreshData(); newSale(); } catch (e) { toast(e.message); }
+    
+    const subEl = document.getElementById('subTotal');
+    const grandEl = document.getElementById('grandTotal');
+    if (subEl) subEl.textContent = money(sub);
+    if (grandEl) grandEl.textContent = money(total) + ' ج.م';
   }
 
-  function loadCrmCartToForm() {
-    if (!cart.length) return toast('السلة فارغة');
-    document.getElementById('crmItems').value = cart.map(i => `${i.name}(${i.qty})`).join(' + ');
-    document.getElementById('crmTotal').value = parseFloat((document.getElementById('grandTotal').textContent || '0').replace(/[^\d.]/g, '')) || 0;
-    showSection('crm');
+  function clearCart() {
+    cart = [];
+    currentQROrderId = null;
+    discountEnabled = false;
+    renderCart();
+    toast('تم مسح السلة');
   }
 
-  async function saveCrm() {
-    const order = { branch: document.getElementById('crmBranchSelect').value, customer: document.getElementById('crmCustomer').value, phone: document.getElementById('crmPhone').value, address: document.getElementById('crmAddress').value, items: document.getElementById('crmItems').value, total: +document.getElementById('crmTotal').value, notes: document.getElementById('crmNotes').value, createdBy: currentUser.branch, status: 'جديد' };
-    try { await postForm('saveCrmOrder', { order }); toast('تم الإرسال'); refreshData(); } catch (e) { toast(e.message); }
+  function newSale() {
+    cart = [];
+    currentQROrderId = null;
+    discountEnabled = false;
+    const fee = document.getElementById('deliveryFee');
+    const disc = document.getElementById('discountVal');
+    if (fee) fee.value = 0;
+    if (disc) disc.value = 0;
+    renderCart();
+    toast('فاتورة جديدة');
   }
 
-  function renderCrmTable() {
-    const body = document.getElementById('crmTable');
-    if (!body) return;
-    let rows = db.crmOrders;
-    if (currentUser?.pointType === 'فرع') rows = rows.filter(r => r.branch === currentUser.branch);
-    body.innerHTML = rows.map(r => `<tr><td>${esc(r.id)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer)}</td><td>${money(r.total)}</td><td>${esc(r.status)}</td><td><button class="btn btn-outline btn-icon" onclick="acceptCrm('${jsq(r.id)}')"><i class="fas fa-check"></i></button></td></tr>`).join('');
+  // ---------- QR OPERATIONS (SALESMAN) ----------
+  async function createQROrder() {
+    if (!cart.length) {
+      toast('السلة فارغة', true);
+      return;
+    }
+    
+    const sub = cart.reduce((a, b) => a + b.total, 0);
+    const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
+    const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
+    const total = Math.max(0, sub + fee - disc);
+    
+    const order = {
+      branch: currentUser.branch,
+      creator: currentUser.branch,
+      items: cart.map(i => ({
+        name: i.name,
+        qty: i.qty,
+        price: i.price,
+        total: i.total
+      })),
+      subtotal: sub,
+      delivery: fee,
+      discount: disc,
+      total: total
+    };
+    
+    try {
+      const res = await postForm('createQROrder', { order });
+      if (res.orderId) {
+        showQRModal(res.orderId);
+        clearCart();
+        toast('تم إنشاء الطلب بنجاح');
+      }
+    } catch(e) {
+      toast(e.message, true);
+    }
   }
 
-  async function acceptCrm(id) { try { await postForm('acceptCrmOrder', { id, branch: currentUser.branch }); toast('تم الاستلام'); refreshData(); } catch (e) { toast(e.message); } }
-
-  function renderStock() {
-    document.getElementById('stockBranch').textContent = currentUser.branch;
-    const branchStock = db.stock.filter(s => s.branch === currentUser.branch);
-    document.getElementById('stockTable').innerHTML = db.products.map(p => {
-      const st = branchStock.find(s => s.item === p.name) || { qty: 0, lastUpdate: '-' };
-      return `<tr><td>${esc(p.name)}</td><td>${st.qty}</td><td>${st.lastUpdate || '-'}</td><td><input type="number" step="0.1" onchange="setStockUpdate('${jsq(p.name)}',this.value)"></td></tr>`;
-    }).join('');
+  function showQRModal(orderId) {
+    document.getElementById('qrOrderId').textContent = orderId;
+    const container = document.getElementById('qrCodeContainer');
+    container.innerHTML = '';
+    
+    QRCode.toCanvas(document.createElement('canvas'), orderId, { width: 280 }, (err, canvas) => {
+      if (err) {
+        container.innerHTML = '<p style="color:red;">فشل إنشاء QR</p>';
+        return;
+      }
+      container.appendChild(canvas);
+    });
+    
+    document.getElementById('qrModal').style.display = 'flex';
   }
 
-  function setStockUpdate(name, val) { const q = +val; stockUpdates = stockUpdates.filter(x => x.item !== name); if (q > 0) stockUpdates.push({ item: name, qty: q }); }
-  async function saveStockUpdates() { if (!stockUpdates.length) return; try { await postForm('bulkStockUpdate', { branch: currentUser.branch, updates: stockUpdates }); stockUpdates = []; toast('تم الحفظ'); refreshData(); } catch (e) { toast(e.message); } }
-
-  function renderProductsTable() {
-    const body = document.getElementById('productsTable');
-    if (!body) return;
-    body.innerHTML = db.products.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td></tr>`).join('');
+  function closeQrModal() {
+    document.getElementById('qrModal').style.display = 'none';
   }
 
-  async function saveProduct(mode) {
-    const prod = { oldName: document.getElementById('prodOldName').value, name: document.getElementById('prodName').value, cat: document.getElementById('prodCat').value, price: +document.getElementById('prodPrice').value, unit: document.getElementById('prodType').value };
-    try { await postForm('manageProduct', { mode, product: prod }); toast('تم'); refreshData(); } catch (e) { toast(e.message); }
+  function printQR() {
+    const container = document.getElementById('qrCodeContainer');
+    const canvas = container.querySelector('canvas');
+    if (!canvas) return;
+    
+    const win = window.open('');
+    win.document.write(`
+      <html><head><title>QR Code</title></head>
+      <body style="display:flex; justify-content:center; align-items:center; height:100vh;">
+        <img src="${canvas.toDataURL()}">
+      </body></html>
+    `);
+    win.document.close();
+    win.print();
   }
 
-  function renderUsersTable() {
-    const body = document.getElementById('usersTable');
-    if (!body) return;
-    body.innerHTML = db.users.map(u => `<tr><td>${esc(u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc(u.notes || '')}</td><td>${u.active ? '✅' : '❌'}</td></tr>`).join('');
+  // ---------- QR SCANNER (CASHIER) ----------
+  function openQRScanner() {
+    document.getElementById('qrScannerModal').style.display = 'flex';
+    document.getElementById('manualQrInput').value = '';
+    
+    if (!html5QrScanner) {
+      html5QrScanner = new Html5Qrcode("qrReader");
+    }
+    
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    html5QrScanner.start(
+      { facingMode: "environment" },
+      config,
+      (decodedText) => {
+        loadQRCodeOrder(decodedText);
+      },
+      (errorMessage) => {}
+    ).catch(err => {
+      console.error(err);
+      toast('فشل تشغيل الكاميرا', true);
+    });
   }
 
-  async function saveUser(mode) {
-    const user = { branch: document.getElementById('userBranch').value, pass: document.getElementById('userPass').value, superPass: document.getElementById('userSuperPass').value, pointType: document.getElementById('userPointType').value, notes: document.getElementById('userPerms').value, active: document.getElementById('userActive').checked };
-    try { await postForm('manageUser', { mode, user }); toast('تم'); refreshData(); } catch (e) { toast(e.message); }
+  function closeQrScanner() {
+    if (html5QrScanner) {
+      html5QrScanner.stop().catch(e => {});
+    }
+    document.getElementById('qrScannerModal').style.display = 'none';
   }
 
-  async function deleteUserRow() { const b = document.getElementById('userBranch').value; if (!b) return; try { await postForm('deleteUser', { branch: b }); toast('حذف'); refreshData(); } catch (e) { toast(e.message); } }
-
-  function renderSales() {
-    const body = document.getElementById('salesTable');
-    if (!body) return;
-    let rows = db.sales;
-    if (currentUser?.pointType !== 'إدارة') rows = rows.filter(s => s.branch === currentUser?.branch);
-    body.innerHTML = rows.slice().reverse().map(r => `<tr><td>${esc(r.saleId)}</td><td>${esc(r.date)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer || '-')}</td><td>${esc(r.channel || '-')}</td><td>${money(r.total)}</td><td>${esc(r.status || 'مكتمل')}</td></tr>`).join('');
+  function loadManualQR() {
+    const code = document.getElementById('manualQrInput').value.trim();
+    if (!code) {
+      toast('أدخل كود الطلب', true);
+      return;
+    }
+    loadQRCodeOrder(code);
   }
 
-  async function exportSales() { try { const res = await jsonp('exportSales', { branch: currentUser?.branch, date: document.getElementById('repDate').value, shift: document.getElementById('repShift').value }); if (res.url) window.open(res.url); } catch (e) { toast(e.message); } }
-  async function exportStock() { try { const res = await jsonp('exportStock', { branch: currentUser?.branch }); if (res.url) window.open(res.url); } catch (e) { toast(e.message); } }
+  async function loadQRCodeOrder(orderId) {
+    try {
+      const res = await jsonp('getQROrder', { orderId });
+      if (!res.order) {
+        toast('الطلب غير موجود', true);
+        return;
+      }
+      
+      const order = res.order;
+      
+      // Load into cart
+      cart = order.items.map(i => ({
+        name: i.name,
+        unit: db.products.find(p => p.name === i.name)?.unit || 'قطعة',
+        price: i.price,
+        qty: i.qty,
+        chargeQty: isWeight({unit: db.products.find(p => p.name === i.name)?.unit}) ? i.qty / 1000 : i.qty,
+        total: i.total
+      }));
+      
+      document.getElementById('deliveryFee').value = order.delivery || 0;
+      document.getElementById('discountVal').value = order.discount || 0;
+      currentQROrderId = orderId;
+      discountEnabled = false;
+      
+      closeQrScanner();
+      renderCart();
+      renderPOS();
+      
+      toast(`تم تحميل الطلب ${orderId}`);
+      playBeep();
+    } catch(e) {
+      toast(e.message, true);
+    }
+  }
 
-  function renderAll() { renderCats(); renderProducts(); renderCart(); renderProductsTable(); renderUsersTable(); renderCrmTable(); renderSales(); }
+  // ---------- FINALIZE ORDER (CASHIER) ----------
+  async function finalizeOrder() {
+    if (!cart.length) {
+      toast('السلة فارغة', true);
+      return;
+    }
+    
+    if (!currentShift) {
+      toast('الرجاء فتح وردية أولاً', true);
+      return;
+    }
+    
+    const sub = cart.reduce((a, b) => a + b.total, 0);
+    const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
+    const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
+    const total = Math.max(0, sub + fee - disc);
+    
+    const orderData = {
+      orderId: currentQROrderId || null,
+      branch: currentUser.branch,
+      cashier: currentUser.branch,
+      shiftId: currentShift.id,
+      items: cart.map(i => ({
+        name: i.name,
+        qty: i.qty,
+        price: i.price,
+        total: i.total
+      })),
+      subtotal: sub,
+      delivery: fee,
+      discount: disc,
+      total: total
+    };
+    
+    try {
+      await postForm('finalizeOrder', { order: orderData });
+      toast('تم إتمام الدفع بنجاح');
+      playBeep();
+      clearCart();
+      await refreshData(true);
+      renderPOS();
+    } catch(e) {
+      toast(e.message, true);
+    }
+  }
 
-  window.login = login; window.logout = logout; window.showSection = showSection; window.refreshData = refreshData; window.askQty = askQty; window.closeQty = closeQty; window.confirmQty = confirmQty; window.renderCart = renderCart; window.clearCart = clearCart; window.newSale = newSale; window.submitOrder = submitOrder; window.loadCrmCartToForm = loadCrmCartToForm; window.saveCrm = saveCrm; window.acceptCrm = acceptCrm; window.setStockUpdate = setStockUpdate; window.saveStockUpdates = saveStockUpdates; window.saveProduct = saveProduct; window.saveUser = saveUser; window.deleteUserRow = deleteUserRow; window.exportSales = exportSales; window.exportStock = exportStock;
+  // ---------- DISCOUNT SUPERVISOR ----------
+  function requestDiscountSupervisor() {
+    document.getElementById('supervisorModal').style.display = 'flex';
+    document.getElementById('superPassInput').value = '';
+  }
 
-  document.getElementById('qtyModal').addEventListener('click', e => { if (e.target.id === 'qtyModal') closeQty(); });
+  function closeSupervisorModal() {
+    document.getElementById('supervisorModal').style.display = 'none';
+  }
+
+  function verifySupervisorForDiscount() {
+    const pass = document.getElementById('superPassInput').value.trim();
+    
+    const supervisor = db.users.find(u => 
+      u.branch === currentUser.branch && 
+      u.superPass === pass
+    );
+    
+    if (supervisor) {
+      discountEnabled = true;
+      const discInput = document.getElementById('discountVal');
+      if (discInput) discInput.removeAttribute('readonly');
+      toast('تم تفعيل صلاحية الخصم');
+      closeSupervisorModal();
+    } else {
+      toast('كلمة مرور المشرف غير صحيحة', true);
+    }
+  }
+
+  // ---------- SHIFT MANAGEMENT ----------
+  async function loadCurrentShift() {
+    if (!currentUser) return;
+    
+    try {
+      const res = await jsonp('getCurrentShift', { branch: currentUser.branch });
+      if (res.shift) {
+        currentShift = res.shift;
+      } else {
+        currentShift = null;
+      }
+      updateShiftDisplay();
+    } catch(e) {
+      console.error('Shift load error:', e);
+    }
+  }
+
+  function updateShiftDisplay() {
+    const statusEl = document.getElementById('shiftStatus');
+    if (statusEl) {
+      if (currentShift) {
+        statusEl.innerHTML = `<i class="fas fa-circle" style="color:#0f9d58; font-size:10px;"></i> وردية ${currentShift.id}`;
+      } else {
+        statusEl.innerHTML = `<i class="fas fa-circle" style="color:#999; font-size:10px;"></i> لا توجد وردية`;
+      }
+    }
+  }
+
+  function showShiftModal() {
+    const modal = document.getElementById('shiftModal');
+    const infoEl = document.getElementById('shiftInfo');
+    const actionsEl = document.getElementById('shiftActions');
+    
+    if (currentShift) {
+      infoEl.innerHTML = `
+        <p><strong>رقم الوردية:</strong> ${esc(currentShift.id)}</p>
+        <p><strong>تاريخ الفتح:</strong> ${esc(currentShift.openTime)}</p>
+        <p><strong>الحالة:</strong> 🟢 مفتوحة</p>
+      `;
+      actionsEl.innerHTML = `
+        <button class="btn btn-primary" style="width:100%;" onclick="closeShift()">
+          <i class="fas fa-door-closed"></i> إغلاق الوردية
+        </button>
+      `;
+    } else {
+      infoEl.innerHTML = `<p>لا توجد وردية مفتوحة حاليًا</p>`;
+      actionsEl.innerHTML = `
+        <button class="btn btn-primary" style="width:100%;" onclick="openShift()">
+          <i class="fas fa-door-open"></i> فتح وردية جديدة
+        </button>
+      `;
+    }
+    
+    modal.style.display = 'flex';
+  }
+
+  function closeShiftModal() {
+    document.getElementById('shiftModal').style.display = 'none';
+  }
+
+  async function openShift() {
+    try {
+      const res = await postForm('openShift', {
+        branch: currentUser.branch,
+        cashier: currentUser.branch
+      });
+      
+      if (res.shiftId) {
+        await loadCurrentShift();
+        closeShiftModal();
+        toast('تم فتح الوردية بنجاح');
+        renderPOS();
+      }
+    } catch(e) {
+      toast(e.message, true);
+    }
+  }
+
+  async function closeShift() {
+    if (!confirm('هل أنت متأكد من إغلاق الوردية؟')) return;
+    
+    try {
+      await postForm('closeShift', {
+        shiftId: currentShift.id,
+        branch: currentUser.branch
+      });
+      
+      currentShift = null;
+      updateShiftDisplay();
+      closeShiftModal();
+      toast('تم إغلاق الوردية بنجاح');
+      renderPOS();
+    } catch(e) {
+      toast(e.message, true);
+    }
+  }
+
+  // ---------- NOTIFICATIONS (CRM) ----------
+  function startNotificationPolling() {
+    if (notificationInterval) clearInterval(notificationInterval);
+    
+    notificationInterval = setInterval(async () => {
+      if (!currentUser) return;
+      
+      try {
+        const res = await jsonp('checkNotifications', {
+          branch: currentUser.branch,
+          userType: currentUser.pointType
+        });
+        
+        if (res.notifications && res.notifications.length > 0) {
+          res.notifications.forEach(n => {
+            toast(n.message);
+            playBeep();
+          });
+          
+          if (document.getElementById('sec-crm')?.classList.contains('active')) {
+            renderCRM();
+          }
+        }
+      } catch(e) {}
+    }, 10000);
+  }
+
+  // ---------- RENDER ALL ----------
+  function renderAll() {
+    if (document.getElementById('sec-pos')?.classList.contains('active')) renderPOS();
+    else if (document.getElementById('sec-crm')?.classList.contains('active')) renderCRM();
+    else if (document.getElementById('sec-stock')?.classList.contains('active')) renderStock();
+    else if (document.getElementById('sec-products')?.classList.contains('active')) renderProductsManagement();
+    else if (document.getElementById('sec-users')?.classList.contains('active')) renderUsersManagement();
+    else if (document.getElementById('sec-reports')?.classList.contains('active')) renderReports();
+  }
+
+  // دوال CRM, Stock, Products, Users, Reports ستضاف هنا...
+  // (سيتم إكمالها في الجزء التالي نظرًا للطول)
+
+  // ---------- EXPOSE GLOBALS ----------
+  window.login = login;
+  window.logout = logout;
+  window.showSection = showSection;
+  window.refreshData = () => refreshData(false);
+  window.setCategory = setCategory;
+  window.renderProducts = renderProducts;
+  window.askQty = askQty;
+  window.closeQty = closeQty;
+  window.confirmQty = confirmQty;
+  window.editCartItem = editCartItem;
+  window.removeFromCart = removeFromCart;
+  window.renderCart = renderCart;
+  window.clearCart = clearCart;
+  window.newSale = newSale;
+  window.createQROrder = createQROrder;
+  window.closeQrModal = closeQrModal;
+  window.printQR = printQR;
+  window.openQRScanner = openQRScanner;
+  window.closeQrScanner = closeQrScanner;
+  window.loadManualQR = loadManualQR;
+  window.finalizeOrder = finalizeOrder;
+  window.requestDiscountSupervisor = requestDiscountSupervisor;
+  window.closeSupervisorModal = closeSupervisorModal;
+  window.verifySupervisorForDiscount = verifySupervisorForDiscount;
+  window.showShiftModal = showShiftModal;
+  window.closeShiftModal = closeShiftModal;
+  window.openShift = openShift;
+  window.closeShift = closeShift;
+
+  // Start
   boot();
 })();
 </script>
