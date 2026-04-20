@@ -38,12 +38,14 @@
     .logo-icon { font-size: 40px; color: var(--primary); }
     .logo-text { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--primary), #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .nav-menu { flex: 1; margin: 20px 0; }
-    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin: 6px 0; border-radius: 18px; color: var(--text-muted); font-weight: 600; transition: var(--transition); cursor:pointer; }
+    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; margin: 6px 0; border-radius: 18px; color: var(--text-muted); font-weight: 600; transition: var(--transition); cursor:pointer; width:100%; text-align:right; }
     .nav-item i { width: 24px; font-size: 1.3rem; }
     .nav-item:hover { background: var(--primary-soft); color: var(--primary); }
     .nav-item.active { background: var(--primary); color: white; box-shadow: 0 8px 14px -6px rgba(184, 27, 92, 0.3); }
     .user-badge { margin-top: auto; background: var(--blue-soft); padding: 16px; border-radius: 22px; }
     .user-badge i { color: var(--blue); margin-left: 8px; }
+    .logout-btn { width:100%; margin-top:10px; background:#fff; border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:14px; }
+    .logout-btn:hover { background:#f7f1f4; }
 
     .main-content { flex: 1; padding: 24px 32px; max-width: calc(100% - 280px); }
     .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; gap:12px; flex-wrap:wrap; }
@@ -61,7 +63,7 @@
     .grid-3 { display: grid; grid-template-columns: 300px 1fr 320px; gap: 20px; }
     .card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 700; font-size: 1.2rem; gap:12px; flex-wrap:wrap; }
-    
+
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; max-height: 60vh; overflow-y: auto; padding: 4px; }
     .product-card { background: #fdfbfc; border: 1px solid var(--border); border-radius: 20px; padding: 16px 8px; text-align: center; cursor: pointer; transition: var(--transition); }
     .product-card:hover { background: var(--primary-soft); border-color: var(--primary); transform: translateY(-3px); }
@@ -96,6 +98,7 @@
       .nav-item { justify-content: center; }
       .main-content { max-width: calc(100% - 90px); padding: 16px; }
       .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .logout-btn { padding:10px; }
     }
   </style>
 </head>
@@ -109,7 +112,8 @@
     </div>
     <div class="nav-menu" id="navMenu"></div>
     <div class="user-badge" id="userBadge">
-      <i class="fas fa-user-circle"></i> <span id="whoami">زائر</span>
+      <div><i class="fas fa-user-circle"></i> <span id="whoami">زائر</span></div>
+      <button class="logout-btn hidden" id="logoutBtn" onclick="logout()"><i class="fas fa-right-from-bracket"></i><span>تسجيل خروج</span></button>
     </div>
   </div>
 
@@ -123,7 +127,7 @@
         </div>
         <div style="margin-bottom:24px">
           <label>كلمة المرور</label>
-          <input id="passInput" type="password" placeholder="••••••••">
+          <input id="passInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
         </div>
         <button class="btn btn-primary" style="width:100%; padding:16px;" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول</button>
         <div id="loginMsg" style="margin-top:16px; text-align:center; color:#b0003a;"></div>
@@ -157,7 +161,7 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><span><i class="fas fa-cubes"></i> المنتجات</span> 
+            <div class="card-header"><span><i class="fas fa-cubes"></i> المنتجات</span>
               <input type="text" id="searchInput" placeholder="🔍 بحث..." style="width:180px; padding:8px;" oninput="renderProducts()">
             </div>
             <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;" id="catsList"></div>
@@ -249,16 +253,9 @@
 
 <script>
 (function(){
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGmbfLqbimgY-qJln0AJj1LovTZ5qrkbGHTr6WuZ6OvLJQrzfe4uKmt17-gK27pNF_NA/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZs6HMTHi-0VQAxXcCUv5GGFKkI5ex08-iKVp-MG-_poY9B3LbXzmN5UgzS3DRxTDetg/exec';
 
-  let db = {
-    products: [],
-    users: [],
-    stock: [],
-    sales: [],
-    crmOrders: []
-  };
-
+  let db = { products: [], users: [], stock: [], sales: [], crmOrders: [] };
   let currentUser = null, currentCat = 'الكل', cart = [], pendingProduct = null, stockUpdates = [];
 
   const money = n => (Number(n || 0)).toFixed(2);
@@ -269,20 +266,14 @@
     clearTimeout(window.__toastTimer);
     window.__toastTimer = setTimeout(() => t.style.display = 'none', 2800);
   };
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[c]));
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const jsq = s => String(s ?? '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
   const isWeight = p => String(p.unit || p.type || '').trim() === 'كيلو';
 
   function jsonp(action, params = {}) {
     return new Promise((resolve, reject) => {
       const base = SCRIPT_URL;
       if (!base) return reject(new Error('الرجاء تعيين SCRIPT_URL'));
-
       const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
       const qs = new URLSearchParams({ action, callback: cb, ...params });
       const script = document.createElement('script');
@@ -358,17 +349,18 @@
   }
 
   function normalizeData(res) {
-    db.products = (res.products || []).map(r => ({ name: r[0], cat: r[1], price: +r[2] || 0, unit: r[3] || 'قطعة' }));
-    db.users = (res.users || []).map(r => ({ branch: r[0], pass: r[1], superPass: r[2], pointType: r[3], notes: r[4], active: r[5] !== false }));
-    db.stock = (res.stock || []).map(r => ({ branch: r[0], item: r[1], qty: +r[2] || 0, lastUpdate: r[3] || '' }));
-    db.sales = (res.sales || []).map(r => ({
-      saleId: r[0], date: r[1], branch: r[2], customer: r[3], phone: r[4], channel: r[5], status: r[6],
-      subtotal: +r[7] || 0, discount: +r[8] || 0, delivery: +r[9] || 0, total: +r[10] || 0, cashier: r[11], notes: r[12]
+    db.products = (res.products || []).map(r => ({ name: String(r[0] ?? '').trim(), cat: String(r[1] ?? '').trim(), price: +r[2] || 0, unit: String(r[3] ?? 'قطعة').trim() }));
+    db.users = (res.users || []).map(r => ({
+      branch: String(r[0] ?? '').trim(),
+      pass: String(r[1] ?? '').trim(),
+      superPass: String(r[2] ?? '').trim(),
+      pointType: String(r[3] ?? '').trim(),
+      notes: String(r[4] ?? '').trim(),
+      active: r[5] === true || String(r[5] ?? '').trim().toUpperCase() === 'TRUE'
     }));
-    db.crmOrders = (res.crmOrders || []).map(r => ({
-      id: r[0], createdAt: r[1], branch: r[2], customer: r[3], phone: r[4], address: r[5], items: r[6],
-      total: +r[7] || 0, notes: r[8], status: r[9], createdBy: r[10]
-    }));
+    db.stock = (res.stock || []).map(r => ({ branch: String(r[0] ?? '').trim(), item: String(r[1] ?? '').trim(), qty: +r[2] || 0, lastUpdate: String(r[3] ?? '') }));
+    db.sales = (res.sales || []).map(r => ({ saleId: r[0], date: r[1], branch: r[2], customer: r[3], phone: r[4], channel: r[5], status: r[6], subtotal: +r[7] || 0, discount: +r[8] || 0, delivery: +r[9] || 0, total: +r[10] || 0, cashier: r[11], notes: r[12] }));
+    db.crmOrders = (res.crmOrders || []).map(r => ({ id: r[0], createdAt: r[1], branch: r[2], customer: r[3], phone: r[4], address: r[5], items: r[6], total: +r[7] || 0, notes: r[8], status: r[9], createdBy: r[10] }));
   }
 
   async function refreshData() {
@@ -400,21 +392,22 @@
 
   function fillBranches() {
     const sel = document.getElementById('branchSelect');
-    sel.innerHTML = '<option value="">اختر الفرع</option>' + db.users.filter(u => u.active !== false).map(u => `<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join('');
+    sel.innerHTML = '<option value="">اختر الفرع</option>' + db.users.filter(u => u.active === true).map(u => `<option value="${esc(u.branch)}">${esc(u.branch)}</option>`).join('');
 
     const crmSel = document.getElementById('crmBranchSelect');
-    if (crmSel) crmSel.innerHTML = '<option>اختر الفرع</option>' + db.users.filter(u => u.pointType === 'فرع' && u.active !== false).map(u => `<option>${esc(u.branch)}</option>`).join('');
+    if (crmSel) crmSel.innerHTML = '<option>اختر الفرع</option>' + db.users.filter(u => u.pointType === 'فرع' && u.active === true).map(u => `<option>${esc(u.branch)}</option>`).join('');
   }
 
   function login() {
-    const branch = document.getElementById('branchSelect').value;
-    const pass = document.getElementById('passInput').value;
-    const user = db.users.find(u => u.branch === branch && (u.pass === pass || u.superPass === pass) && u.active !== false);
-    if (!user) return toast('بيانات خاطئة أو حساب غير نشط');
+    const branch = String(document.getElementById('branchSelect').value || '').trim();
+    const pass = String(document.getElementById('passInput').value || '').trim();
+    const user = db.users.find(u => u.active === true && u.branch === branch && (u.pass === pass || u.superPass === pass));
+    if (!user) return toast('بيانات خاطئة أو الحساب غير نشط');
     currentUser = user;
     localStorage.setItem('SOKAR_USER', JSON.stringify(user));
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appSections').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
     updateUIForUser();
   }
 
@@ -425,6 +418,7 @@
         currentUser = u;
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appSections').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
         updateUIForUser();
       }
     } catch (e) {}
@@ -452,21 +446,19 @@
     if (pt === 'فرع') items = [['pos','نقطة البيع','cash-register'], ['reports','تقارير','chart-bar']];
     else if (pt === 'خدمة العملاء') items = [['crm','CRM','headset'], ['products','المنتجات','tags']];
     else if (pt === 'إدارة') items = [['pos','بيع','cash-register'],['crm','CRM','headset'],['stock','مخزون','warehouse'],['products','منتجات','tags'],['users','مستخدمين','user-cog'],['reports','تقارير','chart-pie']];
-    nav.innerHTML = items.map(([id,label,icon]) => `<div class="nav-item" data-sec="${id}" onclick="showSection('${id}')"><i class="fas fa-${icon}"></i><span>${label}</span></div>`).join('');
+    nav.innerHTML = items.map(([id,label,icon]) => `<button type="button" class="nav-item" data-sec="${id}" onclick="showSection('${id}')"><i class="fas fa-${icon}"></i><span>${label}</span></button>`).join('');
   }
 
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     const sec = document.getElementById('sec-' + id);
     if (sec) sec.classList.add('active');
-
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.toggle('active', el.getAttribute('data-sec') === id);
-    });
-
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('data-sec') === id));
     if (id === 'stock') renderStock();
     if (id === 'reports') renderSales();
     if (id === 'crm') renderCrmTable();
+    if (id === 'products') renderProductsTable();
+    if (id === 'users') renderUsersTable();
   }
 
   function stockFor(item) {
@@ -475,15 +467,21 @@
   }
 
   function renderCats() {
+    const box = document.getElementById('catsList');
+    if (!box) return;
     const cats = ['الكل', ...new Set(db.products.map(p => p.cat).filter(Boolean))];
-    document.getElementById('catsList').innerHTML = cats.map(c => `<span class="badge ${c === currentCat ? 'badge-success' : ''}" style="cursor:pointer" onclick="currentCat='${esc(c)}';renderCats();renderProducts()">${esc(c)}</span>`).join('');
+    box.innerHTML = cats.map(c => `<span class="badge ${c === currentCat ? 'badge-success' : ''}" style="cursor:pointer" onclick="currentCat='${jsq(c)}';renderCats();renderProducts()">${esc(c)}</span>`).join('');
   }
 
   function renderProducts() {
-    const q = (document.getElementById('searchInput')?.value || '').trim();
-    let rows = db.products.filter(p => currentCat === 'الكل' || p.cat === currentCat).filter(p => !q || p.name.includes(q));
-    document.getElementById('productsGrid').innerHTML = rows.map(p => `<div class="product-card" onclick="askQty('${esc(p.name)}')"><div class="product-name">${esc(p.name)}</div><div class="product-meta">${money(p.price)} ج${isWeight(p)?'/كجم':''}</div><div class="stock-badge"><i class="fas fa-box"></i> ${stockFor(p.name)}</div></div>`).join('');
-    document.getElementById('quickStats').innerHTML = `${rows.length} منتج · المجموع: ${currentCat}`;
+    const searchEl = document.getElementById('searchInput');
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    const q = String(searchEl?.value || '').trim();
+    const rows = db.products.filter(p => currentCat === 'الكل' || p.cat === currentCat).filter(p => !q || p.name.includes(q) || p.cat.includes(q));
+    grid.innerHTML = rows.map(p => `<div class="product-card" onclick="askQty('${jsq(p.name)}')"><div class="product-name">${esc(p.name)}</div><div class="product-meta">${money(p.price)} ج${isWeight(p)?'/كجم':''}</div><div class="stock-badge"><i class="fas fa-box"></i> ${stockFor(p.name)}</div></div>`).join('') || '<div>لا توجد منتجات</div>';
+    const stats = document.getElementById('quickStats');
+    if (stats) stats.innerHTML = `${rows.length} منتج · المجموع: ${esc(currentCat)}`;
   }
 
   function askQty(name) {
@@ -504,32 +502,25 @@
 
   function confirmQty() {
     const qty = +document.getElementById('qtyInput').value;
-    if (qty <= 0) return;
-    if (!pendingProduct) return;
-
+    if (qty <= 0 || !pendingProduct) return;
     const charge = isWeight(pendingProduct) ? qty / 1000 : qty;
     const exist = cart.find(i => i.name === pendingProduct.name);
-
     if (exist) {
       exist.qty += qty;
       exist.chargeQty += charge;
       exist.total = exist.chargeQty * exist.price;
     } else {
-      cart.push({name: pendingProduct.name, unit: pendingProduct.unit, price: pendingProduct.price, qty, chargeQty: charge, total: charge * pendingProduct.price});
+      cart.push({ name: pendingProduct.name, unit: pendingProduct.unit, price: pendingProduct.price, qty, chargeQty: charge, total: charge * pendingProduct.price });
     }
-
     closeQty();
     renderCart();
   }
 
   function renderCart() {
     const box = document.getElementById('cartList');
-    if (!cart.length) {
-      box.innerHTML = '<div style="padding:20px;text-align:center">السلة فارغة</div>';
-    } else {
-      box.innerHTML = cart.map((i, idx) => `<div class="cart-row"><div><strong>${esc(i.name)}</strong><div class="product-meta">${isWeight(i)?i.qty+' جم':i.qty}</div></div><div><strong>${money(i.total)}</strong> <i class="fas fa-trash" style="cursor:pointer; color:#b0003a;" onclick="cart.splice(${idx},1);renderCart()"></i></div></div>`).join('');
-    }
-
+    if (!box) return;
+    if (!cart.length) box.innerHTML = '<div style="padding:20px;text-align:center">السلة فارغة</div>';
+    else box.innerHTML = cart.map((i, idx) => `<div class="cart-row"><div><strong>${esc(i.name)}</strong><div class="product-meta">${isWeight(i)?i.qty+' جم':i.qty}</div></div><div><strong>${money(i.total)}</strong> <i class="fas fa-trash" style="cursor:pointer; color:#b0003a;" onclick="cart.splice(${idx},1);renderCart()"></i></div></div>`).join('');
     const sub = cart.reduce((a, b) => a + b.total, 0);
     const fee = +document.getElementById('deliveryFee').value || 0;
     const disc = +document.getElementById('discountVal').value || 0;
@@ -537,17 +528,8 @@
     document.getElementById('grandTotal').textContent = money(Math.max(0, sub + fee - disc)) + ' ج.م';
   }
 
-  function clearCart() {
-    cart = [];
-    renderCart();
-  }
-
-  function newSale() {
-    cart = [];
-    document.getElementById('deliveryFee').value = 0;
-    document.getElementById('discountVal').value = 0;
-    renderCart();
-  }
+  function clearCart() { cart = []; renderCart(); }
+  function newSale() { cart = []; document.getElementById('deliveryFee').value = 0; document.getElementById('discountVal').value = 0; renderCart(); }
 
   async function submitOrder() {
     if (!cart.length) return toast('السلة فارغة');
@@ -555,31 +537,8 @@
     const fee = +document.getElementById('deliveryFee').value || 0;
     const disc = +document.getElementById('discountVal').value || 0;
     const total = Math.max(0, sub + fee - disc);
-
-    const sale = {
-      saleId: 'SALE-' + Date.now().toString(36),
-      date: new Date().toLocaleDateString('ar-EG'),
-      branch: currentUser.branch,
-      customer: 'عميل نقدي',
-      phone: '',
-      channel: 'نقطة بيع',
-      status: 'مكتمل',
-      subtotal: sub,
-      discount: disc,
-      delivery: fee,
-      total: total,
-      cashier: currentUser.branch,
-      notes: cart.map(i => `${i.name}(${i.qty})`).join(' + ')
-    };
-
-    try {
-      await postForm('saveOrder', { order: sale });
-      toast('تم حفظ الفاتورة');
-      await refreshData();
-      newSale();
-    } catch (e) {
-      toast(e.message);
-    }
+    const sale = { saleId: 'SALE-' + Date.now().toString(36), date: new Date().toLocaleDateString('ar-EG'), branch: currentUser.branch, customer: 'عميل نقدي', phone: '', channel: 'نقطة بيع', status: 'مكتمل', subtotal: sub, discount: disc, delivery: fee, total: total, cashier: currentUser.branch, notes: cart.map(i => `${i.name}(${i.qty})`).join(' + ') };
+    try { await postForm('saveOrder', { order: sale }); toast('تم حفظ الفاتورة'); await refreshData(); newSale(); } catch (e) { toast(e.message); }
   }
 
   function loadCrmCartToForm() {
@@ -590,189 +549,72 @@
   }
 
   async function saveCrm() {
-    const order = {
-      branch: document.getElementById('crmBranchSelect').value,
-      customer: document.getElementById('crmCustomer').value,
-      phone: document.getElementById('crmPhone').value,
-      address: document.getElementById('crmAddress').value,
-      items: document.getElementById('crmItems').value,
-      total: +document.getElementById('crmTotal').value,
-      notes: document.getElementById('crmNotes').value,
-      createdBy: currentUser.branch,
-      status: 'جديد'
-    };
-
-    try {
-      await postForm('saveCrmOrder', { order });
-      toast('تم الإرسال');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
+    const order = { branch: document.getElementById('crmBranchSelect').value, customer: document.getElementById('crmCustomer').value, phone: document.getElementById('crmPhone').value, address: document.getElementById('crmAddress').value, items: document.getElementById('crmItems').value, total: +document.getElementById('crmTotal').value, notes: document.getElementById('crmNotes').value, createdBy: currentUser.branch, status: 'جديد' };
+    try { await postForm('saveCrmOrder', { order }); toast('تم الإرسال'); refreshData(); } catch (e) { toast(e.message); }
   }
 
   function renderCrmTable() {
+    const body = document.getElementById('crmTable');
+    if (!body) return;
     let rows = db.crmOrders;
-    if (currentUser.pointType === 'فرع') rows = rows.filter(r => r.branch === currentUser.branch);
-
-    document.getElementById('crmTable').innerHTML = rows.map(r => `<tr><td>${esc(r.id)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer)}</td><td>${money(r.total)}</td><td>${esc(r.status)}</td><td><button class="btn btn-outline btn-icon" onclick="acceptCrm('${esc(r.id)}')"><i class="fas fa-check"></i></button></td></tr>`).join('');
+    if (currentUser?.pointType === 'فرع') rows = rows.filter(r => r.branch === currentUser.branch);
+    body.innerHTML = rows.map(r => `<tr><td>${esc(r.id)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer)}</td><td>${money(r.total)}</td><td>${esc(r.status)}</td><td><button class="btn btn-outline btn-icon" onclick="acceptCrm('${jsq(r.id)}')"><i class="fas fa-check"></i></button></td></tr>`).join('');
   }
 
-  async function acceptCrm(id) {
-    try {
-      await postForm('acceptCrmOrder', { id, branch: currentUser.branch });
-      toast('تم الاستلام');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
-  }
+  async function acceptCrm(id) { try { await postForm('acceptCrmOrder', { id, branch: currentUser.branch }); toast('تم الاستلام'); refreshData(); } catch (e) { toast(e.message); } }
 
   function renderStock() {
     document.getElementById('stockBranch').textContent = currentUser.branch;
     const branchStock = db.stock.filter(s => s.branch === currentUser.branch);
-
     document.getElementById('stockTable').innerHTML = db.products.map(p => {
       const st = branchStock.find(s => s.item === p.name) || { qty: 0, lastUpdate: '-' };
-      return `<tr><td>${esc(p.name)}</td><td>${st.qty}</td><td>${st.lastUpdate || '-'}</td><td><input type="number" step="0.1" onchange="setStockUpdate('${esc(p.name)}',this.value)"></td></tr>`;
+      return `<tr><td>${esc(p.name)}</td><td>${st.qty}</td><td>${st.lastUpdate || '-'}</td><td><input type="number" step="0.1" onchange="setStockUpdate('${jsq(p.name)}',this.value)"></td></tr>`;
     }).join('');
   }
 
-  function setStockUpdate(name, val) {
-    const q = +val;
-    stockUpdates = stockUpdates.filter(x => x.item !== name);
-    if (q > 0) stockUpdates.push({ item: name, qty: q });
-  }
-
-  async function saveStockUpdates() {
-    if (!stockUpdates.length) return;
-    try {
-      await postForm('bulkStockUpdate', { branch: currentUser.branch, updates: stockUpdates });
-      stockUpdates = [];
-      toast('تم الحفظ');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
-  }
+  function setStockUpdate(name, val) { const q = +val; stockUpdates = stockUpdates.filter(x => x.item !== name); if (q > 0) stockUpdates.push({ item: name, qty: q }); }
+  async function saveStockUpdates() { if (!stockUpdates.length) return; try { await postForm('bulkStockUpdate', { branch: currentUser.branch, updates: stockUpdates }); stockUpdates = []; toast('تم الحفظ'); refreshData(); } catch (e) { toast(e.message); } }
 
   function renderProductsTable() {
-    document.getElementById('productsTable').innerHTML = db.products.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td></tr>`).join('');
+    const body = document.getElementById('productsTable');
+    if (!body) return;
+    body.innerHTML = db.products.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td></tr>`).join('');
   }
 
   async function saveProduct(mode) {
-    const prod = {
-      oldName: document.getElementById('prodOldName').value,
-      name: document.getElementById('prodName').value,
-      cat: document.getElementById('prodCat').value,
-      price: +document.getElementById('prodPrice').value,
-      unit: document.getElementById('prodType').value
-    };
-
-    try {
-      await postForm('manageProduct', { mode, product: prod });
-      toast('تم');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
+    const prod = { oldName: document.getElementById('prodOldName').value, name: document.getElementById('prodName').value, cat: document.getElementById('prodCat').value, price: +document.getElementById('prodPrice').value, unit: document.getElementById('prodType').value };
+    try { await postForm('manageProduct', { mode, product: prod }); toast('تم'); refreshData(); } catch (e) { toast(e.message); }
   }
 
   function renderUsersTable() {
-    document.getElementById('usersTable').innerHTML = db.users.map(u => `<tr><td>${esc(u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc(u.notes || '')}</td><td>${u.active ? '✅' : '❌'}</td></tr>`).join('');
+    const body = document.getElementById('usersTable');
+    if (!body) return;
+    body.innerHTML = db.users.map(u => `<tr><td>${esc(u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc(u.notes || '')}</td><td>${u.active ? '✅' : '❌'}</td></tr>`).join('');
   }
 
   async function saveUser(mode) {
-    const user = {
-      branch: document.getElementById('userBranch').value,
-      pass: document.getElementById('userPass').value,
-      superPass: document.getElementById('userSuperPass').value,
-      pointType: document.getElementById('userPointType').value,
-      notes: document.getElementById('userPerms').value,
-      active: document.getElementById('userActive').checked
-    };
-
-    try {
-      await postForm('manageUser', { mode, user });
-      toast('تم');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
+    const user = { branch: document.getElementById('userBranch').value, pass: document.getElementById('userPass').value, superPass: document.getElementById('userSuperPass').value, pointType: document.getElementById('userPointType').value, notes: document.getElementById('userPerms').value, active: document.getElementById('userActive').checked };
+    try { await postForm('manageUser', { mode, user }); toast('تم'); refreshData(); } catch (e) { toast(e.message); }
   }
 
-  async function deleteUserRow() {
-    const b = document.getElementById('userBranch').value;
-    if (!b) return;
-    try {
-      await postForm('deleteUser', { branch: b });
-      toast('حذف');
-      refreshData();
-    } catch (e) {
-      toast(e.message);
-    }
-  }
+  async function deleteUserRow() { const b = document.getElementById('userBranch').value; if (!b) return; try { await postForm('deleteUser', { branch: b }); toast('حذف'); refreshData(); } catch (e) { toast(e.message); } }
 
   function renderSales() {
+    const body = document.getElementById('salesTable');
+    if (!body) return;
     let rows = db.sales;
     if (currentUser?.pointType !== 'إدارة') rows = rows.filter(s => s.branch === currentUser?.branch);
-    document.getElementById('salesTable').innerHTML = rows.slice().reverse().map(r => `<tr><td>${esc(r.saleId)}</td><td>${esc(r.date)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer || '-')}</td><td>${esc(r.channel || '-')}</td><td>${money(r.total)}</td><td>${esc(r.status || 'مكتمل')}</td></tr>`).join('');
+    body.innerHTML = rows.slice().reverse().map(r => `<tr><td>${esc(r.saleId)}</td><td>${esc(r.date)}</td><td>${esc(r.branch)}</td><td>${esc(r.customer || '-')}</td><td>${esc(r.channel || '-')}</td><td>${money(r.total)}</td><td>${esc(r.status || 'مكتمل')}</td></tr>`).join('');
   }
 
-  async function exportSales() {
-    try {
-      const res = await jsonp('exportSales', { branch: currentUser?.branch, date: document.getElementById('repDate').value, shift: document.getElementById('repShift').value });
-      if (res.url) window.open(res.url);
-    } catch (e) {
-      toast(e.message);
-    }
-  }
+  async function exportSales() { try { const res = await jsonp('exportSales', { branch: currentUser?.branch, date: document.getElementById('repDate').value, shift: document.getElementById('repShift').value }); if (res.url) window.open(res.url); } catch (e) { toast(e.message); } }
+  async function exportStock() { try { const res = await jsonp('exportStock', { branch: currentUser?.branch }); if (res.url) window.open(res.url); } catch (e) { toast(e.message); } }
 
-  async function exportStock() {
-    try {
-      const res = await jsonp('exportStock', { branch: currentUser?.branch });
-      if (res.url) window.open(res.url);
-    } catch (e) {
-      toast(e.message);
-    }
-  }
+  function renderAll() { renderCats(); renderProducts(); renderCart(); renderProductsTable(); renderUsersTable(); renderCrmTable(); renderSales(); }
 
-  function renderAll() {
-    renderCats();
-    renderProducts();
-    renderCart();
-    renderProductsTable();
-    renderUsersTable();
-    renderCrmTable();
-    renderSales();
-  }
+  window.login = login; window.logout = logout; window.showSection = showSection; window.refreshData = refreshData; window.askQty = askQty; window.closeQty = closeQty; window.confirmQty = confirmQty; window.renderCart = renderCart; window.clearCart = clearCart; window.newSale = newSale; window.submitOrder = submitOrder; window.loadCrmCartToForm = loadCrmCartToForm; window.saveCrm = saveCrm; window.acceptCrm = acceptCrm; window.setStockUpdate = setStockUpdate; window.saveStockUpdates = saveStockUpdates; window.saveProduct = saveProduct; window.saveUser = saveUser; window.deleteUserRow = deleteUserRow; window.exportSales = exportSales; window.exportStock = exportStock;
 
-  window.login = login;
-  window.logout = logout;
-  window.showSection = showSection;
-  window.refreshData = refreshData;
-  window.askQty = askQty;
-  window.closeQty = closeQty;
-  window.confirmQty = confirmQty;
-  window.renderCart = renderCart;
-  window.clearCart = clearCart;
-  window.newSale = newSale;
-  window.submitOrder = submitOrder;
-  window.loadCrmCartToForm = loadCrmCartToForm;
-  window.saveCrm = saveCrm;
-  window.acceptCrm = acceptCrm;
-  window.setStockUpdate = setStockUpdate;
-  window.saveStockUpdates = saveStockUpdates;
-  window.saveProduct = saveProduct;
-  window.saveUser = saveUser;
-  window.deleteUserRow = deleteUserRow;
-  window.exportSales = exportSales;
-  window.exportStock = exportStock;
-
-  document.getElementById('qtyModal').addEventListener('click', e => {
-    if (e.target.id === 'qtyModal') closeQty();
-  });
-
+  document.getElementById('qtyModal').addEventListener('click', e => { if (e.target.id === 'qtyModal') closeQty(); });
   boot();
 })();
 </script>
