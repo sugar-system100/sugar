@@ -168,13 +168,6 @@
         </div>
 
         <div style="margin-bottom:14px;">
-          <label>القسم / الفرع</label>
-          <select id="branchSelect" style="margin-top:6px;">
-            <option>جاري التحميل...</option>
-          </select>
-        </div>
-
-        <div style="margin-bottom:14px;">
           <label>اسم المستخدم</label>
           <input id="usernameInput" type="text" placeholder="اسم المستخدم" onkeydown="if(event.key==='Enter') login()">
         </div>
@@ -537,17 +530,15 @@ function postForm(action, payload={}) {
   });
 }
 
-function normalizeData(res) {
-  db.users = (res.users||[]).map(r => ({
-    branch: String(r[0]||'').trim(),
-    username: String(r[1]||'').trim(),
-    pass: String(r[2]||'').trim(),
-    superPass: String(r[3]||'').trim(),
-    pointType: String(r[4]||'').trim(),
-    notes: String(r[5]||'').trim(),
-    active: r[6]===true || String(r[6]||'').toUpperCase()==='TRUE'
-  }));
-
+db.users = (res.users||[]).map(r => ({
+  branch: String(r[0]||'').trim(),
+  username: String(r[0]||'').trim(),
+  pass: String(r[1]||'').trim(),
+  superPass: String(r[2]||'').trim(),
+  pointType: String(r[3]||'').trim(),
+  notes: String(r[4]||'').trim(),
+  active: r[5]===true || String(r[5]||'').toUpperCase()==='TRUE'
+}));
   db.products = (res.products||[]).map(r => ({
     name: String(r[0]||'').trim(),
     cat: String(r[1]||'').trim(),
@@ -650,12 +641,10 @@ function login() {
   if (!pass) return toast('أدخل كلمة المرور', true);
 
   const user = db.users.find(u =>
-    u.active &&
-    u.branch===branch &&
-    u.username===username &&
-    (u.pass===pass || u.superPass===pass)
-  );
-
+  u.active &&
+  u.branch===branch &&
+  (u.pass===pass || u.superPass===pass)
+);
   if (!user) return toast('بيانات الدخول غير صحيحة', true);
 
   currentUser = {...user};
