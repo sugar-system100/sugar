@@ -690,7 +690,7 @@
 "use strict";
 
 // ضع هنا رابط Web App
-const SCRIPTURL = "https://script.google.com/macros/s/AKfycby0eL4eRERB4FYtF08fai2-zVOmLXAg6ULHryxuF7jbFFGmEnh_E2qd9qeeXdnxNEAjlQ/exec";
+const SCRIPTURL = "https://script.google.com/macros/s/AKfycbzgWTnVPt3VYcDRzJ4t4Rz0a5arfqBtaVewT7wGG9U8UiNWgp7L8DbWT4hwf-wiRl-Dow/exec";
 
 let db = {
   products: [],
@@ -1742,7 +1742,7 @@ async function createQROrder() {
       toast("لم يتم إنشاء طلب QR", true);
       return null;
     }
-
+د
     currentQROrderId = orderId;
     currentSalesman  = order.salesmanName;
 
@@ -1831,10 +1831,9 @@ function closeSalesmanConfirmModal() {
   if (m) m.style.display = "none";
 }
 
-async function createQROrderAndPrint() {
-  closeSalesmanConfirmModal();
-  const orderId = await createQROrder();
-  if (!orderId) return;
+const res = await jsonp("createQROrder", { payload: JSON.stringify({ order }) });
+console.log("QR RESPONSE:", res);
+const orderId = res?.orderId || res?.id || null;
   // بعد إنشاء QR، المستخدم يضغط زر "طباعة" داخل مودال qrModal
 }
 
