@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>سكر 33 - تسجيل دخول</title>
+  <title>سكر 33 - دخول</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     :root{--primary:#b81b5c;--bg:#f9f6f8;--surface:#fff;--border:#e9dee5;--text:#1e1e2a;--muted:#6b5e66;--shadow:0 10px 25px -5px rgba(0,0,0,.05),0 8px 10px -6px rgba(0,0,0,.02)}
     *{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
     body{margin:0;background:var(--bg);color:var(--text)}
+    .hidden{display:none!important}
     .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
     .card{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px;box-shadow:var(--shadow)}
     h1{text-align:center;margin:12px 0 6px}
@@ -20,15 +21,19 @@
     .msg{margin-top:14px;text-align:center;color:#b0003a;min-height:24px}
     .ok{color:#0f9d58}
     .logo{font-size:52px;color:var(--primary);text-align:center;display:block}
-    .box{background:#faf7f9;border:1px dashed var(--border);padding:14px;border-radius:16px;margin-top:18px;font-size:14px;color:var(--muted)}
+    .app{max-width:980px;margin:24px auto;padding:24px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+    .panel{background:#fff;border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+    .muted{color:var(--muted)}
+    .logout{width:auto;padding:12px 18px}
   </style>
 </head>
 <body>
-<div class="wrap">
+<div id="loginScreen" class="wrap">
   <div class="card">
     <i class="fas fa-candy-cane logo"></i>
     <h1>سكر 33</h1>
-    <p>شاشة دخول 3 اختيارات: نوع المستخدم ثم الفرع ثم كلمة المرور</p>
+    <p>تسجيل الدخول: نوع المستخدم ثم الفرع ثم كلمة المرور</p>
 
     <label>نوع المستخدم</label>
     <select id="pointTypeSelect">
@@ -45,19 +50,37 @@
 
     <button id="loginBtn">دخول</button>
     <div id="loginMsg" class="msg"></div>
+  </div>
+</div>
 
-    <script>
+<div id="appSections" class="hidden app">
+  <div class="top">
+    <div>
+      <h2 style="margin:0 0 6px;">تم الدخول للنظام</h2>
+      <div id="whoami" class="muted"></div>
+    </div>
+    <button id="logoutBtn" class="logout">تسجيل خروج</button>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0;">الواجهة الرئيسية</h3>
+    <p class="muted">تم تطبيق الإصلاح: بعد تسجيل الدخول يتم إخفاء شاشة الدخول وإظهار الواجهة الرئيسية.</p>
+  </div>
+</div>
+
+<script>
 (function(){
   'use strict';
 
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzR_KLq4Wbq4f8q5ghfUJSz_-0PMtmDmVvMAUHq6x2Ud3cvEsMW2YtSEZBRWl3iBHvL4Q/exec';
   let db = { users: [] };
+  let currentUser = null;
 
   const msg = document.getElementById('loginMsg');
   const pointTypeSelect = document.getElementById('pointTypeSelect');
   const branchSelect = document.getElementById('branchSelect');
   const passInput = document.getElementById('passInput');
   const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
 
   function setMsg(text, ok=false){
     msg.textContent = text || '';
@@ -118,8 +141,7 @@
 
   function fillUserTypes(){
     const types = [...new Set(db.users.filter(u => u.active).map(u => u.pointType).filter(Boolean))];
-    pointTypeSelect.innerHTML = '<option value="">اختر نوع المستخدم</option>' +
-      types.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+    pointTypeSelect.innerHTML = '<option value="">اختر نوع المستخدم</option>' + types.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
   }
 
   function fillBranchesByType(){
@@ -128,9 +150,12 @@
       branchSelect.innerHTML = '<option value="">اختر نوع المستخدم أولاً</option>';
       return;
     }
-    const branches = db.users.filter(u => u.active && u.pointType === type).map(u => u.branch);
-    branchSelect.innerHTML = '<option value="">اختر الفرع / المستخدم</option>' +
-      branches.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+    const branches = [...new Set(db.users.filter(u => u.active && u.pointType === type).map(u => u.branch))];
+    branchSelect.innerHTML = '<option value="">اختر الفرع / المستخدم</option>' + branches.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  }
+
+  function updateUIForUser(){
+    document.getElementById('whoami').textContent = `${currentUser.branch} (${currentUser.pointType})`;
   }
 
   function login(){
@@ -151,8 +176,34 @@
 
     if (!user) return setMsg('بيانات الدخول غير صحيحة');
 
+    currentUser = user;
     localStorage.setItem('SOKAR_USER', JSON.stringify(user));
-    setMsg('تم تسجيل الدخول بنجاح', true);
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appSections').classList.remove('hidden');
+    updateUIForUser();
+    setMsg('');
+  }
+
+  function restoreSession(){
+    try {
+      const u = JSON.parse(localStorage.getItem('SOKAR_USER'));
+      if (!u) return;
+      const stillExists = db.users.some(usr => usr.branch === u.branch && usr.pointType === u.pointType && usr.active);
+      if (!stillExists) {
+        localStorage.removeItem('SOKAR_USER');
+        return;
+      }
+      currentUser = u;
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appSections').classList.remove('hidden');
+      updateUIForUser();
+    } catch(e){}
+  }
+
+  function logout(){
+    currentUser = null;
+    localStorage.removeItem('SOKAR_USER');
+    location.reload();
   }
 
   async function boot(){
@@ -162,7 +213,8 @@
       normalizeData(res);
       fillUserTypes();
       branchSelect.innerHTML = '<option value="">اختر نوع المستخدم أولاً</option>';
-      setMsg('جاهز لتسجيل الدخول', true);
+      restoreSession();
+      if (!currentUser) setMsg('جاهز لتسجيل الدخول', true);
     } catch(e) {
       setMsg(e.message || 'فشل التحميل');
       pointTypeSelect.innerHTML = '<option value="">فشل التحميل</option>';
@@ -172,6 +224,7 @@
 
   pointTypeSelect.addEventListener('change', fillBranchesByType);
   loginBtn.addEventListener('click', login);
+  logoutBtn.addEventListener('click', logout);
   passInput.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
   boot();
 })();
