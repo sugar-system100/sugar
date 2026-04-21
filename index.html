@@ -114,13 +114,10 @@
       </div>
     </div>
 
-    <div id="appSections" class="hidden">
-      <!-- الأقسام ستُنشأ ديناميكيًا حسب نوع المستخدم -->
-    </div>
+    <div id="appSections" class="hidden"></div>
   </div>
 </div>
 
-<!-- مودالات عامة -->
 <div class="modal" id="qtyModal"><div class="modal-card"><h2 id="qtyTitle">الكمية</h2><input id="qtyInput" type="number" min="0.05" step="0.05" value="1"><div id="qtyHint"></div><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQty()">إلغاء</button><button class="btn btn-primary" onclick="confirmQty()">تأكيد</button></div></div></div>
 <div class="modal" id="qrModal"><div class="modal-card" style="text-align:center;"><h2>رمز الطلب</h2><div id="qrCodeContainer" style="margin:20px 0; min-height:250px;"></div><p id="qrOrderId"></p><div id="qrItemsList" style="margin:10px 0; font-size:0.9rem;"></div><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQrModal()">إلغاء</button><button class="btn btn-primary" onclick="printQR()"><i class="fas fa-print"></i> طباعة</button></div></div></div>
 <div class="modal" id="qrScannerModal"><div class="modal-card"><h2>مسح QR</h2><div id="qrReader"></div><input id="manualQrInput" placeholder="أدخل الكود يدويًا"><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQrScanner()">إلغاء</button><button class="btn btn-primary" onclick="loadManualQR()">تحميل</button></div></div></div>
@@ -165,47 +162,36 @@
 
   function normalizeData(res) {
     db.products = (res.products||[]).map(r=>({ id:r[0], name:r[0], cat:r[1], price:+r[2]||0, unit:r[3]||'قطعة' }));
-    db.users = (res.users||[]).map(r=>({ branch:r[0], pass:r[1], superPass:r[2], pointType:r[3], notes:r[4], active:r[5]!==false, permissions:r[6]?r[6].split(','):[] }));
+    db.users = (res.users||[]).map(r=>({ branch:r[0], username:r[1], pass:r[2], superPass:r[3], pointType:r[4], notes:r[5], active:r[6]!==false }));
     db.stock = (res.stock||[]).map(r=>({ branch:r[0], item:r[1], qty:+r[2]||0, lastUpdate:r[3] }));
-    db.sales = (res.sales||[]).map(r=>({ saleId:r[0], date:r[1], branch:r[2], customer:r[3], phone:r[4], channel:r[5], status:r[6], subtotal:+r[7]||0, discount:+r[8]||0, delivery:+r[9]||0, total:+r[10]||0, cashier:r[11], notes:r[12], shiftId:r[13], paymentMethod:r[14] }));
+    db.sales = (res.sales||[]).map(r=>({ saleId:r[0], date:r[1], branch:r[2], customer:r[3], phone:r[4], channel:r[6], status:r[7], subtotal:+r[8]||0, discount:+r[9]||0, delivery:+r[10]||0, total:+r[11]||0, cashier:r[12], notes:r[14], shiftId:r[15], paymentMethod:r[16] }));
     db.crmOrders = (res.crmOrders||[]).map(r=>({ id:r[0], createdAt:r[1], branch:r[2], customer:r[3], phone:r[4], address:r[5], items:r[6], total:+r[7]||0, notes:r[8], status:r[9], createdBy:r[10] }));
-    db.shifts = (res.shifts||[]).map(r=>({ id:r[0], branch:r[1], cashier:r[2], openTime:r[3], closeTime:r[4], totalSales:+r[5]||0, status:r[6] }));
-    db.expenses = (res.expenses||[]).map(r=>({ id:r[0], date:r[1], branch:r[2], type:r[3], amount:+r[4]||0, complaint:r[5], notes:r[6], cashier:r[7] }));
+    db.shifts = (res.shifts||[]).map(r=>({ id:r[0], branch:r[1], cashier:r[2], openTime:r[4], closeTime:r[5], totalSales:+r[6]||0, status:r[8] }));
+    db.expenses = (res.expenses||[]).map(r=>({ id:r[0], date:r[1], branch:r[2], type:r[4], amount:+r[5]||0, complaint:r[6], notes:r[7] }));
     db.categories = [...new Set(db.products.map(p=>p.cat))];
   }
 
   async function refreshData(silent=false) { try { const res=await jsonp('getInitialData'); normalizeData(res); if(currentUser) renderAll(); if(!silent) toast('تم التحديث'); } catch(e) { if(!silent) toast(e.message,true); } }
 
   async function boot() {
-  const loginMsg = document.getElementById('loginMsg');
-  const typeSel = document.getElementById('pointTypeSelect');
-  const branchSel = document.getElementById('branchSelect');
-  
-  try {
-    if (loginMsg) loginMsg.textContent = 'جاري الاتصال...';
-    
-    const res = await jsonp('getInitialData');
-    console.log('Response:', res);
-    
-    if (!res || !res.ok) {
-      throw new Error(res?.error || 'فشل تحميل البيانات');
+    const loginMsg = document.getElementById('loginMsg');
+    const typeSel = document.getElementById('pointTypeSelect');
+    const branchSel = document.getElementById('branchSelect');
+    try {
+      if (loginMsg) loginMsg.textContent = 'جاري الاتصال...';
+      const res = await jsonp('getInitialData');
+      if (!res || !res.ok) throw new Error(res?.error || 'فشل تحميل البيانات');
+      normalizeData(res);
+      fillBranches();
+      if (loginMsg) loginMsg.textContent = '';
+      restoreSession();
+    } catch(e) {
+      console.error('Boot error:', e);
+      if (typeSel) typeSel.innerHTML = '<option value="">❌ فشل التحميل: ' + e.message + '</option>';
+      if (branchSel) branchSel.innerHTML = '<option value="">❌ فشل التحميل</option>';
+      if (loginMsg) loginMsg.textContent = 'خطأ: ' + e.message;
     }
-    
-    normalizeData(res);
-    console.log('Data normalized. Users:', db.users.length);
-    
-    fillBranches();
-    console.log('Branches filled');
-    
-    if (loginMsg) loginMsg.textContent = '';
-    restoreSession();
-  } catch(e) {
-    console.error('خطأ:', e);
-    if (typeSel) typeSel.innerHTML = '<option value="">❌ فشل التحميل: ' + e.message + '</option>';
-    if (branchSel) branchSel.innerHTML = '<option value="">❌ فشل التحميل</option>';
-    if (loginMsg) loginMsg.textContent = 'خطأ: ' + e.message;
   }
-}
 
   function fillBranches() {
     const types = [...new Set(db.users.filter(u=>u.active).map(u=>u.pointType))];
@@ -215,15 +201,15 @@
     const type = document.getElementById('pointTypeSelect').value;
     const sel = document.getElementById('branchSelect');
     if(!type) { sel.innerHTML='<option>اختر النوع أولاً</option>'; return; }
-    const branches = db.users.filter(u=>u.active && u.pointType===type).map(u=>u.branch);
-    sel.innerHTML = '<option value="">اختر الفرع</option>'+branches.map(b=>`<option>${esc(b)}</option>`).join('');
+    const branches = db.users.filter(u=>u.active && u.pointType===type).map(u=>u.username || u.branch);
+    sel.innerHTML = '<option value="">اختر المستخدم</option>'+branches.map(b=>`<option>${esc(b)}</option>`).join('');
   }
 
   function login() {
     const type = document.getElementById('pointTypeSelect').value;
-    const branch = document.getElementById('branchSelect').value;
+    const username = document.getElementById('branchSelect').value;
     const pass = document.getElementById('passInput').value;
-    const user = db.users.find(u=>u.active && u.pointType===type && u.branch===branch && (u.pass===pass||u.superPass===pass));
+    const user = db.users.find(u=>u.active && u.pointType===type && (u.username===username || u.branch===username) && (u.pass===pass||u.superPass===pass));
     if(!user) return toast('بيانات خاطئة',true);
     currentUser = user; localStorage.setItem('SOKAR_USER',JSON.stringify(user));
     document.getElementById('loginScreen').classList.add('hidden');
@@ -238,7 +224,7 @@
   function logout() { localStorage.removeItem('SOKAR_USER'); location.reload(); }
 
   function buildUI() {
-    document.getElementById('whoami').textContent = `${currentUser.branch} (${currentUser.pointType})`;
+    document.getElementById('whoami').textContent = `${currentUser.username || currentUser.branch} (${currentUser.pointType})`;
     const nav = document.getElementById('navMenu');
     const sections = document.getElementById('appSections');
     const pt = currentUser.pointType;
@@ -305,11 +291,10 @@
 
   function renderAll() { showSection(document.querySelector('.nav-item.active')?.dataset.sec || 'dashboard'); }
 
-  // ========== ADMIN DASHBOARD ==========
   function renderDashboard() {
     const branch = document.getElementById('adminBranchSelect')?.value || 'كل الفروع';
     const todaySales = db.sales.filter(s=> (branch==='كل الفروع'||s.branch===branch) && s.date===new Date().toLocaleDateString('ar-EG')).reduce((a,b)=>a+b.total,0);
-    const openShift = db.shifts.find(s=> (branch==='كل الفروع'||s.branch===branch) && s.status==='مفتوح');
+    const openShift = db.shifts.find(s=> (branch==='كل الفروع'||s.branch===branch) && s.status==='مفتوحة');
     const shiftSales = openShift ? db.sales.filter(s=>s.shiftId===openShift.id).reduce((a,b)=>a+b.total,0) : 0;
     const invoiceCount = openShift ? db.sales.filter(s=>s.shiftId===openShift.id).length : 0;
     
@@ -343,7 +328,6 @@
     `;
   }
 
-  // ========== POS (مندوب / كاشير / دليفري) ==========
   function renderPOS() {
     const pt = currentUser.pointType;
     const isSalesman = pt === 'مندوب_بيع';
@@ -364,7 +348,7 @@
       <div class="pos-layout">
         <div class="pos-cart-panel"><div class="card"><div class="card-header"><span>السلة</span></div><div id="cartList" class="cart-items"></div><div class="total-section">
           ${showDelivery?'<div><label>توصيل</label><input id="deliveryFee" type="number" value="0" step="0.5" oninput="renderCart()"></div>':''}
-          ${showDiscount?`<div><label>خصم</label><select id="discountType"><option value="fixed">مبلغ</option><option value="percent">%</option></select><input id="discountVal" type="number" value="0" step="0.5" oninput="renderCart()" ${!discountEnabled?'readonly onclick="requestDiscountSupervisor()"':''}></div>`:''}
+          ${showDiscount?`<div><label>خصم</label><select id="discountType"><option value="fixed">مبلغ</option><option value="percent">%</option></select><input id="discountVal" type="number" value="0" step="0.5" oninput="renderCart()"></div>`:''}
           <div style="display:flex; justify-content:space-between;"><span>الإجمالي</span><span id="grandTotal">0 ج.م</span></div>
           <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="proceedToPayment()">متابعة الدفع</button>
         </div></div></div>
@@ -403,14 +387,14 @@
 
   async function createQROrder() {
     if(!cart.length) return toast('السلة فارغة');
-    const order = { branch:currentUser.branch, salesman:currentUser.branch, items:cart, total:cart.reduce((a,b)=>a+b.total,0) };
+    const order = { branch:currentUser.branch, salesmanName:currentUser.username || currentUser.branch, items:cart, total:cart.reduce((a,b)=>a+b.total,0) };
     const res = await postForm('createQROrder',{order});
     if(res.orderId) { showQRModal(res.orderId, cart); toast('تم إنشاء QR'); } else toast('فشل');
   }
 
   function showQRModal(id, items) {
     document.getElementById('qrOrderId').textContent = id;
-    document.getElementById('qrItemsList').innerHTML = `<strong>مندوب البيع: ${esc(currentUser.branch)}</strong><br>` + items.map(i=>`${esc(i.name)} (${i.qty})`).join(' - ');
+    document.getElementById('qrItemsList').innerHTML = `<strong>مندوب البيع: ${esc(currentUser.username || currentUser.branch)}</strong><br>` + items.map(i=>`${esc(i.name)} (${i.qty})`).join(' - ');
     QRCode.toCanvas(document.createElement('canvas'), id, {width:250}, (e,c)=>document.getElementById('qrCodeContainer').appendChild(c));
     document.getElementById('qrModal').style.display='flex';
   }
@@ -434,20 +418,19 @@
   async function confirmPayment() {
     const method = document.getElementById('paymentMethod').value;
     const paid = parseFloat(document.getElementById('paidAmount').value);
-    const order = { branch:currentUser.branch, items:cart, total:cart.reduce((a,b)=>a+b.total,0), paymentMethod:method, paidAmount:paid, customer:customerData };
-    await postForm('finalizeOrder',{order});
-    if(method==='فودافون كاش') await postForm('addExpense',{type:'فودافون كاش',amount:paid, cashier:currentUser.branch});
+    const order = { branch:currentUser.branch, items:cart, total:cart.reduce((a,b)=>a+b.total,0), paymentMethod:method, paidAmount:paid, customer:customerData, cashier:currentUser.username || currentUser.branch };
+    await postForm('saveOrder',{order});
+    if(method==='فودافون كاش') await postForm('addExpense',{expense:{type:'فودافون كاش',amount:paid, branch:currentUser.branch, cashier:currentUser.username}});
     toast('تم البيع'); cart=[]; renderCart(); closePaymentModal();
   }
 
   function openExpenseModal() { document.getElementById('expenseModal').style.display='flex'; }
   function closeExpenseModal() { document.getElementById('expenseModal').style.display='none'; }
   async function saveExpense() {
-    const exp = { type:document.getElementById('expenseType').value, amount:parseFloat(document.getElementById('expenseAmount').value), complaint:document.getElementById('expenseComplaint').value, notes:document.getElementById('expenseNotes').value, branch:currentUser.branch, cashier:currentUser.branch };
-    await postForm('addExpense',exp); toast('تم تسجيل المصروف'); closeExpenseModal();
+    const exp = { type:document.getElementById('expenseType').value, amount:parseFloat(document.getElementById('expenseAmount').value), complaint:document.getElementById('expenseComplaint').value, notes:document.getElementById('expenseNotes').value, branch:currentUser.branch, cashier:currentUser.username || currentUser.branch };
+    await postForm('addExpense',{expense:exp}); toast('تم تسجيل المصروف'); closeExpenseModal();
   }
 
-  // ========== دوال إضافية مختصرة ==========
   function renderStock() {
     const branch = currentUser.pointType==='إدارة' ? (document.getElementById('adminBranchSelect')?.value||'') : currentUser.branch;
     const stock = db.stock.filter(s=>s.branch===branch);
@@ -462,7 +445,7 @@
 
   function renderUsersManagement() {
     document.getElementById('sec-users').innerHTML = `<div class="top-bar"><h2>المستخدمون</h2><button class="btn btn-primary" onclick="openUserModal()">إضافة مستخدم</button></div>
-      <div class="table-wrapper"><table><tr><th>المستخدم</th><th>النوع</th><th>الصلاحيات</th><th>نشط</th><th>إجراءات</th></tr>${db.users.map(u=>`<tr><td>${esc(u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc(u.permissions.join(','))}</td><td>${u.active?'✅':'❌'}</td><td><i class="fas fa-edit" onclick="editUser('${jsq(u.branch)}')"></i></td></tr>`).join('')}</table></div>`;
+      <div class="table-wrapper"><table><tr><th>المستخدم</th><th>النوع</th><th>الفرع</th><th>نشط</th><th>إجراءات</th></tr>${db.users.map(u=>`<tr><td>${esc(u.username||u.branch)}</td><td>${esc(u.pointType)}</td><td>${esc(u.branch)}</td><td>${u.active?'✅':'❌'}</td><td><i class="fas fa-edit" onclick="editUser('${jsq(u.username||u.branch)}')"></i></td></tr>`).join('')}</table></div>`;
   }
 
   function renderExpenses() {
@@ -481,7 +464,6 @@
     document.getElementById('sec-crmOrders').innerHTML = `<div class="top-bar"><h2>طلبات CRM</h2></div><div class="table-wrapper"><table><tr><th>كود</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr>${orders.map(o=>`<tr><td>${esc(o.id)}</td><td>${esc(o.customer)}</td><td>${money(o.total)}</td><td>${esc(o.status)}</td><td><button onclick="editDeliveryOrder('${esc(o.id)}')">تعديل</button></td></tr>`).join('')}</table></div>`;
   }
 
-  // ========== دوال مساعدة للإدارة ==========
   function openProductModal(p=null) {
     if(p) { document.getElementById('prodId').value=p.name; document.getElementById('prodName').value=p.name; document.getElementById('prodCat').value=p.cat; document.getElementById('prodPrice').value=p.price; document.getElementById('prodUnit').value=p.unit; document.getElementById('productModalTitle').textContent='تعديل منتج'; }
     else { document.getElementById('prodId').value=''; document.getElementById('productModalTitle').textContent='إضافة منتج'; }
@@ -489,8 +471,8 @@
   }
   function closeProductModal() { document.getElementById('productModal').style.display='none'; }
   async function saveProduct() {
-    const p = { name:document.getElementById('prodName').value, cat:document.getElementById('prodCat').value, price:document.getElementById('prodPrice').value, unit:document.getElementById('prodUnit').value, oldName:document.getElementById('prodId').value };
-    await postForm('manageProduct', {product:p}); toast('تم الحفظ'); closeProductModal(); refreshData();
+    const p = { name:document.getElementById('prodName').value, cat:document.getElementById('prodCat').value, price:document.getElementById('prodPrice').value, unit:document.getElementById('prodUnit').value, originalName:document.getElementById('prodId').value };
+    await postForm('manageProduct',{product:p}); toast('تم الحفظ'); closeProductModal(); refreshData();
   }
   async function syncProductsToBranches() { await postForm('syncProducts'); toast('تمت المزامنة'); }
 
