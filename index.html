@@ -436,7 +436,6 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Tabs داخل التقارير */
     .reports-tabs {
       display: flex;
       gap: 8px;
@@ -456,12 +455,8 @@
       color: #fff;
       border-color: var(--primary);
     }
-    .report-tab {
-      display: none;
-    }
-    .report-tab.active {
-      display: block;
-    }
+    .report-tab { display: none; }
+    .report-tab.active { display: block; }
 
     @media (max-width: 1000px) {
       .sidebar {
@@ -518,7 +513,6 @@
   </div>
 
   <div class="main-content">
-    <!-- شاشة الدخول -->
     <div id="loginScreen" style="max-width:500px;margin:80px auto;">
       <div class="card" style="padding:32px;">
         <div style="text-align:center;margin-bottom:30px;">
@@ -555,14 +549,14 @@
       </div>
     </div>
 
-    <!-- أقسام التطبيق بعد الدخول -->
     <div id="appSections" class="hidden">
-      <div id="sec-pos"      class="section active"></div>
-      <div id="sec-crm"      class="section"></div>
-      <div id="sec-stock"    class="section"></div>
-      <div id="sec-products" class="section"></div>
-      <div id="sec-users"    class="section"></div>
-      <div id="sec-reports"  class="section"></div>
+      <div id="sec-pos"       class="section active"></div>
+      <div id="sec-crm"       class="section"></div>
+      <div id="sec-stock"     class="section"></div>
+      <div id="sec-products"  class="section"></div>
+      <div id="sec-users"     class="section"></div>
+      <div id="sec-reports"   class="section"></div>
+      <div id="sec-forecast"  class="section"></div>
     </div>
   </div>
 </div>
@@ -580,7 +574,7 @@
   </div>
 </div>
 
-<!-- Modal QR عرض الكود -->
+<!-- Modal QR عرض -->
 <div class="modal" id="qrModal">
   <div class="modal-card" style="text-align:center;">
     <h2><i class="fas fa-qrcode"></i> رمز الطلب</h2>
@@ -601,16 +595,16 @@
 <div class="modal" id="qrScannerModal">
   <div class="modal-card" style="width:500px;">
     <h2 style="text-align:center;margin-bottom:16px;">
-      <i class="fas fa-camera"></i> مسح QR
+      <i class="fas fa-camera"></i> QR
     </h2>
     <div id="qrScannerContainer">
       <div id="qrReader"></div>
     </div>
     <p style="text-align:center;margin:12px 0;">أو أدخل كود الطلب يدويًا</p>
-    <input type="text" id="manualQrInput" placeholder="ادخل كود QR" style="margin-bottom:12px;">
+    <input type="text" id="manualQrInput" placeholder="QR ID..." style="margin-bottom:12px;">
     <div style="display:flex;gap:10px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeQrScanner()">إلغاء</button>
-      <button class="btn btn-primary" style="flex:1;" onclick="loadManualQR()">تحميل الطلب</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="loadManualQR()">تحميل</button>
     </div>
   </div>
 </div>
@@ -630,8 +624,8 @@
 <!-- Modal مشرف الخصم -->
 <div class="modal" id="supervisorModal">
   <div class="modal-card">
-    <h2><i class="fas fa-user-shield"></i> صلاحية المشرف</h2>
-    <p style="margin:16px 0;">أدخل كلمة مرور المشرف لتفعيل الخصم</p>
+    <h2><i class="fas fa-user-shield"></i> تفويض الخصم</h2>
+    <p style="margin:16px 0;">أدخل كلمة مرور المشرف لتفعيل الخصم لهذا الطلب.</p>
     <input id="superPassInput" type="password" placeholder="كلمة مرور المشرف">
     <div style="display:flex;gap:10px;margin-top:20px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeSupervisorModal()">إلغاء</button>
@@ -643,23 +637,19 @@
 <!-- Modal الدفع -->
 <div class="modal" id="paymentModal">
   <div class="modal-card">
-    <h2><i class="fas fa-credit-card"></i> طريقة الدفع</h2>
+    <h2><i class="fas fa-credit-card"></i> الدفع</h2>
     <div style="margin:16px 0;">
       <select id="paymentMethod" style="margin-bottom:12px;">
-        <option value="">اختر طريقة الدفع</option>
-        <option value="نقدي">نقدي</option>
-        <option value="فيزا">فيزا</option>
-        <option value="تحويل بنكي">تحويل بنكي</option>
+        <option value="كاش">كاش</option>
         <option value="فودافون كاش">فودافون كاش</option>
-        <option value="إنستاباي">إنستاباي</option>
-        <option value="أقساط">أقساط</option>
+        <option value="POS">POS</option>
       </select>
       <input type="number" id="paidAmount" placeholder="المبلغ المدفوع" step="0.5" style="margin-bottom:12px;">
-      <input type="text" id="paymentNotes" placeholder="ملاحظات الدفع (اختياري)">
+      <input type="text" id="paymentNotes" placeholder="ملاحظات (اختياري)">
     </div>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closePaymentModal()">إلغاء</button>
-      <button class="btn btn-primary" style="flex:1;" onclick="confirmPayment()">تأكيد الدفع</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="confirmPayment()">تأكيد</button>
     </div>
   </div>
 </div>
@@ -669,9 +659,9 @@
   <div class="modal-card">
     <h2><i class="fas fa-user"></i> بيانات العميل</h2>
     <div style="margin:16px 0;">
-      <input id="customerName"   placeholder="اسم العميل"   style="margin-bottom:12px;">
-      <input id="customerPhone"  placeholder="رقم الهاتف"   style="margin-bottom:12px;">
-      <input id="customerAddress" placeholder="العنوان"      style="margin-bottom:12px;">
+      <input id="customerName"    placeholder="اسم العميل" style="margin-bottom:12px;">
+      <input id="customerPhone"   placeholder="رقم الهاتف" style="margin-bottom:12px;">
+      <input id="customerAddress" placeholder="العنوان"    style="margin-bottom:12px;">
     </div>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeCustomerModal()">إلغاء</button>
@@ -680,11 +670,27 @@
   </div>
 </div>
 
+<!-- Modal إتمام أوردر مندوب البيع -->
+<div class="modal" id="salesmanConfirmModal">
+  <div class="modal-card">
+    <h2><i class="fas fa-check-circle"></i> إتمام الأوردر</h2>
+    <p style="margin:16px 0;">هل تريد إنشاء وطباعة QR لهذا الأوردر؟</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeSalesmanConfirmModal()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="createQROrderAndPrint()">
+        طباعة QR
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
 "use strict";
-const SCRIPTURL = "https://script.google.com/macros/s/AKfycbwlGA4GBGd33PQUphVmdE4DybjxubFWUEZvISl3Z-Bnob2pM9Mmp-QXvAL7wE4nBrzihA/exec"; // ضع هنا رابط Web App من Apps Script
+
+// ضع هنا رابط Web App
+const SCRIPTURL = "https://script.google.com/macros/s/AKfycbwlGA4GBGd33PQUphVmdE4DybjxubFWUEZvISl3Z-Bnob2pM9Mmp-QXvAL7wE4nBrzihA/exec";
 
 let db = {
   products: [],
@@ -699,24 +705,25 @@ let db = {
   crmStatuses: []
 };
 
-let currentUser       = null;
-let currentCat        = "";
-let cart              = [];
-let pendingProduct    = null;
-let pendingEditIndex  = -1;
-let currentShift      = null;
-let discountEnabled   = false;
-let currentQROrderId  = null;
-let currentSalesman   = "";
-let html5QrScanner    = null;
-let customerData      = { name: "", phone: "", address: "" };
+let currentUser = null;
+let currentCat = "";
+let cart = [];
+let pendingProduct = null;
+let pendingEditIndex = -1;
+let currentShift = null;
+let discountEnabled = false;
+let currentQROrderId = null;
+let html5QrScanner = null;
+let customerData = { name: "", phone: "", address: "" };
 
-let crmCart           = [];
-let crmCurrentCat     = "";
+let crmCart = [];
+let crmCurrentCat = "";
 let crmPendingProduct = null;
 let crmPendingEditIndex = -1;
 
-// الجزء 2 (الدوال العامة + login + buildNav + renderAll + POS/CRM/تقارير...) سيأتي في الرسالة التالية
+let currentSalesman = "";
+let lastCrmCount = 0;
+let crmPollTimer = null;
 // =============== أدوات عامة ===============
 
 function money(n) {
@@ -771,7 +778,9 @@ function jsonp(action, params={}) {
       finished = true;
       try { delete window[cb]; } catch(e){}
       if (script.parentNode) script.parentNode.removeChild(script);
-      if (!data || data.ok === false) return reject(new Error(data && data.error || "خطأ في الاستجابة"));
+      if (!data || data.ok === false) {
+        return reject(new Error(data && data.error || "خطأ في الاستجابة"));
+      }
       resolve(data);
     };
 
@@ -824,7 +833,7 @@ function postForm(action, payload={}) {
       done = true;
       if (form.parentNode) form.parentNode.removeChild(form);
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      resolve({ ok: true });
+      resolve({ ok: true, ...payload }); // نرجع نفس البيانات كراحة
     };
 
     iframe.onload = fin;
@@ -861,11 +870,16 @@ function normalizeData(res) {
   }));
 
   db.sales = (res.sales || []).map(r => ({
-    saleId:   r[0], date: r[1], branch: r[2],
-    customer: r[3], phone: r[4], address: r[5],
-    channel:  r[6], status: r[7],
-    subtotal: Number(r[8] || 0),
-    discount: Number(r[9] || 0),
+    saleId:   r[0],
+    date:     r[1],
+    branch:   r[2],
+    customer: r[3],
+    phone:    r[4],
+    address:  r[5],
+    channel:  r[6],
+    status:   r[7],
+    subtotal: Number(r[8]  || 0),
+    discount: Number(r[9]  || 0),
     delivery: Number(r[10] || 0),
     total:    Number(r[11] || 0),
     cashier:  r[12],
@@ -982,9 +996,9 @@ async function boot() {
     if (loginMsg) loginMsg.textContent = "";
     restoreSession();
   } catch (e) {
-    if (typeSel)  typeSel.innerHTML   = '<option value="">اختر...</option>';
+    if (typeSel)   typeSel.innerHTML   = '<option value="">اختر...</option>';
     if (branchSel) branchSel.innerHTML = '<option value="">اختر نوع المستخدم أولاً</option>';
-    if (loginMsg) loginMsg.textContent = e.message || "خطأ في الاتصال";
+    if (loginMsg)  loginMsg.textContent = e.message || "خطأ في الاتصال";
   }
 }
 
@@ -1085,6 +1099,9 @@ function updateUIForUser() {
   buildNav();
   loadCurrentShift();
   renderAll();
+  if (currentUser?.pointType === "دليفري") {
+    startDeliveryPolling();
+  }
 }
 
 // =============== التنقل بين الأقسام ===============
@@ -1095,19 +1112,19 @@ function buildNav() {
   const pt = currentUser?.pointType || "";
   let items = [];
 
-  // توزيع الصلاحيات
   if (pt === "إدارة") {
     items = [
-      ["pos",      "لوحة الأداء",   "gauge-high"],
-      ["crm",      "الورديات",      "clock"],
-      ["stock",    "تقارير المبيعات","chart-bar"],
-      ["products", "المنتجات",     "tags"],
-      ["users",    "المستخدمون",   "user-cog"]
+      ["stock",    "مخزون الفروع",        "warehouse"],
+      ["products", "المنتجات",           "tags"],
+      ["users",    "المستخدمون",         "user-cog"],
+      ["reports",  "تقارير المبيعات",    "chart-bar"],
+      ["forecast", "إدارة المخزون / توقع","chart-line"]
     ];
   } else if (pt === "فرع" || pt === "كاشير") {
     items = [
-      ["pos",     "نقطة البيع", "cash-register"],
-      ["reports", "التقارير",    "chart-bar"]
+      ["pos",     "نقطة البيع",   "cash-register"],
+      ["stock",   "مخزون الفرع", "warehouse"],
+      ["reports", "التقارير",     "chart-bar"]
     ];
   } else if (pt === "مندوب_بيع") {
     items = [
@@ -1116,18 +1133,18 @@ function buildNav() {
     ];
   } else if (pt === "خدمة العملاء") {
     items = [
-      ["crm",    "طلبات العملاء", "headset"],
-      ["stock",  "مخزون الفروع", "warehouse"],
+      ["crm",    "طلبات العملاء",   "headset"],
+      ["stock",  "مخزون الفروع",   "warehouse"],
       ["reports","تقارير المبيعات","chart-bar"]
     ];
   } else if (pt === "دليفري") {
     items = [
       ["pos",     "نقطة بيع الدليفري", "motorcycle"],
-      ["crm",     "طلبات خدمة العملاء", "list-ul"],
+      ["crm",     "طلبات خدمة العملاء","list-ul"],
+      ["stock",   "المخزون",           "warehouse"],
       ["reports", "التقارير",          "chart-bar"]
     ];
   } else {
-    // افتراضي
     items = [
       ["pos",     "نقطة البيع", "cash-register"],
       ["reports", "التقارير",    "chart-bar"]
@@ -1151,16 +1168,18 @@ function showSection(id) {
     el.classList.toggle("active", el.getAttribute("data-sec") === id);
   });
 
-  if (id === "pos")        renderPOS();
-  else if (id === "crm")   renderCRM();
-  else if (id === "stock") renderStock();       // سنستغلها للتقارير/المخزون حسب الدور
-  else if (id === "products") renderProductsManagement();
-  else if (id === "users")    renderUsersManagement();
-  else if (id === "reports")  renderReports();
+  if (id === "pos")          renderPOS();
+  else if (id === "crm")     renderCRM();
+  else if (id === "stock")   renderStock();
+  else if (id === "products")renderProductsManagement();
+  else if (id === "users")   renderUsersManagement();
+  else if (id === "reports") renderReports();
+  else if (id === "forecast")renderForecast();
 }
 
 function renderAll() {
-  const active = document.querySelector(".section.active")?.id?.replace("sec-","") || "pos";
+  const active = document.querySelector(".section.active")?.id?.replace("sec-","") || 
+                 (currentUser?.pointType === "إدارة" ? "reports" : "pos");
   showSection(active);
 }
 
@@ -1177,7 +1196,7 @@ function loadCurrentShift() {
   if (!currentUser) return;
   currentShift = db.shifts.find(s =>
     s.branch === currentUser.branch &&
-    s.cashier === currentUser.branch && // في حال استخدمت اسم الفرع كمستخدم
+    s.cashier === currentUser.branch &&
     s.status === "مفتوحة"
   ) || null;
   updateShiftDisplay();
@@ -1197,9 +1216,107 @@ function updateShiftDisplay() {
   }
 }
 
-window.addEventListener("load", boot);
+function showShiftModal() {
+  const modal = document.getElementById("shiftModal");
+  const info  = document.getElementById("shiftInfo");
+  const act   = document.getElementById("shiftActions");
+  if (!modal || !info || !act) return;
 
+  if (!currentUser) {
+    info.textContent = "لا يوجد مستخدم حالي";
+    act.innerHTML = "";
+    modal.style.display = "flex";
+    return;
+  }
+
+  const pt = currentUser.pointType;
+  if (pt === "إدارة" || pt === "خدمة العملاء") {
+    info.textContent = "عرض الوردية متاح من شاشة التقارير/الإدارة فقط";
+    act.innerHTML = "";
+    modal.style.display = "flex";
+    return;
+  }
+
+  if (!currentShift) {
+    info.innerHTML = `
+      <div>لا توجد وردية مفتوحة لهذا المستخدم.</div>
+      <div>الفرع: ${esc(currentUser.branch)}</div>
+      <div>المستخدم: ${esc(currentUser.username || currentUser.branch)}</div>
+    `;
+    act.innerHTML = `
+      <button class="btn btn-primary" style="width:100%;" onclick="openShiftNow()">فتح وردية جديدة</button>
+    `;
+  } else {
+    info.innerHTML = `
+      <div>الوردية الحالية: ${esc(currentShift.id)}</div>
+      <div>الفرع: ${esc(currentShift.branch)}</div>
+      <div>وقت الفتح: ${esc(currentShift.openTime || "")}</div>
+      <div>إجمالي المبيعات المسجلة: ${money(currentShift.total)}</div>
+      <div>عدد الفواتير: ${currentShift.count}</div>
+    `;
+    act.innerHTML = `
+      <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" onclick="closeShiftNow()">إغلاق الوردية</button>
+    `;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeShiftModal() {
+  const modal = document.getElementById("shiftModal");
+  if (modal) modal.style.display = "none";
+}
+
+async function openShiftNow() {
+  if (!currentUser) return;
+  try {
+    await postForm("openShift", {
+      branch: currentUser.branch,
+      cashier: currentUser.branch
+    });
+    await refreshData(true);
+    loadCurrentShift();
+    renderPOS();
+    toast("تم فتح الوردية");
+    closeShiftModal();
+  } catch (e) {
+    toast(e.message || "خطأ في فتح الوردية", true);
+  }
+}
+
+async function closeShiftNow() {
+  if (!currentUser || !currentShift) return;
+  try {
+    await postForm("closeShift", {
+      shiftId: currentShift.id,
+      branch: currentUser.branch
+    });
+    await refreshData(true);
+    loadCurrentShift();
+    renderPOS();
+    toast("تم إغلاق الوردية");
+    closeShiftModal();
+  } catch (e) {
+    toast(e.message || "خطأ في إغلاق الوردية", true);
+  }
+}
+
+window.addEventListener("load", boot);
 // =============== POS / نقطة البيع ===============
+
+function updateShiftBadge() {
+  const el = document.getElementById("shiftStatus");
+  if (!el) return;
+  if (!currentUser || currentUser.pointType === "إدارة" || currentUser.pointType === "خدمة العملاء") {
+    el.textContent = "";
+    return;
+  }
+  if (!currentShift) {
+    el.textContent = "لا توجد وردية مفتوحة";
+  } else {
+    el.textContent = "وردية: " + currentShift.id + " | " + (currentShift.openTime || "");
+  }
+}
 
 function renderPOS() {
   const sec = document.getElementById("sec-pos");
@@ -1224,18 +1341,18 @@ function renderPOS() {
           <span>طلب جديد</span>
         </button>
         ${isSalesman ? `
-          <button class="btn btn-primary" onclick="createQROrder()">
-            <i class="fas fa-qrcode"></i>
-            <span>إنشاء QR</span>
+          <button class="btn btn-primary" onclick="showSalesmanConfirmModal()">
+            <i class="fas fa-check-circle"></i>
+            <span>إتمام الأوردر</span>
           </button>
         ` : ""}
-        ${isCashier || isDelivery ? `
+        ${(isCashier || isDelivery) ? `
           <button class="btn btn-accent" onclick="openQRScanner()">
             <i class="fas fa-camera"></i>
             <span>استقبال QR</span>
           </button>
         ` : ""}
-        ${(isCashier || isDelivery) ? `
+        ${(isCashier || isDelivery || isSalesman) ? `
           <button class="btn btn-outline" onclick="showShiftModal()">
             <i class="fas fa-clock"></i>
             <span>الوردية</span>
@@ -1265,7 +1382,7 @@ function renderPOS() {
                   <input id="deliveryFee" type="number" value="0" min="0" step="0.5" oninput="renderCart()">
                 </div>
               ` : ""}
-              ${isCashier || isDelivery ? `
+              ${(isCashier || isDelivery) ? `
                 <div style="flex:1;">
                   <label>الخصم</label>
                   <div style="display:flex;gap:4px;">
@@ -1294,7 +1411,7 @@ function renderPOS() {
                 <i class="fas fa-trash"></i>
                 <span>إفراغ السلة</span>
               </button>
-              ${isCashier || isDelivery ? `
+              ${(isCashier || isDelivery) ? `
                 <button class="btn btn-primary" style="flex:2;" onclick="proceedToPayment()" ${!currentShift ? "disabled" : ""}>
                   <i class="fas fa-check-circle"></i>
                   <span>متابعة الدفع</span>
@@ -1322,25 +1439,11 @@ function renderPOS() {
   renderCats();
   renderProducts();
   renderCart();
-  updateShiftDisplay(); // لتحديث النص في badge
+  updateShiftDisplay();
   updateShiftBadge();
 }
 
-function updateShiftBadge() {
-  const el = document.getElementById("shiftBadge");
-  if (!el) return;
-  if (!currentUser || (!currentShift && (currentUser.pointType === "إدارة" || currentUser.pointType === "خدمة العملاء"))) {
-    el.textContent = "";
-    return;
-  }
-  if (!currentShift) {
-    el.textContent = "لا توجد وردية مفتوحة";
-  } else {
-    el.textContent = "وردية: " + currentShift.id + " | " + (currentShift.openTime || "");
-  }
-}
-
-// =============== المنتجات في POS ===============
+// =============== المنتجات و السلة في POS ===============
 
 function renderCats() {
   const box = document.getElementById("catsList");
@@ -1403,6 +1506,8 @@ function askQty(name) {
   if (!p) return;
   pendingProduct   = p;
   pendingEditIndex = -1;
+  crmPendingProduct   = null;
+  crmPendingEditIndex = -1;
 
   document.getElementById("qtyTitle").textContent =
     (isWeight(p) ? "الكمية بالجرام - " : "الكمية - ") + p.name;
@@ -1428,6 +1533,41 @@ function closeQty() {
 function confirmQty() {
   let qty = parseFloat(document.getElementById("qtyInput").value);
   if (isNaN(qty) || qty <= 0) return;
+
+  // لو في منتج CRM معلّق، نستخدم سلة CRM بدلاً من POS
+  if (crmPendingProduct) {
+    const p = crmPendingProduct;
+    const chargeQty = isWeight(p) ? qty / 1000 : qty;
+    const total     = chargeQty * p.price;
+
+    if (crmPendingEditIndex >= 0) {
+      const item = crmCart[crmPendingEditIndex];
+      if (item) {
+        item.qty       = qty;
+        item.chargeQty = chargeQty;
+        item.total     = total;
+      }
+    } else {
+      const existing = crmCart.find(i => i.name === p.name);
+      if (existing) {
+        existing.qty       = existing.qty + qty;
+        existing.chargeQty = existing.chargeQty + chargeQty;
+        existing.total     = existing.chargeQty * existing.price;
+      } else {
+        crmCart.push({
+          name:  p.name,
+          unit:  p.unit,
+          price: p.price,
+          qty,
+          chargeQty,
+          total
+        });
+      }
+    }
+    closeQty();
+    renderCrmCart();
+    return;
+  }
 
   if (!pendingProduct) return;
   const p = pendingProduct;
@@ -1472,6 +1612,8 @@ function editCartItem(index) {
 
   pendingProduct   = p;
   pendingEditIndex = index;
+  crmPendingProduct   = null;
+  crmPendingEditIndex = -1;
 
   document.getElementById("qtyTitle").textContent =
     (isWeight(p) ? "الكمية بالجرام - " : "الكمية - ") + p.name;
@@ -1489,8 +1631,6 @@ function removeFromCart(index) {
   cart.splice(index, 1);
   renderCart();
 }
-
-// =============== حساب السلة ===============
 
 function renderCart() {
   const box = document.getElementById("cartList");
@@ -1547,6 +1687,7 @@ function clearCart() {
   cart              = [];
   currentQROrderId  = null;
   discountEnabled   = false;
+  customerData      = { name:"", phone:"", address:"" };
   const d1 = document.getElementById("deliveryFee");
   const d2 = document.getElementById("discountVal");
   if (d1) d1.value = 0;
@@ -1559,16 +1700,23 @@ function newSale() {
   clearCart();
 }
 
-// =============== QR من المندوب ===============
+// =============== QR من مندوب البيع ===============
 
 async function createQROrder() {
-  if (!cart.length) return toast("لا توجد أصناف في السلة", true);
-  const pt = currentUser?.pointType;
-  if (pt !== "مندوب_بيع") return toast("هذا الخيار مخصص لمندوب البيع فقط", true);
+  if (!cart.length) {
+    toast("لا توجد أصناف في السلة", true);
+    return null;
+  }
 
-  const sub  = cart.reduce((a,b)=>a + Number(b.total || 0), 0);
-  const disc = 0;
-  const fee  = 0;
+  const pt = currentUser?.pointType;
+  if (pt !== "مندوب_بيع") {
+    toast("هذا الخيار مخصص لمندوب البيع فقط", true);
+    return null;
+  }
+
+  const sub   = cart.reduce((a,b)=>a + Number(b.total || 0), 0);
+  const disc  = 0;
+  const fee   = 0;
   const total = Math.max(0, sub + fee - disc);
 
   const order = {
@@ -1576,8 +1724,8 @@ async function createQROrder() {
     creator:      currentUser.username || currentUser.branch,
     salesmanName: currentUser.username || currentUser.branch,
     items: cart.map(i => ({
-      name: i.name,
-      qty:  i.qty,
+      name:  i.name,
+      qty:   i.qty,
       price: i.price,
       total: i.total
     })),
@@ -1590,37 +1738,51 @@ async function createQROrder() {
   try {
     const res = await postForm("createQROrder", { order });
     const orderId = res?.orderId || res?.id || null;
-    if (!orderId) return toast("لم يتم إنشاء طلب QR", true);
+    if (!orderId) {
+      toast("لم يتم إنشاء طلب QR", true);
+      return null;
+    }
+
     currentQROrderId = orderId;
     currentSalesman  = order.salesmanName;
+
     showQRModal(orderId, order);
     toast("تم إنشاء طلب QR للعميل");
+    return orderId;
   } catch (e) {
     toast(e.message || "خطأ في إنشاء QR", true);
+    return null;
   }
 }
 
 function showQRModal(orderId, orderObj) {
-  document.getElementById("qrOrderId").textContent = orderId;
+  const idEl = document.getElementById("qrOrderId");
   const container = document.getElementById("qrCodeContainer");
+  const detailsBox = document.getElementById("qrDetailsBox");
+
+  if (idEl) idEl.textContent = orderId;
   if (!container) return;
   container.innerHTML = "";
 
-  QRCode.toCanvas(document.createElement("canvas"), orderId, { width: 260 }, (err, canvas) => {
-    if (err) {
-      container.innerHTML = '<p style="color:red;">تعذر إنشاء QR</p>';
-      return;
+  QRCode.toCanvas(
+    document.createElement("canvas"),
+    orderId,
+    { width: 260 },
+    (err, canvas) => {
+      if (err) {
+        container.innerHTML = '<p style="color:red;">تعذر إنشاء QR</p>';
+        return;
+      }
+      container.appendChild(canvas);
     }
-    container.appendChild(canvas);
-  });
+  );
 
-  const detailsBox = document.getElementById("qrDetailsBox");
   if (detailsBox) {
     const items = (orderObj?.items || cart);
     detailsBox.innerHTML = `
       <div style="text-align:right;font-size:13px;">
         <div>رقم الطلب: ${esc(orderId)}</div>
-        <div>مندوب البيع: ${esc(currentUser.username || currentUser.branch)}</div>
+        <div>مندوب البيع: ${esc(orderObj?.salesmanName || currentUser.username || currentUser.branch)}</div>
         <hr>
         <div>الأصناف:</div>
         ${items.map(i => `<div>${esc(i.name)} - الكمية: ${i.qty}</div>`).join("")}
@@ -1632,7 +1794,8 @@ function showQRModal(orderId, orderObj) {
 }
 
 function closeQrModal() {
-  document.getElementById("qrModal").style.display = "none";
+  const m = document.getElementById("qrModal");
+  if (m) m.style.display = "none";
 }
 
 function printQR() {
@@ -1655,11 +1818,33 @@ function printQR() {
   win.print();
 }
 
-// =============== Masح / تحميل QR عند الكاشير ===============
+function showSalesmanConfirmModal() {
+  if (!cart.length) return toast("لا توجد أصناف في السلة", true);
+  const pt = currentUser?.pointType;
+  if (pt !== "مندوب_بيع") return;
+  const m = document.getElementById("salesmanConfirmModal");
+  if (m) m.style.display = "flex";
+}
+
+function closeSalesmanConfirmModal() {
+  const m = document.getElementById("salesmanConfirmModal");
+  if (m) m.style.display = "none";
+}
+
+async function createQROrderAndPrint() {
+  closeSalesmanConfirmModal();
+  const orderId = await createQROrder();
+  if (!orderId) return;
+  // بعد إنشاء QR، المستخدم يضغط زر "طباعة" داخل مودال qrModal
+}
+
+// =============== Masح / تحميل QR عند الكاشير / الدليفري ===============
 
 function openQRScanner() {
-  document.getElementById("qrScannerModal").style.display = "flex";
-  document.getElementById("manualQrInput").value = "";
+  const m = document.getElementById("qrScannerModal");
+  if (m) m.style.display = "flex";
+  const inp = document.getElementById("manualQrInput");
+  if (inp) inp.value = "";
   if (!html5QrScanner) {
     html5QrScanner = new Html5Qrcode("qrReader");
   }
@@ -1679,11 +1864,12 @@ function closeQrScanner() {
   if (html5QrScanner) {
     html5QrScanner.stop().catch(()=>{});
   }
-  document.getElementById("qrScannerModal").style.display = "none";
+  const m = document.getElementById("qrScannerModal");
+  if (m) m.style.display = "none";
 }
 
 function loadManualQR() {
-  const code = String(document.getElementById("manualQrInput").value || "").trim();
+  const code = String(document.getElementById("manualQrInput")?.value || "").trim();
   if (!code) return toast("أدخل كود QR أولاً", true);
   loadQROrder(code);
 }
@@ -1698,18 +1884,18 @@ async function loadQROrder(orderId) {
     currentQROrderId = order.id;
     currentSalesman  = order.salesmanName || "";
 
-    const branch = currentUser?.branch;
-    cart = order.items.map(i => {
+    cart = (order.items || []).map(i => {
       const p   = db.products.find(pp => pp.name === i.name) || { unit: "قطعة", price: i.price || 0 };
-      const qty = i.qty;
+      const qty = Number(i.qty || 0);
       const chargeQty = isWeight(p) ? qty / 1000 : qty;
+      const price = p.price || i.price || 0;
       return {
         name:  i.name,
         unit:  p.unit,
-        price: p.price,
+        price,
         qty,
         chargeQty,
-        total: i.total || (chargeQty * p.price)
+        total: i.total || (chargeQty * price)
       };
     });
 
@@ -1735,17 +1921,13 @@ function proceedToPayment() {
   const pt = currentUser?.pointType;
   const isBranchCashier = pt === "فرع" || pt === "كاشير";
   const isDelivery      = pt === "دليفري";
-  const isCRM           = false; // لو حبيت تستخدمه لاحقًا
 
   if (isBranchCashier) {
-    // كاشير الفرع: لا يحتاج بيانات عميل
     openPaymentModal();
   } else if (isDelivery) {
-    // الدليفري: يحتاج بيانات عميل وعنوان
-    openCustomerModal(true);
+    openCustomerModal(true); // يحتاج بيانات عميل وعنوان
   } else {
-    // أدوار أخرى لو استخدمتها في الدفع
-    openCustomerModal(false);
+    openPaymentModal();
   }
 }
 
@@ -1878,90 +2060,23 @@ function verifySupervisorForDiscount() {
   toast("تم تفعيل الخصم بواسطة مشرف");
 }
 
-// =============== مودال الوردية (عرض فقط هنا) ===============
+// =============== Poll بسيط لإشعارات طلبات CRM للدليفري ===============
 
-function showShiftModal() {
-  const modal = document.getElementById("shiftModal");
-  const info  = document.getElementById("shiftInfo");
-  const act   = document.getElementById("shiftActions");
-  if (!modal || !info || !act) return;
+function startDeliveryPolling() {
+  if (!currentUser || currentUser.pointType !== "دليفري") return;
+  lastCrmCount = db.crmOrders.length;
+  if (crmPollTimer) clearInterval(crmPollTimer);
 
-  if (!currentUser) {
-    info.textContent = "لا يوجد مستخدم حالي";
-    act.innerHTML = "";
-    modal.style.display = "flex";
-    return;
-  }
-
-  const pt = currentUser.pointType;
-  if (pt === "إدارة" || pt === "خدمة العملاء") {
-    info.textContent = "عرض الوردية متاح من شاشة الإدارة فقط";
-    act.innerHTML = "";
-    modal.style.display = "flex";
-    return;
-  }
-
-  if (!currentShift) {
-    info.innerHTML = `
-      <div>لا توجد وردية مفتوحة لهذا المستخدم.</div>
-      <div>الفرع: ${esc(currentUser.branch)}</div>
-      <div>المستخدم: ${esc(currentUser.username || currentUser.branch)}</div>
-    `;
-    act.innerHTML = `
-      <button class="btn btn-primary" style="width:100%;" onclick="openShiftNow()">فتح وردية جديدة</button>
-    `;
-  } else {
-    info.innerHTML = `
-      <div>الوردية الحالية: ${esc(currentShift.id)}</div>
-      <div>الفرع: ${esc(currentShift.branch)}</div>
-      <div>وقت الفتح: ${esc(currentShift.openTime || "")}</div>
-      <div>إجمالي المبيعات المسجلة: ${money(currentShift.total)}</div>
-      <div>عدد الفواتير: ${currentShift.count}</div>
-    `;
-    act.innerHTML = `
-      <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" onclick="closeShiftNow()">إغلاق الوردية</button>
-    `;
-  }
-
-  modal.style.display = "flex";
-}
-
-function closeShiftModal() {
-  document.getElementById("shiftModal").style.display = "none";
-}
-
-async function openShiftNow() {
-  if (!currentUser) return;
-  try {
-    const res = await postForm("openShift", {
-      branch: currentUser.branch,
-      cashier: currentUser.branch
-    });
+  crmPollTimer = setInterval(async () => {
+    const old = lastCrmCount;
     await refreshData(true);
-    loadCurrentShift();
-    renderPOS();
-    toast("تم فتح الوردية");
-    closeShiftModal();
-  } catch (e) {
-    toast(e.message || "خطأ في فتح الوردية", true);
-  }
-}
-
-async function closeShiftNow() {
-  if (!currentUser || !currentShift) return;
-  try {
-    await postForm("closeShift", {
-      shiftId: currentShift.id,
-      branch: currentUser.branch
-    });
-    await refreshData(true);
-    loadCurrentShift();
-    renderPOS();
-    toast("تم إغلاق الوردية");
-    closeShiftModal();
-  } catch (e) {
-    toast(e.message || "خطأ في إغلاق الوردية", true);
-  }
+    if (!currentUser || currentUser.pointType !== "دليفري") return;
+    const now = db.crmOrders.length;
+    if (now > old) {
+      toast("تم استلام طلب جديد من خدمة العملاء");
+    }
+    lastCrmCount = now;
+  }, 60000); // كل دقيقة
 }
 // =============== CRM / خدمة العملاء ===============
 
@@ -2019,7 +2134,7 @@ function renderCRM() {
             </div>
             <button class="btn btn-primary" style="width:100%;" onclick="saveCrmOrderFromCart()">
               <i class="fas fa-paper-plane"></i>
-              <span>إرسال الطلب</span>
+              <span>إرسال الطلب للفرع</span>
             </button>
           </div>
         </div>
@@ -2174,6 +2289,8 @@ function crmAskQty(name) {
   if (!p) return;
   crmPendingProduct   = p;
   crmPendingEditIndex = -1;
+  pendingProduct      = null;
+  pendingEditIndex    = -1;
 
   document.getElementById("qtyTitle").textContent =
     (isWeight(p) ? "الكمية بالجرام - " : "الكمية - ") + p.name;
@@ -2195,6 +2312,8 @@ function crmEditCartItem(index) {
 
   crmPendingProduct   = p;
   crmPendingEditIndex = index;
+  pendingProduct      = null;
+  pendingEditIndex    = -1;
 
   document.getElementById("qtyTitle").textContent =
     (isWeight(p) ? "الكمية بالجرام - " : "الكمية - ") + p.name;
@@ -2244,48 +2363,6 @@ function renderCrmCart() {
   const el    = document.getElementById("crmGrandTotal");
   if (el) el.textContent = money(total);
 }
-
-// دمج تأكيد الكمية بين POS وCRM
-
-const _oldConfirmQty = confirmQty;
-confirmQty = function() {
-  let qty = parseFloat(document.getElementById("qtyInput").value);
-  if (isNaN(qty) || qty <= 0) return;
-  if (crmPendingProduct) {
-    const p = crmPendingProduct;
-    const chargeQty = isWeight(p) ? qty / 1000 : qty;
-    const total     = chargeQty * p.price;
-
-    if (crmPendingEditIndex >= 0) {
-      const item = crmCart[crmPendingEditIndex];
-      if (item) {
-        item.qty       = qty;
-        item.chargeQty = chargeQty;
-        item.total     = total;
-      }
-    } else {
-      const existing = crmCart.find(i => i.name === p.name);
-      if (existing) {
-        existing.qty       = existing.qty + qty;
-        existing.chargeQty = existing.chargeQty + chargeQty;
-        existing.total     = existing.chargeQty * existing.price;
-      } else {
-        crmCart.push({
-          name:  p.name,
-          unit:  p.unit,
-          price: p.price,
-          qty,
-          chargeQty,
-          total
-        });
-      }
-    }
-    closeQty();
-    renderCrmCart();
-  } else {
-    _oldConfirmQty();
-  }
-};
 
 // حفظ طلب CRM إلى الشيت
 
@@ -2347,7 +2424,6 @@ function renderCrmTable() {
 
   let filtered = db.crmOrders.slice();
   if (isDeliveryUser) {
-    // الدليفري يرى الطلبات الموجهة لفرعه
     filtered = filtered.filter(o => o.branch === currentUser.branch);
   }
 
@@ -2375,7 +2451,6 @@ function crmLoadOrderToPos(id) {
   const order = db.crmOrders.find(o => o.id === id);
   if (!order) return toast("الطلب غير موجود", true);
 
-  // تحويل items من نص إلى سلة
   const items = String(order.items || "").split("+").map(x => x.trim()).filter(Boolean);
   cart = [];
   items.forEach(seg => {
@@ -2405,14 +2480,14 @@ function crmLoadOrderToPos(id) {
     address: order.address  || ""
   };
 
-  showSection("pos"); // انتقل لـ POS
+  showSection("pos");
   const d1 = document.getElementById("deliveryFee");
-  if (d1) d1.value = 0; // يحددها الكاشير الدليفري حسب التسعير
+  if (d1) d1.value = 0;
   renderCart();
   toast("تم تحميل طلب CRM إلى نقطة البيع");
 }
 
-// مخزون الفروع لخدمة العملاء
+// مخزون الفروع لخدمة العملاء (عرض فقط)
 
 function fillCrmStockBranches() {
   const sel = document.getElementById("crmStockBranchSelect");
@@ -2443,20 +2518,22 @@ function renderCrmStockTable() {
     </tr>
   `).join("");
 }
-// =============== واجهة المخزون / التقارير البسيطة ===============
+// =============== واجهة المخزون ===============
 
 function renderStock() {
   const sec = document.getElementById("sec-stock");
   if (!sec || !currentUser) return;
   const pt = currentUser.pointType;
 
-  // للإدارة وخدمة العملاء: عرض مخزون الفروع
-  if (pt === "إدارة" || pt === "خدمة العملاء") {
+  const isAdminOrCRM = (pt === "إدارة" || pt === "خدمة العملاء");
+  const isDelivery   = (pt === "دليفري");
+
+  if (isAdminOrCRM || isDelivery) {
     sec.innerHTML = `
       <div class="top-bar">
         <div class="page-title">
           <i class="fas fa-warehouse" style="color:var(--primary);"></i>
-          <span>مخزون الفروع</span>
+          <span>${isAdminOrCRM ? "مخزون الفروع" : "مخزون الدليفري"}</span>
         </div>
         <div class="action-buttons">
           <button class="btn btn-outline" onclick="refreshData()">
@@ -2490,7 +2567,7 @@ function renderStock() {
     fillStockBranches();
     renderStockTable();
   } else {
-    // لباقي الأدوار: مخزون الفرع فقط
+    // لبقية الأدوار: مخزون الفرع فقط، عرضي
     sec.innerHTML = `
       <div class="top-bar">
         <div class="page-title">
@@ -2543,7 +2620,7 @@ function renderStockTable() {
   const search = String(document.getElementById("stockSearchInput")?.value || "").trim();
 
   let rows = db.stock.slice();
-  if (pt !== "إدارة" && pt !== "خدمة العملاء") {
+  if (pt !== "إدارة" && pt !== "خدمة العملاء" && pt !== "دليفري") {
     rows = rows.filter(r => r.branch === currentUser.branch);
   } else {
     const bSel = document.getElementById("stockBranchFilter");
@@ -2554,12 +2631,19 @@ function renderStockTable() {
     rows = rows.filter(r => r.item.includes(search));
   }
 
-  const ptAdmin = pt === "إدارة" || pt === "خدمة العملاء";
-  body.innerHTML = rows.map(r => ptAdmin ? `
+  const canEditStock = (pt === "إدارة" || pt === "دليفري");
+  const isAdminOrCRM = (pt === "إدارة" || pt === "خدمة العملاء" || pt === "دليفري");
+
+  body.innerHTML = rows.map(r => isAdminOrCRM ? `
     <tr>
       <td>${esc(r.branch)}</td>
       <td>${esc(r.item)}</td>
-      <td>${r.qty}</td>
+      <td>
+        ${canEditStock ? `
+          <input type="number" value="${r.qty}" style="width:80px;"
+            onchange="updateStockFromUI('${jsq(r.branch)}','${jsq(r.item)}',this.value)">
+        ` : r.qty}
+      </td>
       <td>${esc(r.lastUpdate)}</td>
     </tr>
   ` : `
@@ -2571,7 +2655,22 @@ function renderStockTable() {
   `).join("");
 }
 
+async function updateStockFromUI(branch, item, val) {
+  const qty = parseFloat(val || "0") || 0;
+  try {
+    await postForm("updateStock", { branch, item, qty });
+    toast("تم تحديث المخزون");
+    await refreshData(true);
+    renderStock();
+  } catch (e) {
+    toast(e.message || "خطأ في تحديث المخزون", true);
+  }
+}
+
 // =============== إدارة المنتجات ===============
+
+let productEditOriginalName = null;
+let productEditMode         = "add";
 
 function renderProductsManagement() {
   const sec = document.getElementById("sec-products");
@@ -2643,9 +2742,6 @@ function renderProductsManagement() {
   productEditMode         = "add";
   renderProductsTable();
 }
-
-let productEditOriginalName = null;
-let productEditMode         = "add";
 
 function renderProductsTable() {
   const body = document.getElementById("productsTableBody");
@@ -2749,6 +2845,9 @@ async function deleteProductByName(name) {
 
 // =============== إدارة المستخدمين ===============
 
+let userEditOriginalUsername = null;
+let userEditMode             = "add";
+
 function renderUsersManagement() {
   const sec = document.getElementById("sec-users");
   if (!sec || !currentUser) return;
@@ -2831,9 +2930,6 @@ function renderUsersManagement() {
   userEditMode             = "add";
   renderUsersTable();
 }
-
-let userEditOriginalUsername = null;
-let userEditMode             = "add";
 
 function renderUsersTable() {
   const body   = document.getElementById("usersTableBody");
@@ -2952,7 +3048,7 @@ async function deleteUserByName(username) {
   }
 }
 
-// =============== التقارير (تبويب بسيط) ===============
+// =============== التقارير ===============
 
 function renderReports() {
   const sec = document.getElementById("sec-reports");
@@ -3078,7 +3174,7 @@ function renderReportsData() {
     `).join("");
   }
 
-  // حسب الأصناف (من مبيعات QR قدر الإمكان)
+  // حسب الأصناف (من مبيعات QR)
   const itemsBody = document.getElementById("repItemsBody");
   if (itemsBody) {
     const byItem = {};
@@ -3135,6 +3231,167 @@ function renderReportsData() {
     `).join("");
   }
 }
+
+// =============== إدارة المخزون / توقع متوسط المبيعات ===============
+
+function renderForecast() {
+  const sec = document.getElementById("sec-forecast");
+  if (!sec || !currentUser) return;
+  if (currentUser.pointType !== "إدارة") {
+    sec.innerHTML = `<div class="card"><div>هذه الشاشة متاحة للإدارة فقط</div></div>`;
+    return;
+  }
+
+  sec.innerHTML = `
+    <div class="top-bar">
+      <div class="page-title">
+        <i class="fas fa-chart-line" style="color:var(--primary);"></i>
+        <span>إدارة المخزون / توقع المبيعات</span>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-outline" onclick="refreshData()">
+          <i class="fas fa-sync"></i> تحديث
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span><i class="fas fa-filter"></i> إعدادات التوقع</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div>
+          <label>الفرع</label><br>
+          <select id="forecastBranch" style="min-width:160px;">
+            <option value="">كل الفروع</option>
+          </select>
+        </div>
+        <div>
+          <label>عدد الأيام السابقة</label><br>
+          <select id="forecastDays" style="min-width:120px;">
+            <option value="7">آخر 7 أيام</option>
+            <option value="14" selected>آخر 14 يوم</option>
+            <option value="30">آخر 30 يوم</option>
+          </select>
+        </div>
+        <div>
+          <label>معامل الأمان</label><br>
+          <input id="forecastSafety" type="number" value="1.2" step="0.1" style="width:100px;">
+        </div>
+        <div style="align-self:flex-end;">
+          <button class="btn btn-primary" onclick="calculateForecast()">
+            <i class="fas fa-calculator"></i>
+            <span>حساب التوقع (طريقة متوسطة)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>الصنف</th>
+              <th>إجمالي الكمية في الفترة</th>
+              <th>عدد الأيام التي بها بيع</th>
+              <th>متوسط يومي</th>
+              <th>اقتراح الغد</th>
+              <th>اقتراح بعد غد</th>
+            </tr>
+          </thead>
+          <tbody id="forecastTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  fillForecastBranches();
+}
+
+function fillForecastBranches() {
+  const sel = document.getElementById("forecastBranch");
+  if (!sel) return;
+  const branches = [...new Set(db.sales.map(s => s.branch).filter(Boolean))];
+  sel.innerHTML = [
+    '<option value="">كل الفروع</option>',
+    ...branches.map(b => `<option value="${esc(b)}">${esc(b)}</option>`)
+  ].join("");
+}
+
+function calculateForecast() {
+  const branch = String(document.getElementById("forecastBranch")?.value || "").trim();
+  const days   = parseInt(document.getElementById("forecastDays")?.value || "14", 10) || 14;
+  const safety = parseFloat(document.getElementById("forecastSafety")?.value || "1") || 1;
+
+  const today = new Date();
+  const fromDate = new Date(today.getTime() - days * 24*60*60*1000);
+
+  const itemStats = {};
+
+  db.sales.forEach(s => {
+    if (branch && s.branch !== branch) return;
+    if (!s.date) return;
+
+    const d = new Date(s.date);
+    if (isNaN(d.getTime())) return;
+    if (d < fromDate || d > today) return;
+
+    let relatedItems = [];
+    if (s.qrOrderId) {
+      const qr = db.qrOrders.find(o => o.id === s.qrOrderId);
+      if (qr && Array.isArray(qr.items)) {
+        relatedItems = qr.items;
+      }
+    }
+
+    relatedItems.forEach(i => {
+      const name = i.name;
+      const qty  = Number(i.qty || 0);
+      if (!name || !qty) return;
+
+      if (!itemStats[name]) {
+        itemStats[name] = { totalQty: 0, daysSet: new Set() };
+      }
+      itemStats[name].totalQty += qty;
+      itemStats[name].daysSet.add(d.toDateString());
+    });
+  });
+
+  const body = document.getElementById("forecastTableBody");
+  if (!body) return;
+
+  const rows = Object.keys(itemStats).map(name => {
+    const totalQty = itemStats[name].totalQty;
+    const daysCount = itemStats[name].daysSet.size || 1;
+    const avgDaily = totalQty / daysCount;
+    const tomorrow = avgDaily * safety;
+    const after    = avgDaily * safety;
+    return { name, totalQty, daysCount, avgDaily, tomorrow, after };
+  });
+
+  if (!rows.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">
+          لا توجد بيانات كافية في الفترة المختارة
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.name)}</td>
+      <td>${r.totalQty}</td>
+      <td>${r.daysCount}</td>
+      <td>${money(r.avgDaily)}</td>
+      <td>${money(r.tomorrow)}</td>
+      <td>${money(r.after)}</td>
+    </tr>
+  `).join("");
+}
+
+// نهاية السكربت
 </script>
 </body>
 </html>
