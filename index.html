@@ -177,8 +177,35 @@
   async function refreshData(silent=false) { try { const res=await jsonp('getInitialData'); normalizeData(res); if(currentUser) renderAll(); if(!silent) toast('تم التحديث'); } catch(e) { if(!silent) toast(e.message,true); } }
 
   async function boot() {
-    try { const res=await jsonp('getInitialData'); normalizeData(res); fillBranches(); restoreSession(); } catch(e) { document.getElementById('pointTypeSelect').innerHTML='<option>فشل التحميل</option>'; }
+  const loginMsg = document.getElementById('loginMsg');
+  const typeSel = document.getElementById('pointTypeSelect');
+  const branchSel = document.getElementById('branchSelect');
+  
+  try {
+    if (loginMsg) loginMsg.textContent = 'جاري الاتصال...';
+    
+    const res = await jsonp('getInitialData');
+    console.log('Response:', res);
+    
+    if (!res || !res.ok) {
+      throw new Error(res?.error || 'فشل تحميل البيانات');
+    }
+    
+    normalizeData(res);
+    console.log('Data normalized. Users:', db.users.length);
+    
+    fillBranches();
+    console.log('Branches filled');
+    
+    if (loginMsg) loginMsg.textContent = '';
+    restoreSession();
+  } catch(e) {
+    console.error('خطأ:', e);
+    if (typeSel) typeSel.innerHTML = '<option value="">❌ فشل التحميل: ' + e.message + '</option>';
+    if (branchSel) branchSel.innerHTML = '<option value="">❌ فشل التحميل</option>';
+    if (loginMsg) loginMsg.textContent = 'خطأ: ' + e.message;
   }
+}
 
   function fillBranches() {
     const types = [...new Set(db.users.filter(u=>u.active).map(u=>u.pointType))];
