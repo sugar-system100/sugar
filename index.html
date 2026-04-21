@@ -291,7 +291,7 @@
   function jsonp(action, params = {}) {
     return new Promise((resolve, reject) => {
       const base = SCRIPT_URL;
-      if (!base || base === 'YOUR_SCRIPT_URL_HERE') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
+      if (!base || base === 'https://script.google.com/macros/s/AKfycbzR_KLq4Wbq4f8q5ghfUJSz_-0PMtmDmVvMAUHq6x2Ud3cvEsMW2YtSEZBRWl3iBHvL4Q/exec') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
       const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
       const qs = new URLSearchParams({ action, callback: cb, ...params });
       const script = document.createElement('script');
