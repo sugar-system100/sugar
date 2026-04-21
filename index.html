@@ -689,9 +689,10 @@
 <script>
 "use strict";
 
-// ضع هنا رابط Web App
+// IMPORTANT: ضع هنا رابط Web App بعد نشر سكربت جوجل
 const SCRIPTURL = "https://script.google.com/macros/s/AKfycbzgWTnVPt3VYcDRzJ4t4Rz0a5arfqBtaVewT7wGG9U8UiNWgp7L8DbWT4hwf-wiRl-Dow/exec";
 
+// متغيرات عامة
 let db = {
   products: [],
   users: [],
@@ -764,19 +765,22 @@ function isWeight(p) {
 
 // =============== استدعاء Apps Script ===============
 
+// GET + JSONP (يُستخدم في getInitialData, getQROrder, createQROrder)
 function jsonp(action, params={}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPTURL;
     if (!base) return reject(new Error("SCRIPTURL غير مضبوط"));
-    const cb = "cb" + Date.now() + Math.random().toString(36).slice(2);
-    const qs = new URLSearchParams({ action, callback: cb, ...params });
+
+    const cbName = "cb" + Date.now() + Math.random().toString(36).slice(2);
+    const allParams = { action, callback: cbName, ...params };
+    const qs = new URLSearchParams(allParams);
     const script = document.createElement("script");
     let finished = false;
 
-    window[cb] = (data) => {
+    window[cbName] = (data) => {
       if (finished) return;
       finished = true;
-      try { delete window[cb]; } catch(e){}
+      try { delete window[cbName]; } catch(e){}
       if (script.parentNode) script.parentNode.removeChild(script);
       if (!data || data.ok === false) {
         return reject(new Error(data && data.error || "خطأ في الاستجابة"));
@@ -787,7 +791,7 @@ function jsonp(action, params={}) {
     script.onerror = () => {
       if (finished) return;
       finished = true;
-      try { delete window[cb]; } catch(e){}
+      try { delete window[cbName]; } catch(e){}
       if (script.parentNode) script.parentNode.removeChild(script);
       reject(new Error("فشل الاتصال بالخادم"));
     };
@@ -798,13 +802,14 @@ function jsonp(action, params={}) {
     setTimeout(() => {
       if (finished) return;
       finished = true;
-      try { delete window[cb]; } catch(e){}
+      try { delete window[cbName]; } catch(e){}
       if (script.parentNode) script.parentNode.removeChild(script);
       reject(new Error("انتهت مهلة الاتصال بالخادم"));
     }, 15000);
   });
 }
 
+// POST بسيط (لا نحتاج await على الرد من السيرفر، فقط نستخدمه كـ fire-and-forget)
 function postForm(action, payload={}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPTURL;
@@ -833,7 +838,7 @@ function postForm(action, payload={}) {
       done = true;
       if (form.parentNode) form.parentNode.removeChild(form);
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      resolve({ ok: true, ...payload }); // نرجع نفس البيانات كراحة
+      resolve({ ok: true });
     };
 
     iframe.onload = fin;
@@ -1178,7 +1183,7 @@ function showSection(id) {
 }
 
 function renderAll() {
-  const active = document.querySelector(".section.active")?.id?.replace("sec-","") || 
+  const active = document.querySelector(".section.active")?.id?.replace("sec-","") ||
                  (currentUser?.pointType === "إدارة" ? "reports" : "pos");
   showSection(active);
 }
@@ -1534,7 +1539,7 @@ function confirmQty() {
   let qty = parseFloat(document.getElementById("qtyInput").value);
   if (isNaN(qty) || qty <= 0) return;
 
-  // لو في منتج CRM معلّق، نستخدم سلة CRM بدلاً من POS
+  // CRM؟
   if (crmPendingProduct) {
     const p = crmPendingProduct;
     const chargeQty = isWeight(p) ? qty / 1000 : qty;
@@ -1569,6 +1574,7 @@ function confirmQty() {
     return;
   }
 
+  // POS عادي
   if (!pendingProduct) return;
   const p = pendingProduct;
 
@@ -1700,7 +1706,7 @@ function newSale() {
   clearCart();
 }
 
-// =============== QR من مندوب البيع ===============
+// =============== QR من مندوب البيع (باستخدام jsonp) ===============
 
 async function createQROrder() {
   if (!cart.length) {
@@ -1736,13 +1742,16 @@ async function createQROrder() {
   };
 
   try {
-    const res = await postForm("createQROrder", { order });
+    const res = await jsonp("createQROrder", {
+      payload: JSON.stringify({ order })
+    });
+    console.log("QR RESPONSE:", res);
     const orderId = res?.orderId || res?.id || null;
     if (!orderId) {
       toast("لم يتم إنشاء طلب QR", true);
       return null;
     }
-د
+
     currentQROrderId = orderId;
     currentSalesman  = order.salesmanName;
 
@@ -1831,10 +1840,11 @@ function closeSalesmanConfirmModal() {
   if (m) m.style.display = "none";
 }
 
-const res = await jsonp("createQROrder", { payload: JSON.stringify({ order }) });
-console.log("QR RESPONSE:", res);
-const orderId = res?.orderId || res?.id || null;
-  // بعد إنشاء QR، المستخدم يضغط زر "طباعة" داخل مودال qrModal
+async function createQROrderAndPrint() {
+  closeSalesmanConfirmModal();
+  const orderId = await createQROrder();
+  if (!orderId) return;
+  // المودال مفتوح بالفعل، المستخدم يضغط زر "طباعة"
 }
 
 // =============== Masح / تحميل QR عند الكاشير / الدليفري ===============
@@ -1924,7 +1934,7 @@ function proceedToPayment() {
   if (isBranchCashier) {
     openPaymentModal();
   } else if (isDelivery) {
-    openCustomerModal(true); // يحتاج بيانات عميل وعنوان
+    openCustomerModal(true); // يحتاج عنوان
   } else {
     openPaymentModal();
   }
@@ -2014,7 +2024,11 @@ async function finalizeOrder(paymentMethod, paidAmount, paymentNotes) {
     shiftId:  currentShift?.id || "",
     paymentMethod,
     paidAmount,
-    qrOrderId: currentQROrderId
+    qrOrderId: currentQROrderId,
+    items: cart.map(i => ({
+      name: i.name,
+      qty:  i.qty
+    }))
   };
 
   try {
@@ -2210,9 +2224,9 @@ function renderCRM() {
 // سلة CRM
 
 function crmNewOrder() {
-  crmCart           = [];
-  crmCurrentCat     = "";
-  crmPendingProduct = null;
+  crmCart             = [];
+  crmCurrentCat       = "";
+  crmPendingProduct   = null;
   crmPendingEditIndex = -1;
 
   const c = document.getElementById("crmCustomer");
@@ -2413,7 +2427,7 @@ async function saveCrmOrderFromCart() {
   }
 }
 
-// جدول طلبات CRM
+// جدول طلبات CRM + تغيير حالة للدليفري
 
 function renderCrmTable() {
   const body = document.getElementById("crmTableBody");
@@ -2426,6 +2440,8 @@ function renderCrmTable() {
     filtered = filtered.filter(o => o.branch === currentUser.branch);
   }
 
+  const statuses = ["أرسل للفرع","قيد التجهيز","خرج مع الدليفري","مكتمل","ملغي"];
+
   body.innerHTML = filtered.map(o => `
     <tr>
       <td>${esc(o.id)}</td>
@@ -2434,7 +2450,15 @@ function renderCrmTable() {
       <td>${esc(o.customer)}</td>
       <td>${esc(o.phone)}</td>
       <td>${money(o.total)}</td>
-      <td>${esc(o.status)}</td>
+      <td>
+        ${isDeliveryUser ? `
+          <select onchange="updateCrmStatus('${jsq(o.id)}', this.value)">
+            ${statuses.map(s => `
+              <option value="${esc(s)}" ${s === o.status ? "selected" : ""}>${esc(s)}</option>
+            `).join("")}
+          </select>
+        ` : esc(o.status)}
+      </td>
       <td>
         <button class="btn btn-outline btn-icon" onclick="crmLoadOrderToPos('${jsq(o.id)}')">
           <i class="fas fa-download"></i>
@@ -2442,6 +2466,17 @@ function renderCrmTable() {
       </td>
     </tr>
   `).join("");
+}
+
+async function updateCrmStatus(id, status) {
+  try {
+    await postForm("updateCrmOrderStatus", { id, status });
+    toast("تم تحديث حالة الطلب");
+    await refreshData(true);
+    renderCRM();
+  } catch (e) {
+    toast(e.message || "خطأ في تحديث حالة الطلب", true);
+  }
 }
 
 // تحميل طلب CRM إلى POS (للدليفري / من يستخدمها)
@@ -2566,7 +2601,7 @@ function renderStock() {
     fillStockBranches();
     renderStockTable();
   } else {
-    // لبقية الأدوار: مخزون الفرع فقط، عرضي
+    // لبقية الأدوار: مخزون الفرع فقط
     sec.innerHTML = `
       <div class="top-bar">
         <div class="page-title">
@@ -2630,17 +2665,17 @@ function renderStockTable() {
     rows = rows.filter(r => r.item.includes(search));
   }
 
-  const canEditStock = (pt === "إدارة" || pt === "دليفري");
-  const isAdminOrCRM = (pt === "إدارة" || pt === "خدمة العملاء" || pt === "دليفري");
+  const canEditStock   = (pt === "إدارة" || pt === "دليفري");
+  const canSeeBranches = (pt === "إدارة" || pt === "خدمة العملاء" || pt === "دليفري");
 
-  body.innerHTML = rows.map(r => isAdminOrCRM ? `
+  body.innerHTML = rows.map(r => canSeeBranches ? `
     <tr>
       <td>${esc(r.branch)}</td>
       <td>${esc(r.item)}</td>
       <td>
         ${canEditStock ? `
           <input type="number" value="${r.qty}" style="width:80px;"
-            onchange="updateStockFromUI('${jsq(r.branch)}','${jsq(r.item)}',this.value)">
+                 onchange="updateStockFromUI('${jsq(r.branch)}','${jsq(r.item)}',this.value)">
         ` : r.qty}
       </td>
       <td>${esc(r.lastUpdate)}</td>
@@ -3321,7 +3356,7 @@ function calculateForecast() {
   const days   = parseInt(document.getElementById("forecastDays")?.value || "14", 10) || 14;
   const safety = parseFloat(document.getElementById("forecastSafety")?.value || "1") || 1;
 
-  const today = new Date();
+  const today    = new Date();
   const fromDate = new Date(today.getTime() - days * 24*60*60*1000);
 
   const itemStats = {};
@@ -3359,11 +3394,11 @@ function calculateForecast() {
   if (!body) return;
 
   const rows = Object.keys(itemStats).map(name => {
-    const totalQty = itemStats[name].totalQty;
+    const totalQty  = itemStats[name].totalQty;
     const daysCount = itemStats[name].daysSet.size || 1;
-    const avgDaily = totalQty / daysCount;
-    const tomorrow = avgDaily * safety;
-    const after    = avgDaily * safety;
+    const avgDaily  = totalQty / daysCount;
+    const tomorrow  = avgDaily * safety;
+    const after     = avgDaily * safety;
     return { name, totalQty, daysCount, avgDaily, tomorrow, after };
   });
 
