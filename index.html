@@ -181,7 +181,7 @@
 
 <script>
 // ======================== التكوين الأساسي ========================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzueeXeqoIj5homzRSaCI5fPrBU0J9q82CdDSVCI-_u2Q2po26fy_uLrDNcbpYxv376Vg/exec'; // استبدل برابط Web App الخاص بك
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec'; // استبدل برابط Web App الخاص بك
 
 let db = { products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [], complaints: [], customers: [] };
 let currentUser = null, currentCat = 'الكل', cart = [], pendingProduct = null, pendingEditIndex = -1, currentShift = null, discountEnabled = false, currentQROrderId = null, html5QrScanner = null, customerData = { name:'', phone:'', address:'' };
@@ -197,7 +197,7 @@ const isWeight = p => String(p.unit || '').trim() === 'كيلو';
 function jsonp(action, params = {}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPT_URL;
-    if (!base || base === 'YOUR_SCRIPT_URL_HERE') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
+    if (!base || base === 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
     const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const qs = new URLSearchParams({ action, callback: cb, ...params });
     const script = document.createElement('script');
@@ -213,7 +213,7 @@ function jsonp(action, params = {}) {
 function postForm(action, payload = {}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPT_URL;
-    if (!base || base === 'YOUR_SCRIPT_URL_HERE') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
+    if (!base || base === 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
     const iframe = document.createElement('iframe');
     iframe.name = 'frm_' + Date.now();
     iframe.style.display = 'none';
