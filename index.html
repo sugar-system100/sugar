@@ -61,9 +61,8 @@
 
   const isWeight = p => String(p.unit || "").trim() === "g";
 
-  function normalizeData(res) {
-    // المنتجات
-
+ function normalizeData(res) {
+  // المنتجات - آمنة
   db.products = (res.products || []).map(r => ({
     name: String(r[0] || "").trim(),
     cat: String(r[1] || "").trim(),
@@ -71,8 +70,8 @@
     unit: String(r[3] || "").trim()
   }));
 
-    // المستخدمين
-    db.users = (res.users
+  // المستخدمين - آمنة
+  db.users
       branch: String(r[0] || "").trim(),
       username: String(r[1] || "").trim(),
       pass: String(r[2] || "").trim(),
@@ -730,8 +729,8 @@ async function updateCrmOrderStatus(id, status) {
     toast('تم تحديث حالة الأوردر', false);
   } catch (e) {
     toast(e.message, true);
-  }
-// نهاية السكربت
+   }
+}
 </script>
 </body>
 </html>
