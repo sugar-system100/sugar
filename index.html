@@ -63,15 +63,16 @@
 
   function normalizeData(res) {
     // المنتجات
-    db.products = (res.products || []).map(r => ({
-      name: String(r[0] || "").trim(),
-      cat: String(r[1] || "").trim(),
-      price: Number(r[2] || 0),
-      unit: String(r[3] || "").trim()
-    }));
+
+  db.products = (res.products || []).map(r => ({
+    name: String(r[0] || "").trim(),
+    cat: String(r[1] || "").trim(),
+    price: Number(r[2] || 0),
+    unit: String(r[3] || "").trim()
+  }));
 
     // المستخدمين
-    db.users = (res.users || []).map(r => ({
+    db.users = (res.users
       branch: String(r[0] || "").trim(),
       username: String(r[1] || "").trim(),
       pass: String(r[2] || "").trim(),
