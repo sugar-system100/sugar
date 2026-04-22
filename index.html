@@ -63,7 +63,6 @@
     .pos-cart-panel, .crm-cart-panel { width: 340px; flex-shrink: 0; }
     .pos-products-panel, .crm-products-panel { flex: 1; min-width: 0; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     .card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 700; font-size: 1.2rem; gap: 12px; flex-wrap: wrap; }
 
@@ -181,7 +180,7 @@
 
 <script>
 // ======================== التكوين الأساسي ========================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec'; // استبدل برابط Web App الخاص بك
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec';
 
 let db = { products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [], complaints: [], customers: [] };
 let currentUser = null, currentCat = 'الكل', cart = [], pendingProduct = null, pendingEditIndex = -1, currentShift = null, discountEnabled = false, currentQROrderId = null, html5QrScanner = null, customerData = { name:'', phone:'', address:'' };
@@ -197,7 +196,6 @@ const isWeight = p => String(p.unit || '').trim() === 'كيلو';
 function jsonp(action, params = {}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPT_URL;
-    if (!base || base === 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
     const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const qs = new URLSearchParams({ action, callback: cb, ...params });
     const script = document.createElement('script');
@@ -213,7 +211,6 @@ function jsonp(action, params = {}) {
 function postForm(action, payload = {}) {
   return new Promise((resolve, reject) => {
     const base = SCRIPT_URL;
-    if (!base || base === 'https://script.google.com/macros/s/AKfycbxRb7YvH7g3ciBMQAtu403gbRB7ZOE2H9OgiU9d68mpzBte0O6J5RlPFpoFb6MSmm7vuA/exec') return reject(new Error('الرجاء تعيين SCRIPT_URL'));
     const iframe = document.createElement('iframe');
     iframe.name = 'frm_' + Date.now();
     iframe.style.display = 'none';
@@ -662,7 +659,7 @@ async function doSearch() {
     const sales = res.sales || [];
     const container = document.getElementById('searchResults');
     if(!sales.length) { container.innerHTML = '<p>لا توجد نتائج</p>'; return; }
-    container.innerHTML = `<table><thead><tr><th>الكود</th><th>التاريخ</th><th>الفرع</th><th>العميل</th><th>الإجمالي</th><th></th></tr></thead><tbody>${sales.map(s => `<tr><td>${esc(s.saleId)}</td><td>${s.date}</td><td>${esc(s.branch)}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td><button class="btn btn-outline" onclick="viewInvoice('${s.saleId}')">عرض</button></td></tr>`).join('')}</tbody></table>`;
+    container.innerHTML = `<table><thead><tr><th>الكود</th><th>التاريخ</th><th>الفرع</th><th>العميل</th><th>الإجمالي</th><th></th></tr></thead><tbody>${sales.map(s => `<tr><td>${esc(s.saleId)}</td><td>${s.date}</td><td>${esc(s.branch)}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td><button class="btn btn-outline" onclick="viewInvoice('${s.saleId}')">عرض</button></td>`).join('')}</tbody></table>`;
   } catch(e) { toast(e.message, true); }
 }
 async function viewInvoice(saleId) {
@@ -678,30 +675,78 @@ async function viewInvoice(saleId) {
 }
 
 // ======================== باقي الشاشات (مختصرة) ========================
-function renderStock() { /* عرض المخزون */ document.getElementById('sec-stock').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${db.stock.filter(s=>s.branch===currentUser.branch).map(s=>`<tr><td>${esc(s.item)}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div></div>`; }
-function renderProductsManagement() { /* مشابه */ }
-function renderUsersManagement() { /* مشابه */ }
-function renderReports() { /* مشابه */ }
-function renderComplaints() { /* واجهة الشكاوى */ document.getElementById('sec-complaints').innerHTML = `<div class="top-bar"><button class="btn btn-primary" onclick="openComplaintModal()"><i class="fas fa-plus"></i> شكوى جديدة</button></div><div class="card"><div id="complaintsList"></div></div>`; loadComplaints(); }
-async function loadComplaints() { /* جلب الشكاوى */ }
+function renderStock() { document.getElementById('sec-stock').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${db.stock.filter(s=>s.branch===currentUser.branch).map(s=>`<tr><td>${esc(s.item)}</td><td>${s.qty}</td>`).join('')}</tbody></table></div></div>`; }
+function renderProductsManagement() { document.getElementById('sec-products').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th><th>الوحدة</th></tr></thead><tbody>${db.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td>`).join('')}</tbody></table></div></div>`; }
+function renderUsersManagement() { document.getElementById('sec-users').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الفرع</th><th>اسم المستخدم</th><th>النوع</th><th>نشط</th></tr></thead><tbody>${db.users.map(u=>`<tr><td>${esc(u.branch)}</td><td>${esc(u.username)}</td><td>${esc(u.pointType)}</td><td>${u.active?'✅':'❌'}</td>`).join('')}</tbody></table></div></div>`; }
+function renderReports() { document.getElementById('sec-reports').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الكود</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>الكاشير</th></tr></thead><tbody>${db.sales.filter(s=>s.branch===currentUser.branch).slice(0,50).map(s=>`<tr><td>${esc(s.saleId)}</td><td>${s.date}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td>${esc(s.cashier)}</td>`).join('')}</tbody></table></div></div>`; }
+function renderComplaints() { document.getElementById('sec-complaints').innerHTML = `<div class="top-bar"><button class="btn btn-primary" onclick="openComplaintModal()"><i class="fas fa-plus"></i> شكوى جديدة</button></div><div class="card"><div id="complaintsList"></div></div>`; loadComplaints(); }
+async function loadComplaints() { try { const res = await jsonp('getInitialData', { userType: currentUser.pointType, branch: currentUser.branch, username: currentUser.branch }); const complaints = res.complaints || []; document.getElementById('complaintsList').innerHTML = `<div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>العميل</th><th>النوع</th><th>الحالة</th></tr></thead><tbody>${complaints.map(c=>`<tr><td>${c.date}</td><td>${esc(c.customerName)}</td><td>${esc(c.type)}</td><td>${esc(c.status)}</td>`).join('')}</tbody></table></div>`; } catch(e){} }
 function openComplaintModal() { document.getElementById('complaintModal').style.display = 'flex'; }
 function closeComplaintModal() { document.getElementById('complaintModal').style.display = 'none'; }
-async function saveComplaint() { /* حفظ */ toast('تم حفظ الشكوى'); closeComplaintModal(); }
+async function saveComplaint() {
+  const phone = document.getElementById('complaintPhone').value.trim();
+  const name = document.getElementById('complaintName').value.trim();
+  const type = document.getElementById('complaintType').value;
+  const desc = document.getElementById('complaintDesc').value.trim();
+  if(!phone || !desc) return toast('رقم الهاتف ووصف الشكوى مطلوبان', true);
+  try {
+    await postForm('saveComplaint', { complaint: { phone, customerName: name, branch: currentUser.branch, type, description: desc, handledBy: currentUser.branch, notes: '' } });
+    toast('تم حفظ الشكوى');
+    closeComplaintModal();
+    await refreshData();
+    renderComplaints();
+  } catch(e) { toast(e.message, true); }
+}
 
 // ======================== الورديات ========================
 function loadCurrentShift() { currentShift = db.shifts.find(s => s.branch === currentUser.branch && s.cashier === currentUser.branch && s.status === 'مفتوحة') || null; updateShiftDisplay(); }
 function updateShiftDisplay() { const el = document.getElementById('shiftStatus'); if(el) el.textContent = currentShift ? `وردية مفتوحة: ${currentShift.openTime}` : 'لا توجد وردية مفتوحة'; }
-function showShiftModal() { /* عرض مودال */ }
+function showShiftModal() { const modal = document.getElementById('shiftModal'); const info = document.getElementById('shiftInfo'); const actions = document.getElementById('shiftActions'); info.innerHTML = currentShift ? `<div>الحالة: مفتوحة</div><div>وقت الفتح: ${currentShift.openTime}</div>` : `<div>لا توجد وردية مفتوحة</div>`; actions.innerHTML = currentShift ? `<div style="display:flex; gap:10px;"><button class="btn btn-danger" onclick="closeShiftConfirmed()">إغلاق الوردية</button><button class="btn btn-outline" onclick="cancelShiftConfirmed()">إلغاء الوردية</button></div>` : `<button class="btn btn-primary" onclick="openShiftConfirmed()">فتح وردية</button>`; modal.style.display = 'flex'; }
 function closeShiftModal() { document.getElementById('shiftModal').style.display = 'none'; }
 async function openShiftConfirmed() { await postForm('openShift', { branch: currentUser.branch, cashier: currentUser.branch }); await refreshData(); closeShiftModal(); toast('تم فتح الوردية'); }
 async function closeShiftConfirmed() { await postForm('closeShift', { shiftId: currentShift.id, branch: currentUser.branch }); await refreshData(); closeShiftModal(); toast('تم إغلاق الوردية'); }
 async function cancelShiftConfirmed() { await postForm('cancelShift', { shiftId: currentShift.id, branch: currentUser.branch }); await refreshData(); closeShiftModal(); toast('تم إلغاء الوردية'); }
 
 // ======================== دوال QR ========================
-async function createQROrder() { /* إنشاء QR */ }
-function openQRScanner() { /* فتح الماسح */ }
-function closeQrScanner() { /* إغلاق */ }
-async function loadManualQR() { /* تحميل */ }
+async function createQROrder() {
+  if(!cart.length) return toast('السلة فارغة', true);
+  const sub = cart.reduce((a,b)=>a+b.total,0);
+  const fee = parseFloat(document.getElementById('deliveryFee')?.value)||0;
+  const discType = document.getElementById('discountType')?.value;
+  let disc = parseFloat(document.getElementById('discountVal')?.value)||0;
+  if(discType==='percent') disc = sub*disc/100;
+  const total = Math.max(0, sub+fee-disc);
+  try {
+    const res = await postForm('createQROrder', { order: { branch: currentUser.branch, creator: currentUser.branch, items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price, total:i.total })), subtotal: sub, discount: disc, delivery: fee, total } });
+    const orderId = res?.orderId;
+    if(!orderId) return toast('فشل إنشاء QR', true);
+    document.getElementById('qrOrderId').innerText = orderId;
+    const container = document.getElementById('qrCodeContainer');
+    container.innerHTML = '';
+    QRCode.toCanvas(document.createElement('canvas'), orderId, { width: 260 }, (err, canvas) => { if(err) container.innerHTML = '<p style="color:red;">فشل إنشاء QR</p>'; else { container.appendChild(canvas); document.getElementById('qrModal').style.display = 'flex'; } });
+    toast('تم إنشاء QR بنجاح');
+  } catch(e) { toast(e.message, true); }
+}
+function closeQrModal() { document.getElementById('qrModal').style.display = 'none'; }
+function printQR() { const canvas = document.querySelector('#qrCodeContainer canvas'); if(!canvas) return; const win = window.open(''); win.document.write(`<html><head><title>QR</title></head><body style="display:flex;justify-content:center;align-items:center;height:100vh">${'<img src="' + canvas.toDataURL() + '">'} </body></html>`); win.document.close(); win.print(); }
+function openQRScanner() { document.getElementById('qrScannerModal').style.display = 'flex'; document.getElementById('manualQrInput').value = ''; if(!html5QrScanner) html5QrScanner = new Html5Qrcode("qrReader"); html5QrScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => { loadQROrder(decodedText); }, () => {}).catch(() => toast('فشل تشغيل الكاميرا', true)); }
+function closeQrScanner() { if(html5QrScanner) html5QrScanner.stop().catch(()=>{}); document.getElementById('qrScannerModal').style.display = 'none'; }
+async function loadManualQR() { const code = document.getElementById('manualQrInput').value.trim(); if(!code) return toast('أدخل كود الطلب', true); loadQROrder(code); }
+async function loadQROrder(orderId) {
+  try {
+    const res = await jsonp('getQROrder', { orderId });
+    if(!res.order) return toast('الطلب غير موجود', true);
+    const order = res.order;
+    cart = order.items.map(i => { const p = db.products.find(pp => pp.name === i.name) || { unit:'قطعة' }; return { name:i.name, unit:p.unit, price:i.price, qty:i.qty, chargeQty:isWeight(p) ? (i.qty / 1000) : i.qty, total:i.total }; });
+    currentQROrderId = orderId;
+    closeQrScanner();
+    renderPOS();
+    if(document.getElementById('deliveryFee')) document.getElementById('deliveryFee').value = order.delivery || 0;
+    if(document.getElementById('discountVal')) document.getElementById('discountVal').value = order.discount || 0;
+    renderCart();
+    toast(`تم تحميل الطلب ${orderId}`);
+  } catch(e) { toast(e.message, true); }
+}
 
 // ======================== bootstrap ========================
 window.onload = () => { boot(); };
