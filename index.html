@@ -1,8 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>نظام إدارة المبيعات - POS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f0f1a;
+      color: #eef2ff;
+      direction: rtl;
+    }
+
+    /* Import Cairo font */
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #b81b5c;
+      --primary-dark: #8e1547;
+      --primary-light: #e91e7a;
+      --secondary: #1e1e2a;
+      --accent: #00b4d8;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --info: #3498db;
+      --dark: #0a0a0f;
+      --gray: #2a2a35;
+      --light-gray: #3a3a48;
+      --text-muted: #8a8a9e;
+      --border: #2c2c3a;
+    }
+
+    /* Login Screen */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2000;
+    }
+
+    .login-card {
+      background: var(--secondary);
+      border-radius: 24px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+    }
+
+    .login-card h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--primary-light);
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+    }
+
+    .login-card input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .login-card button {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .login-card button:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Main App */
+    .app-container {
+      display: none;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--secondary);
+      border-left: 1px solid var(--border);
+      padding: 20px 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .logo {
+      padding: 0 20px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .logo h2 {
+      color: var(--primary-light);
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: var(--text-muted);
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .nav-item i {
+      width: 24px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-right: 260px;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-badge {
+      background: var(--primary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      background: var(--danger);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--secondary);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      background: var(--gray);
+      border-bottom: 1px solid var(--border);
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .btn-outline:hover {
+      background: var(--gray);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: var(--gray);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .product-card:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .product-name {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .product-meta {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Cart */
+    .cart-items {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cart-row-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .total-section {
+      padding: 16px;
+      border-top: 2px solid var(--border);
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--gray);
+      font-weight: bold;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+
+    .modal-card {
+      background: var(--secondary);
+      border-radius: 24px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-card input, .modal-card select, .modal-card textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      font-family: inherit;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--gray);
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .badge-success {
+      background: var(--primary);
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      right: 30px;
+      background: #1e1e2a;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      z-index: 4000;
+      display: none;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+      .sidebar span:not(.nav-item i) {
+        display: none;
+      }
+      .main-content {
+        margin-right: 70px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      }
+    }
+
+    .crm-layout {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .crm-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pill {
+      background: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-container">
+  <div class="login-card">
+    <h1><i class="fas fa-store"></i> نظام POS</h1>
+    <input type="text" id="loginUsername" placeholder="اسم المستخدم">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    <button onclick="doLogin()">تسجيل الدخول</button>
+  </div>
+</div>
+
+<div id="appContainer" class="app-container">
+  <div class="sidebar">
+    <div class="logo">
+      <h2><i class="fas fa-chart-line"></i> POS</h2>
+    </div>
+    <div class="nav-item active" data-section="sec-dashboard">
+      <i class="fas fa-tachometer-alt"></i> <span>الرئيسية</span>
+    </div>
+    <div class="nav-item" data-section="sec-sales">
+      <i class="fas fa-cash-register"></i> <span>المبيعات</span>
+    </div>
+    <div class="nav-item" data-section="sec-products">
+      <i class="fas fa-boxes"></i> <span>المنتجات</span>
+    </div>
+    <div class="nav-item" data-section="sec-stock">
+      <i class="fas fa-warehouse"></i> <span>المخزون</span>
+    </div>
+    <div class="nav-item" data-section="sec-users">
+      <i class="fas fa-users"></i> <span>المستخدمين</span>
+    </div>
+    <div class="nav-item" data-section="sec-shifts">
+      <i class="fas fa-clock"></i> <span>الورديات</span>
+    </div>
+    <div class="nav-item" data-section="sec-expenses">
+      <i class="fas fa-money-bill-wave"></i> <span>المصروفات</span>
+    </div>
+    <div class="nav-item" data-section="sec-crm">
+      <i class="fas fa-headset"></i> <span>CRM</span>
+    </div>
+    <div class="nav-item" data-section="sec-reports">
+      <i class="fas fa-chart-bar"></i> <span>التقارير</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="top-bar">
+      <div class="page-title" id="pageTitle">الرئيسية</div>
+      <div class="user-info">
+        <span class="user-badge" id="userNameDisplay"></span>
+        <span class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</span>
+      </div>
+    </div>
+
+    <div id="sec-dashboard" class="section">
+      <div class="card">
+        <div class="card-header">لوحة التحكم</div>
+        <div style="padding: 20px; text-align: center;">
+          <h3>مرحباً بك في نظام إدارة المبيعات</h3>
+          <p style="color: var(--text-muted); margin-top: 10px;">اختر أحد الأقسام من القائمة الجانبية</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="sec-sales" class="section" style="display: none;"></div>
+    <div id="sec-products" class="section" style="display: none;"></div>
+    <div id="sec-stock" class="section" style="display: none;"></div>
+    <div id="sec-users" class="section" style="display: none;"></div>
+    <div id="sec-shifts" class="section" style="display: none;"></div>
+    <div id="sec-expenses" class="section" style="display: none;"></div>
+    <div id="sec-crm" class="section" style="display: none;"></div>
+    <div id="sec-reports" class="section" style="display: none;"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Modal for quantity -->
+<div id="qtyModal" class="modal">
+  <div class="modal-card">
+    <h3 id="qtyTitle">الكمية</h3>
+    <input type="number" id="qtyInput" step="1" min="1">
+    <small id="qtyHint" style="color: var(--text-muted);">الكمية بالقطعة</small>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeQtyModal()">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmQty()">إضافة</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  "use strict";
+  // ==================== CONFIGURATION ====================
+  const SCRIPTURL = "https://script.google.com/macros/s/AKfycbwWRcyCfBFRTYIlQ7dqVlqNdXHLAg76C6wuIzivFbs0fFGIP0jAHLKSa7TlGHTt1I_X/exec";
 
-  const SCRIPTURL = "https://script.google.com/macros/s/AKfycbwWRcyCfBFRTYIlQ7dqVlqNdXHLAg76C6wuIzivFbs0fFGIP0jAHLKSa7TlGHTt1I_X/exec"; // تأكد إنه نفس الموجود عندك
-
+  // ==================== GLOBAL STATE ====================
   let db = {
     products: [],
     users: [],
@@ -19,23 +573,29 @@
     complaints: []
   };
 
-  let currentUser = null,
-    currentCat = null,
-    cart = [],
-    pendingProduct = null,
-    pendingEditIndex = -1,
-    currentShift = null,
-    discountEnabled = false,
-    currentQROrderId = null,
-    html5QrScanner = null,
-    customerData = { name: "", phone: "", address: "" };
+  let currentUser = null;
+  let currentCat = null;
+  let cart = [];
+  let pendingProduct = null;
+  let pendingEditIndex = -1;
+  let currentShift = null;
+  
+  // CRM State
+  let crmCart = [];
+  let crmCurrentCat = null;
+  let crmPendingProduct = null;
+  let crmPendingEditIndex = -1;
 
-  let crmCart = [],
-    crmCurrentCat = null,
-    crmPendingProduct = null,
-    crmPendingEditIndex = -1;
-
+  // ==================== HELPER FUNCTIONS ====================
   const money = n => Number(n || 0).toFixed(2);
+  
+  const esc = s => String(s ?? "").replace(/[&<>\"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+  })[c]);
+
+  const jsq = s => String(s ?? "").replace(/'/g, "\\'").replace(/"/g, "\\\"").replace(/\n/g, " ");
+
+  const isWeight = p => String(p.unit || "").trim() === "g";
 
   const toast = (msg, isError = false) => {
     const t = document.getElementById("toast");
@@ -49,29 +609,58 @@
     }, 3500);
   };
 
-  const esc = s => String(s ?? "").replace(/[&<>\"']/g, c => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "\"": "&quot;",
-    "'": "&#39;"
-  })[c]);
+  // ==================== API FUNCTIONS ====================
+  async function postForm(action, data) {
+    const payload = { action, ...data };
+    const response = await fetch(SCRIPTURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
+    });
+    
+    // Since mode is 'no-cors', we can't read response directly
+    // We'll use GET for reading data
+    return { ok: true };
+  }
 
-  const jsq = s => String(s ?? "").replace(/'/g, "\\'").replace(/"/g, "\\\"").replace(/\n/g, " ");
+  async function postFormWithResponse(action, data) {
+    const payload = { action, ...data };
+    const response = await fetch(SCRIPTURL + '?action=' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
+    });
+    return await response.json();
+  }
 
-  const isWeight = p => String(p.unit || "").trim() === "g";
+  async function refreshData(silent = false) {
+    try {
+      const url = `${SCRIPTURL}?action=getInitialData&t=${Date.now()}`;
+      const response = await fetch(url);
+      const res = await response.json();
+      
+      if (res && res.ok !== false) {
+        normalizeData(res);
+        if (!silent) toast("تم تحديث البيانات", false);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      if (!silent) toast(e.message, true);
+      return false;
+    }
+  }
 
- function normalizeData(res) {
-  // المنتجات - آمنة
-  db.products = (res.products || []).map(r => ({
-    name: String(r[0] || "").trim(),
-    cat: String(r[1] || "").trim(),
-    price: Number(r[2] || 0),
-    unit: String(r[3] || "").trim()
-  }));
+  function normalizeData(res) {
+    db.products = (res.products || []).map(r => ({
+      name: String(r[0] || "").trim(),
+      cat: String(r[1] || "").trim(),
+      price: Number(r[2] || 0),
+      unit: String(r[3] || "").trim()
+    }));
 
-  // المستخدمين - آمنة
-  db.users
+    db.users = (res.users || []).map(r => ({
       branch: String(r[0] || "").trim(),
       username: String(r[1] || "").trim(),
       pass: String(r[2] || "").trim(),
@@ -81,7 +670,6 @@
       active: String(r[6] || "").toUpperCase() === "TRUE"
     }));
 
-    // المخزون
     db.stock = (res.stock || []).map(r => ({
       branch: String(r[0] || "").trim(),
       item: String(r[1] || "").trim(),
@@ -89,121 +677,52 @@
       lastUpdate: String(r[3] || "")
     }));
 
-    // المبيعات
     db.sales = (res.sales || []).map(r => ({
-      saleId: r[0],
-      date: r[1],
-      branch: r[2],
-      customer: r[3],
-      phone: r[4],
-      address: r[5],
-      channel: r[6],
-      status: r[7],
-      subtotal: Number(r[8] || 0),
-      discount: Number(r[9] || 0),
-      delivery: Number(r[10] || 0),
-      total: Number(r[11] || 0),
-      cashier: r[12],
-      username: r[13],
-      notes: r[14],
-      shiftId: r[15],
-      paymentMethod: r[16],
-      paidAmount: Number(r[17] || 0),
-      qrOrderId: r[18]
+      saleId: r[0], date: r[1], branch: r[2], customer: r[3], phone: r[4],
+      address: r[5], channel: r[6], status: r[7], subtotal: Number(r[8] || 0),
+      discount: Number(r[9] || 0), delivery: Number(r[10] || 0), total: Number(r[11] || 0),
+      cashier: r[12], username: r[13], notes: r[14], shiftId: r[15],
+      paymentMethod: r[16], paidAmount: Number(r[17] || 0), qrOrderId: r[18]
     }));
 
-    // أوامر CRM
     db.crmOrders = (res.crmOrders || []).map(r => ({
-      id: r[0],
-      createdAt: r[1],
-      branch: r[2],
-      customer: r[3],
-      phone: r[4],
-      address: r[5],
-      items: r[6],
-      total: Number(r[7] || 0),
-      notes: r[8],
-      status: r[9],
-      createdBy: r[10],
-      deliveryFee: Number(r[11] || 0),
-      deliveryZone: r[12]
+      id: r[0], createdAt: r[1], branch: r[2], customer: r[3], phone: r[4],
+      address: r[5], items: r[6], total: Number(r[7] || 0), notes: r[8],
+      status: r[9], createdBy: r[10], deliveryFee: Number(r[11] || 0), deliveryZone: r[12]
     }));
 
-    // طلبات QR
     db.qrOrders = (res.qrOrders || []).map(r => {
-      let items;
-      try {
-        items = JSON.parse(r[5] || "[]");
-      } catch (e) {
-        items = [];
-      }
+      let items = [];
+      try { items = JSON.parse(r[5] || "[]"); } catch(e) {}
       return {
-        id: r[0],
-        date: r[1],
-        creator: r[2],
-        salesmanName: r[3],
-        branch: r[4],
-        items,
-        subtotal: Number(r[6] || 0),
-        discount: Number(r[7] || 0),
-        delivery: Number(r[8] || 0),
-        total: Number(r[9] || 0),
-        status: r[10],
-        cashier: r[11],
-        closedAt: r[12]
+        id: r[0], date: r[1], creator: r[2], salesmanName: r[3], branch: r[4],
+        items, subtotal: Number(r[6] || 0), discount: Number(r[7] || 0),
+        delivery: Number(r[8] || 0), total: Number(r[9] || 0),
+        status: r[10], cashier: r[11], closedAt: r[12]
       };
     });
 
-    // الورديات
     db.shifts = (res.shifts || []).map(r => ({
-      id: r[0],
-      branch: r[1],
-      cashier: r[2],
-      openedBy: r[3],
-      openTime: r[4],
-      closeTime: r[5],
-      totalSales: Number(r[6] || 0),
-      salesCount: Number(r[7] || 0),
-      status: r[8]
+      id: r[0], branch: r[1], cashier: r[2], openedBy: r[3], openTime: r[4],
+      closeTime: r[5], totalSales: Number(r[6] || 0), salesCount: Number(r[7] || 0), status: r[8]
     }));
 
-    // المصروفات
     db.expenses = (res.expenses || []).map(r => ({
-      id: r[0],
-      date: r[1],
-      branch: r[2],
-      username: r[3],
-      type: r[4],
-      amount: Number(r[5] || 0),
-      complaintId: r[6],
-      notes: r[7],
-      shiftId: r[8]
+      id: r[0], date: r[1], branch: r[2], username: r[3], type: r[4],
+      amount: Number(r[5] || 0), complaintId: r[6], notes: r[7], shiftId: r[8]
     }));
 
-    // المرتجعات
     db.returns = (res.returns || []).map(r => ({
-      id: r[0],
-      date: r[1],
-      branch: r[2],
-      username: r[3],
-      originalSaleId: r[4],
-      items: r[5],
-      amount: Number(r[6] || 0),
-      reason: r[7],
-      shiftId: r[8]
+      id: r[0], date: r[1], branch: r[2], username: r[3], originalSaleId: r[4],
+      items: r[5], amount: Number(r[6] || 0), reason: r[7], shiftId: r[8]
     }));
 
-    // حالات CRM (لو استخدمناها لاحقًا)
-    db.crmStatuses = Array.isArray(res.crmStatuses) && res.crmStatuses.length ? res.crmStatuses : [];
-
-    // مناطق ورسوم التوصيل من ملف DeliveryZones
     db.deliveryZones = (res.deliveryZones || []).map(r => ({
-      branch: String(r[0] || "").trim(),   // الفرع
-      address: String(r[1] || "").trim(),  // العنوان/الوصف
-      fee: Number(r[2] || 0)               // السعر
+      branch: String(r[0] || "").trim(),
+      address: String(r[1] || "").trim(),
+      fee: Number(r[2] || 0)
     }));
 
-    // جدول العملاء
     db.customers = (res.customers || []).map(r => ({
       phone: String(r[0] || "").trim(),
       name: String(r[1] || "").trim(),
@@ -213,7 +732,6 @@
       notes: String(r[5] || "").trim()
     }));
 
-    // جدول الشكاوى
     db.complaints = (res.complaints || []).map(r => ({
       id: String(r[0] || "").trim(),
       date: String(r[1] || "").trim(),
@@ -229,508 +747,475 @@
       notes: String(r[11] || "").trim()
     }));
   }
-function renderCRM() {
-  const sec = document.getElementById('sec-crm');
-  const pt = currentUser?.pointType;
-  sec.innerHTML = `
-    <div class="top-bar">
-      <div class="page-title">
-        <i class="fas fa-headset" style="color: var(--primary)"></i> CRM
-      </div>
-      <div class="action-buttons">
-        <button class="btn btn-outline" onclick="crmNewOrder()">
-          <i class="fas fa-plus-circle"></i> طلب جديد
-        </button>
-        <button class="btn btn-outline" onclick="refreshData()">
-          <i class="fas fa-sync"></i> تحديث
-        </button>
-        <button class="btn btn-outline" onclick="importCustomersClick()">
-          <i class="fas fa-file-import"></i> استيراد العملاء من الشيت
-        </button>
-      </div>
-    </div>
 
-    <div class="crm-layout">
-      <div class="crm-cart-panel">
-        <div class="card">
-          <div class="card-header">
-            <span><i class="fas fa-clipboard-list"></i> بيانات الطلب</span>
-            <span class="pill">${crmCart.length || 0}</span>
-          </div>
-
-          <!-- بيانات العميل -->
-          <div style="display:grid; gap:10px; margin-bottom:14px;">
-            <input id="crmCustomer" placeholder="اسم العميل">
-            <input id="crmPhone" placeholder="رقم الموبايل" onblur="onCrmPhoneBlur()">
-            <input id="crmAddress" placeholder="العنوان بالتفصيل">
-
-            <!-- الفرع -->
-            <select id="crmBranchSelect">
-              <option value="">اختر الفرع</option>
-            </select>
-
-            <!-- مناطق التوصيل حسب الفرع -->
-            <select id="crmZoneSelect" onchange="onCrmZoneChange()">
-              <option value="">اختر المنطقة / أقرب وصف</option>
-            </select>
-
-            <!-- رسوم التوصيل -->
-            <input id="crmDeliveryFee" type="number" min="0" step="0.5" placeholder="رسوم التوصيل">
-
-            <input id="crmNotes" placeholder="ملاحظات إضافية (اختياري)">
-          </div>
-
-          <div id="crmCartList" class="cart-items"></div>
-          <div class="total-section">
-            <div style="display:flex; justify-content:space-between; margin:10px 0;">
-              <span>إجمالي المنتجات:</span>
-              <span id="crmGrandTotal">0</span>
-            </div>
-            <button class="btn btn-primary" style="width:100%" onclick="saveCrmOrderFromCart()">
-              <i class="fas fa-paper-plane"></i> حفظ طلب CRM
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="crm-products-panel">
-        <div class="card">
-          <div class="card-header">
-            <span><i class="fas fa-cubes"></i></span>
-            <input type="text" id="crmSearchInput" placeholder="ابحث في المنتجات..." style="width:200px; padding:10px;" oninput="renderCrmProducts()">
-          </div>
-          <div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;" id="crmCatsList"></div>
-          <div id="crmProductsGrid" class="product-grid"></div>
-        </div>
-
-        <div class="card" style="margin-top:20px;">
-          <div class="card-header">
-            <span><i class="fas fa-list-ul"></i> أوامر CRM</span>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>الفرع</th>
-                  <th>العميل</th>
-                  <th>الإجمالي</th>
-                  <th>الحالة</th>
-                  <th>عمليات</th>
-                </tr>
-              </thead>
-              <tbody id="crmTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  fillCrmBranchSelect();
-  renderCrmCats();
-  renderCrmProducts();
-  renderCrmCart();
-  renderCrmTable();
-}
-// ملء فروع CRM (مع ربط المناطق)
-function fillCrmBranchSelect() {
-  const el = document.getElementById('crmBranchSelect');
-  if (!el) return;
-
-  const branches = db.users.filter(u =>
-    ['crm', 'admin', 'owner', 'supervisor', 'cashier', 'delivery'].includes(u.pointType) &&
-    u.active
-  );
-
-  const unique = [...new Map(branches.map(x => [x.branch, x])).values()];
-
-  el.innerHTML = [
-    '<option value="">اختر الفرع</option>',
-    ...unique.map(u => `<option value="${esc(u.branch)}">${esc(u.branch)}</option>`)
-  ].join('');
-
-  // ربط تغيير الفرع بتعبئة المناطق
-  el.onchange = function() {
-    const branch = this.value.trim();
-    fillCrmZonesForBranch(branch);
-  };
-}
-
-// ملء قائمة المناطق حسب الفرع
-function fillCrmZonesForBranch(branch) {
-  const zoneSelect = document.getElementById('crmZoneSelect');
-  if (!zoneSelect) return;
-
-  if (!branch) {
-    zoneSelect.innerHTML = '<option value="">اختر المنطقة / أقرب وصف</option>';
-    return;
+  function stockFor(item, branch) {
+    const s = db.stock.find(x => x.item === item && x.branch === branch);
+    return s ? s.qty : 0;
   }
 
-  const zones = db.deliveryZones.filter(z => z.branch === branch);
-  if (!zones.length) {
-    zoneSelect.innerHTML = '<option value="">لا توجد مناطق مسجّلة لهذا الفرع</option>';
-    return;
-  }
-
-  zoneSelect.innerHTML = [
-    '<option value="">اختر المنطقة / أقرب وصف</option>',
-    ...zones.map((z, idx) =>
-      `<option value="${idx}">${esc(z.address)} - ${money(z.fee)}</option>`
-    )
-  ].join('');
-}
-
-// عند اختيار منطقة: تعبئة رسوم التوصيل
-function onCrmZoneChange() {
-  const branch = document.getElementById('crmBranchSelect')?.value?.trim();
-  const zoneSelect = document.getElementById('crmZoneSelect');
-  const feeInput = document.getElementById('crmDeliveryFee');
-  if (!branch || !zoneSelect || !feeInput) return;
-
-  const index = zoneSelect.value;
-  if (index === '') {
-    feeInput.value = '';
-    return;
-  }
-
-  const zones = db.deliveryZones.filter(z => z.branch === branch);
-  const selected = zones[Number(index)];
-  if (!selected) {
-    feeInput.value = '';
-    return;
-  }
-
-  feeInput.value = selected.fee || 0;
-}
-
-// البحث التلقائي عن العميل برقم الهاتف
-function onCrmPhoneBlur() {
-  const phone = document.getElementById('crmPhone')?.value?.trim();
-  if (!phone) return;
-
-  const c = db.customers.find(cu => cu.phone === phone);
-  if (!c) return;
-
-  document.getElementById('crmCustomer').value = c.name || '';
-  document.getElementById('crmAddress').value = c.address || '';
-
-  let msg = `عميل مسجّل: ${c.name}`;
-  if (c.ordersCount) msg += ` | طلبات: ${c.ordersCount}`;
-  if (c.complaintsCount) msg += ` | شكاوى: ${c.complaintsCount}`;
-  toast(msg, false);
-}
-
-// حفظ طلب CRM (مع الرسوم والمنطقة وبيانات العميل)
-async function saveCrmOrderFromCart() {
-  const branch = document.getElementById('crmBranchSelect')?.value?.trim();
-  const customer = document.getElementById('crmCustomer')?.value?.trim();
-  const phone = document.getElementById('crmPhone')?.value?.trim();
-  const address = document.getElementById('crmAddress')?.value?.trim();
-  const notes = document.getElementById('crmNotes')?.value?.trim();
-  const deliveryFee = parseFloat(document.getElementById('crmDeliveryFee')?.value || '0') || 0;
-
-  const zoneSelect = document.getElementById('crmZoneSelect');
-  const zoneLabel = zoneSelect && zoneSelect.options[zoneSelect.selectedIndex]
-    ? zoneSelect.options[zoneSelect.selectedIndex].text
-    : '';
-
-  const total = crmCart.reduce((a, b) => a + b.total, 0);
-
-  if (!branch) return toast('اختر الفرع', true);
-  if (!crmCart.length) return toast('أضف صنف واحد على الأقل', true);
-
-  const order = {
-    branch,
-    customer,
-    phone,
-    address,
-    items: crmCart.map(i => `${i.name} x ${i.qty}`).join(' | '),
-    itemsJson: crmCart,
-    total,
-    notes,
-    createdBy: currentUser.branch,
-    status: 'جديد',
-    deliveryFee,
-    deliveryZone: zoneLabel
-  };
-
-  try {
-    const res = await postForm('saveCrmOrder', { order });
-    toast('تم حفظ طلب CRM', false);
-    crmCart = [];
-    renderCRM();
-    await refreshData(true);
-    renderCRM();
-  } catch (e) {
-    toast(e.message, true);
-  }
-}
-
-// استيراد العملاء من شيت IMPORT_CUSTOMERS
-async function importCustomersClick() {
-  if (!confirm('هل تريد استيراد/تحديث بيانات العملاء من ورقة IMPORT_CUSTOMERS؟')) return;
-  try {
-    const res = await postForm('importCustomersFromSheet', {});
-    if (!res || res.ok !== true) {
-      return toast(res?.error || 'حدث خطأ أثناء الاستيراد', true);
-    }
-    toast('تم استيراد بيانات العملاء بنجاح', false);
-    await refreshData(true);
-    toast('تم تحديث قاعدة العملاء', false);
-  } catch (e) {
-    toast(e.message, true);
-  }
-}
-// مودال الشكوى (أضفه في نهاية HTML قبل </body>)
-const complaintModalHTML = `
-<div class="modal" id="complaintModal">
-  <div class="modal-card">
-    <h2><i class="fas fa-exclamation-triangle"></i> فتح شكوى جديدة</h2>
+  // ==================== LOGIN ====================
+  async function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
     
-    <div style="margin:16px 0;">
-      <input id="complaintPhone" placeholder="رقم الموبايل" readonly>
-      <input id="complaintName" placeholder="اسم العميل" readonly>
-      <input id="complaintOrderId" placeholder="رقم الأوردر (اختياري)">
-    </div>
-
-    <div style="margin:16px 0;">
-      <select id="complaintType">
-        <option value="">نوع الشكوى</option>
-        <option value="تأخير">تأخير في التوصيل</option>
-        <option value="جودة">جودة المنتج</option>
-        <option value="تعامل">تعامل الموظف</option>
-        <option value="كمية">مشكلة في الكمية</option>
-        <option value="سعر">مشكلة في السعر</option>
-        <option value="أخرى">أخرى</option>
-      </select>
-    </div>
-
-    <textarea id="complaintDetails" placeholder="وصف الشكوى بالتفصيل..." rows="4" style="resize:vertical;"></textarea>
-
-    <div style="display:flex; gap:10px; margin-top:20px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeComplaintModal()">
-        <i class="fas fa-times"></i> إلغاء
-      </button>
-      <button class="btn btn-danger" style="flex:1" onclick="saveComplaint()">
-        <i class="fas fa-paper-plane"></i> حفظ الشكوى
-      </button>
-    </div>
-  </div>
-</div>
-`;
-
-// دالة فتح مودال الشكوى
-function openComplaintModal(phone = '', name = '', orderId = '') {
-  document.getElementById('complaintPhone').value = phone;
-  document.getElementById('complaintName').value = name;
-  document.getElementById('complaintOrderId').value = orderId;
-  document.getElementById('complaintType').value = '';
-  document.getElementById('complaintDetails').value = '';
-  
-  const modal = document.getElementById('complaintModal');
-  if (!modal) {
-    document.body.insertAdjacentHTML('beforeend', complaintModalHTML);
-  }
-  document.getElementById('complaintModal').style.display = 'flex';
-}
-
-// إغلاق مودال الشكوى
-function closeComplaintModal() {
-  document.getElementById('complaintModal').style.display = 'none';
-}
-
-// حفظ الشكوى
-async function saveComplaint() {
-  const phone = document.getElementById('complaintPhone')?.value?.trim();
-  const name = document.getElementById('complaintName')?.value?.trim();
-  const orderId = document.getElementById('complaintOrderId')?.value?.trim();
-  const type = document.getElementById('complaintType')?.value?.trim();
-  const details = document.getElementById('complaintDetails')?.value?.trim();
-
-  if (!phone) return toast('رقم الموبايل مطلوب', true);
-  if (!details) return toast('وصف الشكوى مطلوب', true);
-  if (!type) return toast('نوع الشكوى مطلوب', true);
-
-  const payload = {
-    phone,
-    name,
-    orderId,
-    branch: currentUser.branch,
-    source: currentUser.pointType, // crm أو delivery
-    type,
-    details
-  };
-
-  try {
-    const res = await postForm('saveComplaint', { complaint: payload });
-    if (!res || res.ok !== true) {
-      return toast(res?.error || 'حدث خطأ في حفظ الشكوى', true);
+    if (!username || !password) {
+      toast('يرجى إدخال اسم المستخدم وكلمة المرور', true);
+      return;
     }
-    toast(`تم تسجيل الشكوى #${res.complaintId}`, false);
-    closeComplaintModal();
-    await refreshData(true); // تحديث db.complaints وdb.customers
-  } catch (e) {
-    toast(e.message, true);
+    
+    await refreshData(true);
+    
+    const user = db.users.find(u => u.username === username && u.pass === password && u.active);
+    
+    if (!user) {
+      toast('اسم المستخدم أو كلمة المرور غير صحيحة', true);
+      return;
+    }
+    
+    currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${user.username} (${user.pointType})`;
+    
+    // Check for open shift
+    const openShift = db.shifts.find(s => s.branch === user.branch && s.status === 'open' && s.cashier === user.username);
+    if (openShift) {
+      currentShift = openShift;
+      toast(`الوردية مفتوحة من ${openShift.openTime}`, false);
+    }
+    
+    renderCurrentSection();
   }
-}
 
-// دالة لفتح شكوى من أي أوردر CRM (يمكن استخدامها في جدول CRM)
-function openComplaintFromOrder(order) {
-  openComplaintModal(order.phone, order.customer, order.id);
-}
-
-// دالة عرض سجل الشكاوى لعميل معيّن (اختيارية)
-function showCustomerComplaints(phone) {
-  const customerComplaints = db.complaints.filter(c => c.phone === phone);
-  if (!customerComplaints.length) {
-    toast('لا توجد شكاوى لهذا العميل', false);
-    return;
+  function logout() {
+    currentUser = null;
+    currentShift = null;
+    cart = [];
+    crmCart = [];
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
   }
 
-  let msg = `الشكاوى (${customerComplaints.length}):\n`;
-  customerComplaints.slice(0, 3).forEach((c, idx) => {
-    msg += `${idx + 1}. ${c.type}: ${c.details.substring(0, 50)}... (${c.status})\n`;
+  // ==================== NAVIGATION ====================
+  function renderCurrentSection() {
+    const activeNav = document.querySelector('.nav-item.active');
+    if (!activeNav) return;
+    const sectionId = activeNav.getAttribute('data-section');
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(sectionId).style.display = 'block';
+    document.getElementById('pageTitle').innerText = activeNav.querySelector('span')?.innerText || '';
+    
+    switch(sectionId) {
+      case 'sec-crm': renderCRM(); break;
+      case 'sec-products': renderProducts(); break;
+      case 'sec-users': renderUsers(); break;
+      case 'sec-shifts': renderShifts(); break;
+      case 'sec-sales': renderSales(); break;
+      case 'sec-stock': renderStock(); break;
+      case 'sec-expenses': renderExpenses(); break;
+      case 'sec-reports': renderReports(); break;
+      default: break;
+    }
+  }
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      item.classList.add('active');
+      renderCurrentSection();
+    });
   });
-  if (customerComplaints.length > 3) msg += `\n... و${customerComplaints.length - 3} شكوى أخرى`;
 
-  alert(msg);
-}
-// دوال CRM القديمة مع تعديلات بسيطة للتوافق
-function renderCrmCats() {
-  const box = document.getElementById('crmCatsList');
-  if (!box) return;
-  const cats = [...new Set(db.products.map(p => p.cat).filter(Boolean))];
-  box.innerHTML = cats.map(c =>
-    `<span class="badge${crmCurrentCat === c ? ' badge-success' : ''}" onclick="setCrmCategory('${jsq(c)}')">${esc(c)}</span>`
-  ).join('');
-}
-
-function setCrmCategory(cat) {
-  crmCurrentCat = cat;
-  renderCrmCats();
-  renderCrmProducts();
-}
-
-function renderCrmProducts() {
-  const grid = document.getElementById('crmProductsGrid');
-  if (!grid) return;
-  const searchTerm = document.getElementById('crmSearchInput')?.value?.trim();
-  let filtered = db.products.filter(p =>
-    !crmCurrentCat || p.cat === crmCurrentCat
-  );
-  if (searchTerm) {
-    filtered = filtered.filter(p =>
-      p.name.includes(searchTerm) || p.cat.includes(searchTerm)
-    );
-  }
-  grid.innerHTML = filtered.map(p => {
-    const st = stockFor(p.name, currentUser?.branch);
-    return `
-      <div class="product-card" onclick="crmAskQty('${jsq(p.name)}')">
-        <div class="product-name">${esc(p.name)}</div>
-        <div class="product-meta">${money(p.price)}${isWeight(p) ? '<div>g</div>' : ''}</div>
+  // ==================== SIMPLE RENDER FUNCTIONS ====================
+  function renderProducts() {
+    const sec = document.getElementById('sec-products');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span>إدارة المنتجات</span>
+          <button class="btn btn-primary" onclick="showAddProductModal()"><i class="fas fa-plus"></i> منتج جديد</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th><th>الوحدة</th><th>عمليات</th></tr></thead>
+            <tbody id="productsTable"></tbody>
+          </table>
+        </div>
       </div>
     `;
-  }).join('');
-  if (!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1 / -1; text-align:center; padding:20px;">لا توجد نتائج</div>';
+    renderProductsTable();
   }
-}
 
-function crmAskQty(name) {
-  const p = db.products.find(x => x.name === name);
-  if (!p) return;
-  crmPendingProduct = p;
-  crmPendingEditIndex = -1;
-  pendingProduct = p;
-  pendingEditIndex = -1;
-  document.getElementById('qtyTitle').textContent = isWeight(p) ? 'كجم - ' + p.name : p.name;
-  document.getElementById('qtyInput').value = isWeight(p) ? 1000 : 1;
-  document.getElementById('qtyInput').step = isWeight(p) ? 50 : 1;
-  document.getElementById('qtyInput').min = isWeight(p) ? 50 : 1;
-  document.getElementById('qtyHint').textContent = isWeight(p) ? 'الكمية بالجرام (g)' : 'الكمية بالقطعة (pcs)';
-  document.getElementById('qtyModal').style.display = 'flex';
-}
+  function renderProductsTable() {
+    const tbody = document.getElementById('productsTable');
+    if (!tbody) return;
+    tbody.innerHTML = db.products.map(p => `
+      <tr>
+        <td>${esc(p.name)}</td>
+        <td>${esc(p.cat)}</td>
+        <td>${money(p.price)}</td>
+        <td>${esc(p.unit)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="editProduct('${jsq(p.name)}')"><i class="fas fa-edit"></i></button></td>
+      </tr>
+    `).join('');
+  }
 
-function renderCrmCart() {
-  const box = document.getElementById('crmCartList');
-  if (!box) return;
-  if (!crmCart.length) {
-    box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">لا توجد منتجات</div>';
-  } else {
-    box.innerHTML = crmCart.map((i, idx) => `
-      <div class="cart-row">
-        <div style="flex:1">
-          <strong>${esc(i.name)}</strong>
+  function renderUsers() {
+    const sec = document.getElementById('sec-users');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span>إدارة المستخدمين</span>
+          <button class="btn btn-primary" onclick="showAddUserModal()"><i class="fas fa-plus"></i> مستخدم جديد</button>
         </div>
-        <div class="product-meta">
-          ${isWeight(i) ? i.qty + 'g' : i.qty + ' قطعة'}
-          ${money(i.price)}
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>الفرع</th><th>اسم المستخدم</th><th>النوع</th><th>الحالة</th><th>عمليات</th></tr></thead>
+            <tbody id="usersTable"></tbody>
+          </table>
         </div>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <strong>${money(i.total)}</strong>
-          <div class="cart-row-actions">
-            <i class="fas fa-trash" style="cursor:pointer; color:#d32f2f;" onclick="crmRemoveItem(${idx})" title="حذف"></i>
+      </div>
+    `;
+    renderUsersTable();
+  }
+
+  function renderUsersTable() {
+    const tbody = document.getElementById('usersTable');
+    if (!tbody) return;
+    tbody.innerHTML = db.users.filter(u => u.active).map(u => `
+      <tr>
+        <td>${esc(u.branch)}</td>
+        <td>${esc(u.username)}</td>
+        <td>${esc(u.pointType)}</td>
+        <td>${u.active ? 'نشط' : 'غير نشط'}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="editUser('${jsq(u.username)}')"><i class="fas fa-edit"></i></button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderShifts() {
+    const sec = document.getElementById('sec-shifts');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span>الورديات</span>
+          <div class="action-buttons">
+            ${!currentShift ? `<button class="btn btn-success" onclick="openShift()"><i class="fas fa-play"></i> فتح وردية</button>` : 
+              `<button class="btn btn-danger" onclick="closeShift()"><i class="fas fa-stop"></i> إغلاق الوردية</button>`}
           </div>
         </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>ID</th><th>الكاشير</th><th>وقت الفتح</th><th>وقت الإغلاق</th><th>المبيعات</th><th>عدد الفواتير</th><th>الحالة</th></tr></thead>
+            <tbody id="shiftsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    renderShiftsTable();
+  }
+
+  function renderShiftsTable() {
+    const tbody = document.getElementById('shiftsTable');
+    if (!tbody) return;
+    const userShifts = db.shifts.filter(s => s.branch === currentUser?.branch);
+    tbody.innerHTML = userShifts.map(s => `
+      <tr>
+        <td>${esc(s.id)}</td>
+        <td>${esc(s.cashier)}</td>
+        <td>${s.openTime}</td>
+        <td>${s.closeTime || '-'}</td>
+        <td>${money(s.totalSales)}</td>
+        <td>${s.salesCount}</td>
+        <td>${s.status === 'open' ? 'مفتوحة' : (s.status === 'closed' ? 'مغلقة' : 'ملغية')}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderSales() {
+    const sec = document.getElementById('sec-sales');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">المبيعات - قيد التطوير</div>
+        <div style="padding: 20px; text-align: center;">واجهة المبيعات الرئيسية قيد الإكمال</div>
+      </div>
+    `;
+  }
+
+  function renderStock() {
+    const sec = document.getElementById('sec-stock');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">المخزون - قيد التطوير</div>
+        <div style="padding: 20px; text-align: center;">إدارة المخزون قيد الإكمال</div>
+      </div>
+    `;
+  }
+
+  function renderExpenses() {
+    const sec = document.getElementById('sec-expenses');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">المصروفات - قيد التطوير</div>
+        <div style="padding: 20px; text-align: center;">نظام المصروفات قيد الإكمال</div>
+      </div>
+    `;
+  }
+
+  function renderReports() {
+    const sec = document.getElementById('sec-reports');
+    sec.innerHTML = `
+      <div class="card">
+        <div class="card-header">التقارير - قيد التطوير</div>
+        <div style="padding: 20px; text-align: center;">نظام التقارير قيد الإكمال</div>
+      </div>
+    `;
+  }
+
+  // ==================== CRM FUNCTIONS ====================
+  function renderCRM() {
+    const sec = document.getElementById('sec-crm');
+    sec.innerHTML = `
+      <div class="crm-layout">
+        <div class="crm-cart-panel">
+          <div class="card">
+            <div class="card-header"><span><i class="fas fa-clipboard-list"></i> بيانات الطلب</span><span class="pill">${crmCart.length}</span></div>
+            <div style="display:grid; gap:10px; padding:16px;">
+              <input id="crmCustomer" placeholder="اسم العميل">
+              <input id="crmPhone" placeholder="رقم الموبايل" onblur="onCrmPhoneBlur()">
+              <input id="crmAddress" placeholder="العنوان بالتفصيل">
+              <select id="crmBranchSelect"><option value="">اختر الفرع</option></select>
+              <select id="crmZoneSelect" onchange="onCrmZoneChange()"><option value="">اختر المنطقة</option></select>
+              <input id="crmDeliveryFee" type="number" step="0.5" placeholder="رسوم التوصيل">
+              <input id="crmNotes" placeholder="ملاحظات">
+            </div>
+            <div id="crmCartList" class="cart-items"></div>
+            <div class="total-section">
+              <div style="display:flex; justify-content:space-between;"><span>الإجمالي:</span><span id="crmGrandTotal">0</span></div>
+              <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveCrmOrder()"><i class="fas fa-save"></i> حفظ طلب CRM</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-header"><span><i class="fas fa-cubes"></i> المنتجات</span><input type="text" id="crmSearchInput" placeholder="بحث" style="width:150px; padding:8px;" oninput="renderCrmProducts()"></div>
+            <div style="padding:10px; display:flex; gap:8px; flex-wrap:wrap;" id="crmCatsList"></div>
+            <div id="crmProductsGrid" class="product-grid"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">أوامر CRM</div>
+            <div class="table-wrapper"><table><thead><tr><th>ID</th><th>العميل</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody id="crmTable"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    fillCrmBranchSelect();
+    renderCrmCats();
+    renderCrmProducts();
+    renderCrmCart();
+    renderCrmTable();
+  }
+
+  function fillCrmBranchSelect() {
+    const el = document.getElementById('crmBranchSelect');
+    if (!el) return;
+    const branches = [...new Set(db.users.map(u => u.branch))];
+    el.innerHTML = ['<option value="">اختر الفرع</option>', ...branches.map(b => `<option value="${esc(b)}">${esc(b)}</option>`)].join('');
+    el.onchange = () => fillCrmZonesForBranch(el.value);
+  }
+
+  function fillCrmZonesForBranch(branch) {
+    const zoneSelect = document.getElementById('crmZoneSelect');
+    if (!zoneSelect) return;
+    const zones = db.deliveryZones.filter(z => z.branch === branch);
+    zoneSelect.innerHTML = ['<option value="">اختر المنطقة</option>', ...zones.map((z, i) => `<option value="${i}">${esc(z.address)} - ${money(z.fee)}</option>`)].join('');
+  }
+
+  function onCrmZoneChange() {
+    const branch = document.getElementById('crmBranchSelect')?.value;
+    const zoneSelect = document.getElementById('crmZoneSelect');
+    const feeInput = document.getElementById('crmDeliveryFee');
+    if (!branch || !zoneSelect || !feeInput) return;
+    const zones = db.deliveryZones.filter(z => z.branch === branch);
+    const selected = zones[Number(zoneSelect.value)];
+    if (selected) feeInput.value = selected.fee;
+  }
+
+  function onCrmPhoneBlur() {
+    const phone = document.getElementById('crmPhone')?.value?.trim();
+    if (!phone) return;
+    const c = db.customers.find(cu => cu.phone === phone);
+    if (c) {
+      document.getElementById('crmCustomer').value = c.name || '';
+      document.getElementById('crmAddress').value = c.address || '';
+      toast(`عميل مسجل: ${c.name}`, false);
+    }
+  }
+
+  function renderCrmCats() {
+    const box = document.getElementById('crmCatsList');
+    if (!box) return;
+    const cats = [...new Set(db.products.map(p => p.cat).filter(Boolean))];
+    box.innerHTML = cats.map(c => `<span class="badge${crmCurrentCat === c ? ' badge-success' : ''}" onclick="setCrmCategory('${jsq(c)}')">${esc(c)}</span>`).join('');
+  }
+
+  function setCrmCategory(cat) {
+    crmCurrentCat = cat;
+    renderCrmCats();
+    renderCrmProducts();
+  }
+
+  function renderCrmProducts() {
+    const grid = document.getElementById('crmProductsGrid');
+    if (!grid) return;
+    const searchTerm = document.getElementById('crmSearchInput')?.value?.trim();
+    let filtered = db.products.filter(p => !crmCurrentCat || p.cat === crmCurrentCat);
+    if (searchTerm) filtered = filtered.filter(p => p.name.includes(searchTerm));
+    grid.innerHTML = filtered.map(p => `
+      <div class="product-card" onclick="crmAskQty('${jsq(p.name)}')">
+        <div class="product-name">${esc(p.name)}</div>
+        <div class="product-meta">${money(p.price)}</div>
       </div>
     `).join('');
   }
-  const total = crmCart.reduce((a, b) => a + b.total, 0);
-  document.getElementById('crmGrandTotal').textContent = money(total);
-}
 
-function crmRemoveItem(index) {
-  crmCart.splice(index, 1);
-  renderCrmCart();
-}
-
-// ربط الشكاوى في جدول CRM
-function renderCrmTable() {
-  const body = document.getElementById('crmTable');
-  if (!body) return;
-  let rows = db.crmOrders;
-  if (currentUser.pointType !== 'admin') {
-    rows = rows.filter(r => r.branch === currentUser.branch);
+  function crmAskQty(name) {
+    const p = db.products.find(x => x.name === name);
+    if (!p) return;
+    crmPendingProduct = p;
+    document.getElementById('qtyTitle').textContent = p.name;
+    document.getElementById('qtyInput').value = 1;
+    document.getElementById('qtyHint').textContent = 'الكمية';
+    document.getElementById('qtyModal').style.display = 'flex';
+    window.pendingCallback = () => {
+      const qty = Number(document.getElementById('qtyInput').value);
+      if (qty > 0) {
+        const existing = crmCart.find(i => i.name === p.name);
+        if (existing) existing.qty += qty;
+        else crmCart.push({ name: p.name, price: p.price, qty: qty, total: p.price * qty, unit: p.unit });
+        renderCrmCart();
+      }
+      closeQtyModal();
+    };
   }
-  body.innerHTML = rows.slice(-20).reverse().map(r => {
-    const canBranchUpdate = ['admin', 'owner', 'supervisor', 'cashier', 'delivery'].includes(currentUser.pointType) && r.branch === currentUser.branch;
-    const statusControl = canBranchUpdate ? `
-      <select onchange="updateCrmOrderStatus('${jsq(r.id)}', this.value)">
-        <option value="جديد" ${r.status === 'جديد' ? 'selected' : ''}>جديد</option>
-        <option value="تحت التنفيذ" ${r.status === 'تحت التنفيذ' ? 'selected' : ''}>تحت التنفيذ</option>
-        <option value="مكتمل" ${r.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
-        <option value="ملغي" ${r.status === 'ملغي' ? 'selected' : ''}>ملغي</option>
-      </select>
-    ` : esc(r.status);
-    return `
+
+  function renderCrmCart() {
+    const box = document.getElementById('crmCartList');
+    if (!box) return;
+    if (!crmCart.length) box.innerHTML = '<div style="padding:20px; text-align:center;">لا توجد منتجات</div>';
+    else box.innerHTML = crmCart.map((i, idx) => `
+      <div class="cart-row">
+        <div style="flex:1"><strong>${esc(i.name)}</strong><br><small>${i.qty} × ${money(i.price)}</small></div>
+        <div><strong>${money(i.total)}</strong></div>
+        <div><i class="fas fa-trash" style="cursor:pointer; color:#d32f2f;" onclick="crmRemoveItem(${idx})"></i></div>
+      </div>
+    `).join('');
+    const total = crmCart.reduce((a, b) => a + b.total, 0);
+    document.getElementById('crmGrandTotal').innerHTML = money(total);
+  }
+
+  function crmRemoveItem(index) {
+    crmCart.splice(index, 1);
+    renderCrmCart();
+  }
+
+  async function saveCrmOrder() {
+    const branch = document.getElementById('crmBranchSelect')?.value;
+    const customer = document.getElementById('crmCustomer')?.value;
+    const phone = document.getElementById('crmPhone')?.value;
+    const address = document.getElementById('crmAddress')?.value;
+    const notes = document.getElementById('crmNotes')?.value;
+    const deliveryFee = Number(document.getElementById('crmDeliveryFee')?.value || 0);
+    
+    if (!branch) return toast('اختر الفرع', true);
+    if (!crmCart.length) return toast('أضف منتجات', true);
+    
+    const total = crmCart.reduce((a, b) => a + b.total, 0) + deliveryFee;
+    const itemsText = crmCart.map(i => `${i.name} x${i.qty}`).join(' | ');
+    
+    await postForm('saveCrmOrder', { order: { branch, customer, phone, address, items: itemsText, total, notes, createdBy: currentUser.username, deliveryFee, status: 'جديد' } });
+    toast('تم حفظ طلب CRM');
+    crmCart = [];
+    await refreshData(true);
+    renderCRM();
+  }
+
+  function renderCrmTable() {
+    const body = document.getElementById('crmTable');
+    if (!body) return;
+    let rows = db.crmOrders;
+    if (currentUser?.pointType !== 'admin') rows = rows.filter(r => r.branch === currentUser?.branch);
+    body.innerHTML = rows.slice(-20).reverse().map(r => `
       <tr>
         <td>${esc(r.id)}</td>
-        <td>${esc(r.branch)}</td>
         <td>${esc(r.customer)}<br><small>${esc(r.phone)}</small></td>
-        <td>${money(r.total)}<br><small>${r.deliveryFee ? 'توصيل: ' + money(r.deliveryFee) : ''}</small></td>
-        <td>${statusControl}</td>
-        <td>
-          <button class="btn btn-outline btn-icon" onclick="openComplaintFromOrder({id: '${r.id}', phone: '${r.phone}', customer: '${r.customer}'})" title="فتح شكوى">
-            <i class="fas fa-exclamation-triangle"></i>
-          </button>
-        </td>
+        <td>${money(r.total)}</td>
+        <td>${esc(r.status)}</td>
       </tr>
-    `;
-  }).join('');
-}
+    `).join('');
+  }
 
-async function updateCrmOrderStatus(id, status) {
-  try {
-    await postForm('updateCrmOrderStatus', { id, status });
+  // ==================== MODAL FUNCTIONS ====================
+  function closeQtyModal() {
+    document.getElementById('qtyModal').style.display = 'none';
+    crmPendingProduct = null;
+    pendingProduct = null;
+  }
+
+  function confirmQty() {
+    if (window.pendingCallback) window.pendingCallback();
+    else if (pendingProduct) {
+      const qty = Number(document.getElementById('qtyInput').value);
+      if (qty > 0) {
+        const existing = cart.find(i => i.name === pendingProduct.name);
+        if (existing) existing.qty += qty;
+        else cart.push({ name: pendingProduct.name, price: pendingProduct.price, qty, total: pendingProduct.price * qty, unit: pendingProduct.unit });
+        renderCart();
+      }
+      closeQtyModal();
+    } else if (crmPendingProduct) {
+      const qty = Number(document.getElementById('qtyInput').value);
+      if (qty > 0) {
+        const existing = crmCart.find(i => i.name === crmPendingProduct.name);
+        if (existing) existing.qty += qty;
+        else crmCart.push({ name: crmPendingProduct.name, price: crmPendingProduct.price, qty, total: crmPendingProduct.price * qty, unit: crmPendingProduct.unit });
+        renderCrmCart();
+      }
+      closeQtyModal();
+    }
+  }
+
+  // Shift functions
+  async function openShift() {
+    if (!currentUser) return;
+    const res = await postForm('openShift', { branch: currentUser.branch, cashier: currentUser.username });
+    toast('تم فتح الوردية');
     await refreshData(true);
-    renderCrmTable();
-    toast('تم تحديث حالة الأوردر', false);
-  } catch (e) {
-    toast(e.message, true);
-   }
-}
+    currentShift = db.shifts.find(s => s.branch === currentUser.branch && s.status === 'open' && s.cashier === currentUser.username);
+    renderShifts();
+  }
+
+  async function closeShift() {
+    if (!currentShift) return toast('لا توجد وردية مفتوحة', true);
+    await postForm('closeShift', { shiftId: currentShift.id, branch: currentUser.branch });
+    toast('تم إغلاق الوردية');
+    await refreshData(true);
+    currentShift = null;
+    renderShifts();
+  }
+
+  function renderCart() {}
+
+  // Product/User modals (simplified)
+  function showAddProductModal() { toast('سيتم إضافة هذه الميزة قريباً'); }
+  function editProduct(name) { toast('سيتم إضافة هذه الميزة قريباً'); }
+  function showAddUserModal() { toast('سيتم إضافة هذه الميزة قريباً'); }
+  function editUser(name) { toast('سيتم إضافة هذه الميزة قريباً'); }
+
+  // Initial load
+  window.pendingCallback = null;
+  refreshData(true);
 </script>
 </body>
 </html>
