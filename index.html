@@ -166,7 +166,7 @@
   </div>
 </div>
 
-<!-- مودالات -->
+<!-- المودالات -->
 <div class="modal" id="qtyModal"><div class="modal-card"><h2 id="qtyTitle">الكمية</h2><input id="qtyInput" type="number" min="0.05" step="0.05" value="1"><div id="qtyHint"></div><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQty()">إلغاء</button><button class="btn btn-primary" onclick="confirmQty()">تأكيد</button></div></div></div>
 <div class="modal" id="qrModal"><div class="modal-card"><h2><i class="fas fa-qrcode"></i> رمز الطلب</h2><div id="qrCodeContainer"></div><p id="qrOrderId"></p><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQrModal()">إلغاء</button><button class="btn btn-primary" onclick="printQR()">طباعة</button></div></div></div>
 <div class="modal" id="qrScannerModal"><div class="modal-card"><h2>مسح QR</h2><div id="qrReader"></div><input id="manualQrInput" placeholder="أدخل كود الطلب"><div style="display:flex; gap:10px;"><button class="btn btn-outline" onclick="closeQrScanner()">إلغاء</button><button class="btn btn-primary" onclick="loadManualQR()">تحميل</button></div></div></div>
@@ -701,13 +701,13 @@ async function viewInvoice(saleId) {
   } catch(e) { toast(e.message, true); }
 }
 
-// ======================== باقي الشاشات ========================
-function renderStock() { document.getElementById('sec-stock').innerHTML = `<div class="card"><div class="table-wrapper"><tr><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${db.stock.filter(s=>s.branch===currentUser.branch).map(s=>`<tr><td>${esc(s.item)}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div></div>`; }
-function renderProductsManagement() { document.getElementById('sec-products').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th><th>الوحدة</th></tr></thead><tbody>${db.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td></tr>`).join('')}</tbody></table></div></div>`; }
-function renderUsersManagement() { document.getElementById('sec-users').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الفرع</th><th>اسم المستخدم</th><th>النوع</th><th>نشط</th></tr></thead><tbody>${db.users.map(u=>`<tr><td>${esc(u.branch)}</td><td>${esc(u.username)}</td><td>${esc(u.pointType)}</td><td>${u.active?'✅':'❌'}</td></tr>`).join('')}</tbody></table></div></div>`; }
-function renderReports() { document.getElementById('sec-reports').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الكود</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>الكاشير</th></tr></thead><tbody>${db.sales.filter(s=>s.branch===currentUser.branch).slice(0,50).map(s=>`<tr><td>${esc(s.saleId)}</td><td>${s.date}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td>${esc(s.cashier)}</td></tr>`).join('')}</tbody></table></div></div>`; }
+// ======================== باقي الشاشات (مختصرة ولكن كافية) ========================
+function renderStock() { document.getElementById('sec-stock').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${db.stock.filter(s=>s.branch===currentUser.branch).map(s=>`<tr><td>${esc(s.item)}</td><td>${s.qty}</td>`).join('')}</tbody></table></div></div>`; }
+function renderProductsManagement() { document.getElementById('sec-products').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th><th>الوحدة</th></tr></thead><tbody>${db.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.price)}</td><td>${esc(p.unit)}</td>`).join('')}</tbody></table></div></div>`; }
+function renderUsersManagement() { document.getElementById('sec-users').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الفرع</th><th>اسم المستخدم</th><th>النوع</th><th>نشط</th></tr></thead><tbody>${db.users.map(u=>`<tr><td>${esc(u.branch)}</td><td>${esc(u.username)}</td><td>${esc(u.pointType)}</td><td>${u.active?'✅':'❌'}</td>`).join('')}</tbody></table></div></div>`; }
+function renderReports() { document.getElementById('sec-reports').innerHTML = `<div class="card"><div class="table-wrapper"><table><thead><tr><th>الكود</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>الكاشير</th></tr></thead><tbody>${db.sales.filter(s=>s.branch===currentUser.branch).slice(0,50).map(s=>`<tr><td>${esc(s.saleId)}</td><td>${s.date}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td>${esc(s.cashier)}</td>`).join('')}</tbody></table></div></div>`; }
 function renderComplaints() { document.getElementById('sec-complaints').innerHTML = `<div class="top-bar"><button class="btn btn-primary" onclick="openComplaintModal()"><i class="fas fa-plus"></i> شكوى جديدة</button></div><div class="card"><div id="complaintsList"></div></div>`; loadComplaints(); }
-async function loadComplaints() { try { const res = await jsonp('getInitialData', { userType: currentUser.pointType, branch: currentUser.branch, username: currentUser.branch }); const complaints = res.complaints || []; document.getElementById('complaintsList').innerHTML = `<div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>العميل</th><th>النوع</th><th>الحالة</th></tr></thead><tbody>${complaints.map(c=>`<tr><td>${c.date}</td><td>${esc(c.customerName)}</td><td>${esc(c.type)}</td><td>${esc(c.status)}</td></tr>`).join('')}</tbody></table></div>`; } catch(e){} }
+async function loadComplaints() { try { const res = await jsonp('getInitialData', { userType: currentUser.pointType, branch: currentUser.branch, username: currentUser.branch }); const complaints = res.complaints || []; document.getElementById('complaintsList').innerHTML = `<div class="table-wrapper"><table><thead><tr><th>التاريخ</th><th>العميل</th><th>النوع</th><th>الحالة</th></tr></thead><tbody>${complaints.map(c=>`<tr><td>${c.date}</td><td>${esc(c.customerName)}</td><td>${esc(c.type)}</td><td>${esc(c.status)}</td>`).join('')}</tbody></table></div>`; } catch(e){} }
 function openComplaintModal() { document.getElementById('complaintModal').style.display = 'flex'; }
 function closeComplaintModal() { document.getElementById('complaintModal').style.display = 'none'; }
 async function saveComplaint() {
@@ -775,7 +775,7 @@ async function loadQROrder(orderId) {
   } catch(e) { toast(e.message, true); }
 }
 
-// ======================== bootstrap ========================
+// ======================== Bootstrap ========================
 window.onload = () => { loadInitialDataForLogin(); };
 </script>
 </body>
