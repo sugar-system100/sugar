@@ -1626,8 +1626,47 @@ function renderPOS() {
   const pt = State.currentUser.pointType;
   const r = role();
 
-  const feeDiscountControls = pt === 'seller' ? `
-    <div style="display:flex;gap:12px;margin-bottom:16px">
+ const feeDiscountControls = pt === 'seller' ? (
+  '<div style="display:flex;gap:12px;margin-bottom:16px">' +
+    '<div style="flex:1">' +
+      '<label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:4px">رسوم التوصيل</label>' +
+      '<input id="deliveryFee" type="number" value="0" readonly ' +
+             'style="padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
+    '</div>' +
+    '<div style="flex:1">' +
+      '<label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:4px">الخصم</label>' +
+      '<div style="display:flex;gap:4px">' +
+        '<select id="discountType" disabled ' +
+                'style="width:80px;padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
+          '<option value="fixed">ثابت</option>' +
+        '</select>' +
+        '<input id="discountVal" type="number" value="0" readonly ' +
+               'style="padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
+      '</div>' +
+    '</div>' +
+  '</div>'
+) : (
+  '<div style="display:flex;gap:12px;margin-bottom:16px">' +
+    '<div style="flex:1">' +
+      '<label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:4px">رسوم التوصيل</label>' +
+      '<input id="deliveryFee" type="number" value="0" min="0" step="0.5" ' +
+             'oninput="renderCart()" style="padding:10px">' +
+    '</div>' +
+    '<div style="flex:1">' +
+      '<label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:4px">الخصم</label>' +
+      '<div style="display:flex;gap:4px">' +
+        '<select id="discountType" onchange="renderCart()" style="width:80px;padding:10px">' +
+          '<option value="fixed">ثابت</option>' +
+          '<option value="percent">%</option>' +
+        '</select>' +
+        '<input id="discountVal" type="number" value="0" min="0" step="0.5" ' +
+               'oninput="renderCart()" ' +
+               ( (!State.discountEnabled && (pt === "cash" || pt === "manager" || pt === "admin")) ? 'readonly onclick="requestDiscountSupervisor()"' : '' ) +
+               ' style="padding:10px">' +
+      '</div>' +
+    '</div>' +
+  '</div>'
+);
       <div style="flex:1">
         <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:4px">رسوم التوصيل</label>
         <input id="deliveryFee" type="number" value="0" readonly
