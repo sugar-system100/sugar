@@ -1,853 +1,1049 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <meta name="theme-color" content="#b81b5c">
-  <meta name="description" content="سكّر - نظام متكامل لإدارة المبيعات والمخازن والتوصيل">
-  <title>سكّر نظام متكامل</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sokar POS System</title>
+  <meta name="theme-color" content="#b81b5c" />
 
-  <!-- Libraries -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/idb@7.1.1/build/umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
   <style>
-    :root {
-      --primary: #b81b5c;
-      --primary-light: #e84a8a;
-      --primary-soft: #fce4f0;
-      --primary-dark: #8a1240;
-      --accent: #0f9d58;
-      --accent-soft: #e6f4ea;
-      --accent-dark: #0b6e3e;
-      --blue: #1a73e8;
-      --blue-soft: #e8f0fe;
-      --orange: #f9ab00;
-      --orange-soft: #fff8e1;
-      --purple: #7c4dff;
-      --purple-soft: #ede7f6;
-      --bg: #f9f6f8;
-      --surface: #ffffff;
-      --surface-hover: #fdf8fa;
-      --border: #e9dee5;
-      --text: #1e1e2a;
-      --text-muted: #6b5e66;
-      --text-light: #9e8e96;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-      --shadow-lg: 0 20px 60px -15px rgba(0,0,0,0.12);
-      --radius-sm: 12px;
-      --radius: 20px;
-      --radius-lg: 28px;
-      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    :root{
+      --primary:#b81b5c;
+      --primary-2:#d63384;
+      --primary-soft:#fde7f1;
+      --accent:#0f9d58;
+      --accent-soft:#e8f7ef;
+      --warn:#f9ab00;
+      --warn-soft:#fff7df;
+      --danger:#d93025;
+      --danger-soft:#fde8e6;
+      --blue:#1a73e8;
+      --blue-soft:#e8f0fe;
+
+      --bg:#f8f6f9;
+      --surface:#ffffff;
+      --surface-2:#fcfbfd;
+      --border:#eadfe6;
+      --text:#1f2430;
+      --muted:#7a6f77;
+
+      --shadow-sm:0 4px 12px rgba(0,0,0,.05);
+      --shadow:0 12px 30px rgba(20,20,20,.08);
+      --shadow-lg:0 20px 60px rgba(20,20,20,.12);
+
+      --radius-sm:12px;
+      --radius:18px;
+      --radius-lg:28px;
+
+      --sidebar-width:280px;
+      --sidebar-collapsed:86px;
+      --transition:.25s ease;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#fbf8fb 0%,#f4f1f6 100%);
+      color:var(--text);
+      overflow-x:hidden;
     }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      font-family: 'Cairo', 'Segoe UI', 'Tahoma', sans-serif;
-      overflow-x: hidden;
+    button,input,select,textarea{
+      font:inherit;
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+    button{
+      cursor:pointer;
+      border:none;
+      background:none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+    input,select,textarea{
+      width:100%;
+      border:2px solid var(--border);
+      background:#fff;
+      border-radius:14px;
+      padding:13px 14px;
+      outline:none;
+      transition:var(--transition);
+      color:var(--text);
     }
 
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(-30px); }
-      to   { opacity: 1; transform: translateX(0); }
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(184,27,92,.08);
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .hidden{display:none !important}
+    .section{display:none}
+    .section.active{display:block}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:13px 18px;
+      border-radius:999px;
+      font-weight:700;
+      transition:var(--transition);
+      white-space:nowrap;
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-10px); }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      box-shadow:0 8px 20px rgba(184,27,92,.22);
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    .btn-primary:hover{transform:translateY(-2px)}
+    .btn-outline{
+      background:#fff;
+      border:2px solid var(--border);
+      color:var(--text);
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary-light);
+    .btn-outline:hover{
+      border-color:var(--primary);
+      color:var(--primary);
+      transform:translateY(-2px);
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font-family: inherit;
-      font-size: 1rem;
-      border-radius: var(--radius-sm);
-      transition: var(--transition);
+    .btn-accent{
+      background:linear-gradient(135deg,var(--accent),#22b86a);
+      color:#fff;
+      box-shadow:0 8px 20px rgba(15,157,88,.18);
     }
 
-    button {
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .btn-danger{
+      background:linear-gradient(135deg,var(--danger),#ef4444);
+      color:#fff;
     }
 
-    input,
-    select,
-    textarea {
-      border: 2px solid var(--border);
-      padding: 12px 16px;
-      background: var(--surface);
-      outline: none;
-      width: 100%;
-      color: var(--text);
+    .btn-sm{
+      padding:8px 12px;
+      font-size:.88rem;
+      border-radius:12px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(184, 27, 92, 0.1);
-      transform: translateY(-1px);
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:700;
+      background:#eef1f6;
+      color:#556;
     }
 
-    input::placeholder {
-      color: var(--text-light);
+    .badge-primary{background:var(--primary-soft);color:var(--primary)}
+    .badge-success{background:var(--accent-soft);color:var(--accent)}
+    .badge-warning{background:var(--warn-soft);color:#9a6700}
+    .badge-danger{background:var(--danger-soft);color:var(--danger)}
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
+      padding:22px;
     }
 
-    /* App Layout */
-    .app-wrapper {
-      display: flex;
-      min-height: 100vh;
+    .card-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      right: 0;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow);
-      z-index: 100;
-      transition: var(--transition);
+    .card-title{
+      font-size:1.18rem;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
-    .sidebar.collapsed {
-      width: 80px;
+    .app-wrapper{
+      min-height:100vh;
+      display:flex;
     }
 
+    .sidebar{
+      width:var(--sidebar-width);
+      position:fixed;
+      top:0;
+      right:0;
+      bottom:0;
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(8px);
+      border-left:1px solid var(--border);
+      box-shadow:var(--shadow);
+      padding:18px 14px;
+      display:flex;
+      flex-direction:column;
+      z-index:100;
+      transition:var(--transition);
+      overflow:auto;
+    }
+
+    .sidebar.collapsed{width:var(--sidebar-collapsed)}
     .sidebar.collapsed .logo-text,
     .sidebar.collapsed .nav-item span,
-    .sidebar.collapsed .user-badge span {
-      display: none;
+    .sidebar.collapsed .user-meta,
+    .sidebar.collapsed .copyright{
+      display:none;
     }
 
-    .sidebar.collapsed .nav-item {
-      justify-content: center;
-      padding: 14px;
+    .logo-area{
+      position:relative;
+      border-bottom:1px solid var(--border);
+      padding:8px 8px 20px;
+      margin-bottom:16px;
+      text-align:center;
     }
 
-    .logo-area {
-      padding: 12px 16px 28px;
-      text-align: center;
-      border-bottom: 2px solid var(--primary-soft);
-      position: relative;
+    .logo-icon{
+      width:64px;
+      height:64px;
+      margin:auto;
+      border-radius:20px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.7rem;
+      box-shadow:0 10px 24px rgba(184,27,92,.2);
     }
 
-    .logo-icon {
-      font-size: 44px;
-      color: var(--primary);
-      animation: bounce 2s infinite;
+    .logo-text h1{
+      margin:12px 0 4px;
+      font-size:1.45rem;
+      line-height:1.1;
+      font-weight:900;
+      color:var(--primary);
     }
 
-    .logo-text {
-      font-size: 28px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), #d63384);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-top: 8px;
+    .logo-text p{
+      margin:0;
+      color:var(--muted);
+      font-size:.88rem;
     }
 
-    .nav-menu {
-      flex: 1;
-      margin: 24px 0;
+    .toggle-sidebar{
+      position:absolute;
+      left:-12px;
+      top:50%;
+      transform:translateY(-50%);
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:var(--primary);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:var(--shadow-sm);
     }
 
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      margin: 6px 0;
-      border-radius: var(--radius);
-      color: var(--text-muted);
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      text-align: right;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
+    .nav-menu{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:18px;
     }
 
-    .nav-item:hover {
-      background: var(--primary-soft);
-      color: var(--primary);
-      transform: translateX(-4px);
+    .nav-item{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:18px;
+      color:#5f5660;
+      font-weight:700;
+      transition:var(--transition);
+      position:relative;
     }
 
-    .nav-item.active {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: white;
-      box-shadow: 0 8px 20px -6px rgba(184, 27, 92, 0.35);
-      transform: translateX(-4px);
+    .nav-item i{
+      width:24px;
+      text-align:center;
+      font-size:1.1rem;
     }
 
-    .nav-item i {
-      width: 24px;
-      font-size: 1.3rem;
-      text-align: center;
+    .nav-item:hover{
+      background:var(--primary-soft);
+      color:var(--primary);
+      transform:translateX(-3px);
     }
 
-    .user-badge {
-      margin-top: auto;
-      background: var(--blue-soft);
-      padding: 18px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
+    .nav-item.active{
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      box-shadow:0 10px 24px rgba(184,27,92,.22);
     }
 
-    .logout-btn {
-      width: 100%;
-      margin-top: 12px;
-      background: white;
-      border: 2px solid var(--border);
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      font-weight: 600;
+    .user-box{
+      margin-top:auto;
+      padding:14px;
+      border-radius:22px;
+      background:var(--blue-soft);
+      border:1px solid #dce7ff;
     }
 
-    .logout-btn:hover {
-      border-color: #d32f2f;
-      color: #d32f2f;
-      background: #ffebee;
+    .user-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
     }
 
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-right: 280px;
-      padding: 24px 32px;
-      transition: var(--transition);
+    .user-avatar{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      flex-shrink:0;
     }
 
-    .main-content.expanded {
-      margin-right: 80px;
+    .user-meta .name{
+      font-weight:800;
+      font-size:.95rem;
     }
 
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      gap: 16px;
-      flex-wrap: wrap;
-      animation: fadeInUp 0.4s ease;
+    .user-meta .sub{
+      font-size:.82rem;
+      color:var(--muted);
+      margin-top:2px;
     }
 
-    .page-title {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      letter-spacing: -0.5px;
+    .logout-btn{
+      width:100%;
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:2px solid transparent;
+      background:#fff;
+      color:#4f5561;
+      font-weight:800;
     }
 
-    .page-title i {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: white;
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 12px rgba(184, 27, 92, 0.25);
+    .logout-btn:hover{
+      color:var(--danger);
+      border-color:#ffd7d3;
+      background:#fff7f7;
     }
 
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .main-content{
+      flex:1;
+      margin-right:var(--sidebar-width);
+      padding:24px;
+      transition:var(--transition);
     }
 
-    .btn {
-      padding: 14px 24px;
-      border-radius: 50px;
-      font-weight: 700;
-      box-shadow: var(--shadow-sm);
-      border: 2px solid transparent;
-      transition: var(--transition-bounce);
-      font-size: 0.95rem;
-      position: relative;
-      overflow: hidden;
+    .main-content.expanded{margin-right:var(--sidebar-collapsed)}
+
+    .top-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:24px;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: white;
-      box-shadow: 0 4px 16px rgba(184, 27, 92, 0.3);
+    .page-title{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      font-size:1.7rem;
+      font-weight:900;
+      letter-spacing:-.3px;
     }
 
-    .btn-outline {
-      background: white;
-      border-color: var(--border);
-      color: var(--text);
+    .page-title i{
+      width:50px;
+      height:50px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      font-size:1.15rem;
+      box-shadow:0 10px 24px rgba(184,27,92,.22);
     }
 
-    .btn-outline:hover {
-      background: var(--surface-hover);
-      border-color: var(--primary);
-      color: var(--primary);
+    .action-buttons{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .btn-danger {
-      background: linear-gradient(135deg, #d32f2f, #f44336);
-      color: white;
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+      margin-bottom:22px;
     }
 
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 0.85rem;
+    .kpi-card{
+      background:linear-gradient(180deg,#fff,#fffdfd);
+      border:1px solid var(--border);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:20px;
+      position:relative;
+      overflow:hidden;
     }
 
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      transition: var(--transition);
-      animation: fadeInUp 0.5s ease forwards;
+    .kpi-card::before{
+      content:"";
+      position:absolute;
+      top:0; right:0; left:0;
+      height:5px;
+      background:linear-gradient(90deg,var(--primary),var(--primary-2));
     }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      font-weight: 700;
-      font-size: 1.25rem;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: var(--text);
+    .kpi-icon{
+      width:50px;
+      height:50px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.1rem;
+      margin-bottom:14px;
+      background:var(--primary-soft);
+      color:var(--primary);
     }
 
-    .section {
-      display: none;
-      animation: fadeInUp 0.4s ease;
+    .kpi-value{
+      font-size:2rem;
+      font-weight:900;
+      margin-bottom:4px;
     }
 
-    .section.active {
-      display: block;
+    .kpi-label{
+      color:var(--muted);
+      font-weight:700;
     }
 
-    .hidden {
-      display: none !important;
+    .stats-row{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:18px;
     }
 
-    /* POS layout */
-    .pos-layout {
-      display: flex;
-      gap: 24px;
-      animation: fadeInUp 0.5s ease;
+    .chart-box{
+      min-height:320px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted);
+      background:linear-gradient(180deg,#fff,#faf7fa);
+      border:1px dashed var(--border);
+      border-radius:22px;
     }
 
-    .pos-cart-panel {
-      width: 380px;
-      flex-shrink: 0;
+    .pos-layout,.crm-layout{
+      display:flex;
+      gap:22px;
+      align-items:flex-start;
     }
 
-    .pos-products-panel {
-      flex: 1;
-      min-width: 0;
+    .pos-cart-panel,.crm-cart-panel{
+      width:390px;
+      flex-shrink:0;
+      position:sticky;
+      top:20px;
     }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 16px;
-      max-height: 65vh;
-      overflow-y: auto;
-      padding: 8px 4px;
+    .pos-products-panel,.crm-products-panel{
+      flex:1;
+      min-width:0;
     }
 
-    .product-card {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 20px 14px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition-bounce);
+    .product-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+      gap:14px;
     }
 
-    .product-card:hover {
-      background: var(--primary-soft);
-      border-color: var(--primary);
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: var(--shadow);
+    .product-card{
+      position:relative;
+      background:linear-gradient(180deg,#fff,#fcfafc);
+      border:2px solid var(--border);
+      border-radius:22px;
+      padding:18px 14px;
+      cursor:pointer;
+      transition:var(--transition);
+      min-height:148px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      text-align:center;
     }
 
-    .product-name {
-      font-weight: 800;
-      margin-bottom: 10px;
-      font-size: 1.05rem;
-      color: var(--text);
+    .product-card:hover{
+      transform:translateY(-4px);
+      border-color:var(--primary);
+      box-shadow:0 16px 32px rgba(184,27,92,.12);
+      background:linear-gradient(180deg,#fff,#fff7fb);
     }
 
-    .product-meta {
-      font-size: 0.95rem;
-      color: var(--primary);
-      margin-bottom: 8px;
-      font-weight: 700;
+    .product-name{
+      font-weight:900;
+      font-size:1rem;
+      margin-bottom:8px;
     }
 
-    .cart-items {
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 4px;
+    .product-price{
+      color:var(--primary);
+      font-weight:900;
+      margin-bottom:8px;
     }
 
-    .total-section {
-      border-top: 2px solid var(--border);
-      margin-top: 20px;
-      padding-top: 24px;
+    .product-unit{
+      color:var(--muted);
+      font-size:.88rem;
+      margin-bottom:10px;
     }
 
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      font-size: 0.95rem;
-      color: var(--text-muted);
+    .stock-chip{
+      margin:auto;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      color:var(--blue);
+      font-size:.82rem;
+      font-weight:800;
     }
 
-    .total-row.grand {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--primary);
-      border-top: 2px solid var(--border);
-      margin-top: 8px;
-      padding-top: 16px;
+    .stock-chip.low{
+      background:var(--warn-soft);
+      color:#9a6700;
     }
 
-    /* Modals */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      padding: 20px;
-      animation: fadeIn 0.3s ease;
+    .stock-chip.out{
+      background:var(--danger-soft);
+      color:var(--danger);
     }
 
-    .modal-card {
-      background: white;
-      width: 520px;
-      max-width: 94%;
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      box-shadow: var(--shadow-lg);
-      max-height: 90vh;
-      overflow-y: auto;
+    .cart-items{
+      max-height:430px;
+      overflow:auto;
+      padding-left:4px;
     }
 
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 28px;
-      background: var(--text);
-      color: white;
-      padding: 16px 28px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 9999;
-      display: none;
-      box-shadow: var(--shadow-lg);
-      max-width: 400px;
+    .cart-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 0;
+      border-bottom:1px dashed var(--border);
     }
 
-    .toast.error { background: #d32f2f; }
-    .toast.success { background: #0f9d58; }
-
-    /* Login */
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--bg) 0%, var(--primary-soft) 100%);
-      padding: 20px;
+    .cart-row .name{
+      font-weight:800;
+      margin-bottom:5px;
     }
 
-    .login-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 40px;
-      box-shadow: var(--shadow-lg);
-      width: 100%;
-      max-width: 480px;
-      border: 1px solid var(--border);
-      animation: fadeInUp 0.6s ease;
+    .cart-row .meta{
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.6;
     }
 
-    .form-group { margin-bottom: 20px; }
-
-    .form-label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-      font-size: 0.95rem;
+    .cart-actions{
+      display:flex;
+      gap:8px;
+      margin-top:8px;
     }
 
-    .form-input-wrapper { position: relative; }
-
-    .form-input-wrapper i {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-light);
-      font-size: 16px;
+    .totals{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:2px solid var(--border);
     }
 
-    .form-input-wrapper input,
-    .form-input-wrapper select {
-      padding-right: 44px;
+    .total-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:8px 0;
+      color:#4f5561;
+      font-weight:700;
     }
 
-    @media (max-width: 1024px) {
-      .sidebar {
-        width: 80px;
-        padding: 16px 8px;
+    .total-row.grand{
+      margin-top:6px;
+      padding-top:16px;
+      border-top:2px solid var(--border);
+      color:var(--primary);
+      font-size:1.28rem;
+      font-weight:900;
+    }
+
+    .search-box{
+      position:relative;
+      flex:1;
+      min-width:230px;
+      max-width:320px;
+    }
+
+    .search-box i{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#9b8c96;
+    }
+
+    .search-box input{
+      padding-right:42px;
+    }
+
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .chip{
+      padding:9px 14px;
+      border-radius:999px;
+      background:#f1edf1;
+      color:#675a63;
+      font-weight:800;
+      cursor:pointer;
+      transition:var(--transition);
+    }
+
+    .chip.active,
+    .chip:hover{
+      background:var(--primary-soft);
+      color:var(--primary);
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:20px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+      background:#fff;
+    }
+
+    th,td{
+      text-align:right;
+      padding:16px 14px;
+      border-bottom:1px solid #eee6ec;
+      white-space:nowrap;
+    }
+
+    th{
+      background:linear-gradient(180deg,#fcf2f7,#fff);
+      color:#8a1240;
+      font-size:.92rem;
+      font-weight:900;
+    }
+
+    tr:hover td{background:#fcfafc}
+
+    .empty-state{
+      text-align:center;
+      padding:48px 18px;
+      color:var(--muted);
+    }
+
+    .empty-state i{
+      font-size:3rem;
+      color:#d4c7cf;
+      margin-bottom:12px;
+      display:block;
+    }
+
+    .login-screen{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at top right, rgba(184,27,92,.08), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(26,115,232,.08), transparent 28%),
+        linear-gradient(180deg,#faf7fb 0%,#f4f1f6 100%);
+    }
+
+    .login-card{
+      width:100%;
+      max-width:500px;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:34px;
+      box-shadow:var(--shadow-lg);
+      padding:34px;
+    }
+
+    .login-brand{
+      text-align:center;
+      margin-bottom:28px;
+    }
+
+    .login-brand .icon{
+      width:78px;
+      height:78px;
+      margin:auto;
+      border-radius:24px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2rem;
+      box-shadow:0 16px 34px rgba(184,27,92,.24);
+    }
+
+    .login-brand h1{
+      margin:16px 0 6px;
+      font-size:2rem;
+      color:var(--primary);
+      font-weight:900;
+    }
+
+    .login-brand p{
+      margin:0;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .form-group{margin-bottom:16px}
+    .form-label{
+      display:block;
+      margin-bottom:8px;
+      font-size:.94rem;
+      font-weight:800;
+    }
+
+    .input-wrap{position:relative}
+    .input-wrap i{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#a1919b;
+    }
+
+    .input-wrap input,.input-wrap select{
+      padding-right:42px;
+    }
+
+    .helper-text{
+      font-size:.84rem;
+      color:var(--muted);
+      margin-top:8px;
+    }
+
+    .toast{
+      position:fixed;
+      bottom:24px;
+      left:24px;
+      z-index:9999;
+      display:none;
+      min-width:260px;
+      max-width:420px;
+      color:#fff;
+      padding:16px 18px;
+      border-radius:18px;
+      box-shadow:var(--shadow-lg);
+      font-weight:800;
+    }
+
+    .toast.success{display:block;background:linear-gradient(135deg,var(--accent),#1fb463)}
+    .toast.error{display:block;background:linear-gradient(135deg,var(--danger),#ef4444)}
+    .toast.info{display:block;background:linear-gradient(135deg,#1f2937,#374151)}
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(17,24,39,.36);
+      backdrop-filter:blur(8px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:999;
+    }
+
+    .modal-card{
+      width:min(540px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:28px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-lg);
+      padding:28px;
+    }
+
+    .modal-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .modal-icon{
+      width:44px;
+      height:44px;
+      border-radius:16px;
+      background:var(--primary-soft);
+      color:var(--primary);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .modal-title{
+      font-size:1.25rem;
+      font-weight:900;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .muted{color:var(--muted)}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:9px 14px;
+      font-weight:800;
+      background:var(--warn-soft);
+      color:#9a6700;
+    }
+
+    .section-shell{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    @media (max-width:1100px){
+      .sidebar{
+        width:var(--sidebar-collapsed);
       }
-      .main-content {
-        margin-right: 80px;
-        padding: 16px;
+      .sidebar .logo-text,
+      .sidebar .nav-item span,
+      .sidebar .user-meta,
+      .sidebar .copyright{
+        display:none;
       }
-      .pos-layout {
-        flex-direction: column;
+      .main-content{
+        margin-right:var(--sidebar-collapsed);
       }
-      .pos-cart-panel {
-        width: 100%;
+      .stats-row{
+        grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 768px) {
-      .top-bar {
-        flex-direction: column;
-        align-items: stretch;
+    @media (max-width:960px){
+      .pos-layout,.crm-layout{
+        flex-direction:column;
       }
-      .page-title {
-        font-size: 24px;
+      .pos-cart-panel,.crm-cart-panel{
+        width:100%;
+        position:static;
       }
-      .product-grid {
-        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width:768px){
+      .main-content{
+        padding:16px;
       }
+      .page-title{
+        font-size:1.35rem;
+      }
+      .kpi-grid{
+        grid-template-columns:1fr;
+      }
+      .product-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+      .login-card{
+        padding:24px;
+      }
+    }
+
+    @media print{
+      .sidebar,.top-bar,.btn,.modal{display:none !important}
+      .main-content{margin:0;padding:0}
+      .card{box-shadow:none;border:1px solid #ddd}
     }
   </style>
 </head>
 <body>
-  <!-- Login Screen -->
-  <div id="loginScreen" class="login-container">
+
+  <!-- Login -->
+  <div id="loginScreen" class="login-screen">
     <div class="login-card">
-      <div class="login-logo">
-        <i class="fas fa-cash-register"></i>
-        <h1 style="font-size:32px;font-weight:800;
-                   background:linear-gradient(135deg,var(--primary),#d63384);
-                   -webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-          نظام المبيعات
-        </h1>
-        <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.95rem;">
-          اختر نوع نقطة البيع والفرع ثم أدخل كلمة المرور.
-        </p>
+      <div class="login-brand">
+        <div class="icon"><i class="fas fa-cash-register"></i></div>
+        <h1>Sokar System</h1>
+        <p>POS · CRM · Delivery · Inventory</p>
       </div>
 
       <div class="form-group">
-        <label class="form-label">نوع المستخدم</label>
-        <div class="form-input-wrapper">
+        <label class="form-label">User Type</label>
+        <div class="input-wrap">
           <i class="fas fa-user-tag"></i>
           <select id="pointTypeSelect">
-            <option value="">جاري تحميل الأنواع...</option>
+            <option value="">Select user type</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">الفرع / المستخدم</label>
-        <div class="form-input-wrapper">
+        <label class="form-label">Branch / User</label>
+        <div class="input-wrap">
           <i class="fas fa-store"></i>
           <select id="branchSelect">
-            <option value="">اختر نوع المستخدم أولاً</option>
+            <option value="">Select branch</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <div class="form-input-wrapper">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
           <i class="fas fa-lock"></i>
-          <input id="passInput"
-                 type="password"
-                 placeholder="••••••••"
-                 onkeydown="if(event.key==='Enter'){ login(); }">
+          <input id="passInput" type="password" placeholder="Enter password" />
         </div>
       </div>
 
-      <button class="btn btn-primary"
-              style="width:100%; padding:16px; margin-top:8px;"
-              onclick="login()">
-        <i class="fas fa-sign-in-alt"></i>
-        تسجيل الدخول
+      <button class="btn btn-primary" style="width:100%;padding:16px" onclick="login()">
+        <i class="fas fa-right-to-bracket"></i>
+        Login
       </button>
 
-      <div id="loginMsg"
-           style="margin-top:16px; text-align:center; color:#b0003a; font-weight:500;"></div>
-
-      <div id="loginLoading"
-           style="display:none; text-align:center; margin-top:16px;">
-        <div class="spinner"
-             style="width:30px; height:30px; border:4px solid var(--border);
-                    border-top-color:var(--primary); border-radius:50%;
-                    animation:spin 0.8s linear infinite;">
-        </div>
-        <p style="color: var(--text-muted); margin-top:8px; font-size:0.9rem;">
-          جاري التحقق من البيانات...
-        </p>
-      </div>
-
-      <div style="text-align:center; margin-top:24px; padding-top:20px; border-top:1px solid var(--border);">
-        <p style="font-size:0.8rem; color:var(--text-muted);">
-          © 2026 نظام سكر للمبيعات
-        </p>
-      </div>
+      <div id="loginMsg" class="helper-text" style="text-align:center;margin-top:12px;"></div>
+      <div id="loginLoading" class="helper-text hidden" style="text-align:center;">Loading...</div>
     </div>
   </div>
 
-  <!-- Main App Wrapper -->
+  <!-- App -->
   <div id="appWrapper" class="app-wrapper hidden">
+
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="logo-area">
-        <i class="fas fa-cash-register logo-icon"></i>
-        <div class="logo-text">سكر POS</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
-          نظام نقاط بيع وتوصيل
+        <button class="toggle-sidebar" onclick="toggleSidebar()">
+          <i class="fas fa-chevron-right" id="toggleIcon"></i>
+        </button>
+
+        <div class="logo-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+
+        <div class="logo-text">
+          <h1>Sokar</h1>
+          <p>Professional Operations Panel</p>
         </div>
       </div>
 
-      <div id="navMenu" class="nav-menu"></div>
+      <nav class="nav-menu" id="navMenu"></nav>
 
-      <div class="user-badge">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-          <div style="width:40px; height:40px;
-                      background:linear-gradient(135deg, var(--primary), var(--primary-light));
-                      border-radius:50%; display:flex; align-items:center;
-                      justify-content:center; color:white;">
+      <div class="user-box">
+        <div class="user-row">
+          <div class="user-avatar">
             <i class="fas fa-user"></i>
           </div>
-          <div>
-            <div id="whoami" style="font-weight:700; color:var(--text);">زائر</div>
-            <div id="shiftStatus"
-                 style="font-size:12px; color:var(--text-muted); margin-top:2px;"></div>
+          <div class="user-meta">
+            <div class="name" id="whoami">-</div>
+            <div class="sub" id="shiftStatus">No shift opened</div>
           </div>
         </div>
+
         <button class="logout-btn hidden" id="logoutBtn" onclick="logout()">
-          <i class="fas fa-right-from-bracket"></i>
-          <span>تسجيل خروج</span>
+          <i class="fas fa-arrow-right-from-bracket"></i>
+          Logout
         </button>
       </div>
-    </div>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
+    <!-- Main -->
+    <main class="main-content" id="mainContent">
       <div id="appSections" class="hidden">
-        <div id="sec-dashboard"   class="section"></div>
-        <div id="sec-pos"         class="section"></div>
-        <div id="sec-crm"         class="section"></div>
-        <div id="sec-delivery"    class="section"></div>
-        <div id="sec-search"      class="section"></div>
-        <div id="sec-stock"       class="section"></div>
-        <div id="sec-products"    class="section"></div>
-        <div id="sec-users"       class="section"></div>
-        <div id="sec-reports"     class="section"></div>
-        <div id="sec-complaints"  class="section"></div>
-        <div id="sec-forecast"    class="section"></div>
-        <div id="sec-loyalty"     class="section"></div>
-        <div id="sec-expenses"    class="section"></div>
-        <div id="sec-returns"     class="section"></div>
+
+        <section id="sec-dashboard" class="section active"></section>
+        <section id="sec-pos" class="section"></section>
+        <section id="sec-crm" class="section"></section>
+        <section id="sec-delivery" class="section"></section>
+        <section id="sec-search" class="section"></section>
+        <section id="sec-stock" class="section"></section>
+        <section id="sec-products" class="section"></section>
+        <section id="sec-users" class="section"></section>
+        <section id="sec-reports" class="section"></section>
+        <section id="sec-complaints" class="section"></section>
+        <section id="sec-forecast" class="section"></section>
+        <section id="sec-loyalty" class="section"></section>
+        <section id="sec-expenses" class="section"></section>
+        <section id="sec-returns" class="section"></section>
+
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- Quantity Modal -->
+  <!-- Qty Modal -->
   <div class="modal" id="qtyModal">
     <div class="modal-card">
       <div class="modal-header">
-        <i class="fas fa-weight-hanging"></i>
-        <h3 class="modal-title" id="qtyTitle">الكمية</h3>
+        <div class="modal-icon"><i class="fas fa-weight-hanging"></i></div>
+        <div class="modal-title" id="qtyTitle">Quantity</div>
       </div>
-      <div class="form-group">
-        <input id="qtyInput"
-               type="number"
-               min="0.05"
-               step="0.05"
-               value="1"
-               style="font-size:1.2rem; text-align:center; padding:16px;">
-      </div>
-      <div class="form-group">
-        <textarea id="itemNote"
-                  placeholder="ملاحظة على الصنف (اختياري)"
-                  rows="2"></textarea>
-      </div>
-      <div id="qtyHint"
-           style="margin-bottom:16px; color:var(--text-muted); font-size:0.9rem;"></div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closeQty()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="confirmQty()">تأكيد</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- QR Modal -->
-  <div class="modal" id="qrModal">
-    <div class="modal-card" style="text-align:center;">
-      <div class="modal-header" style="justify-content:center;">
-        <i class="fas fa-qrcode"></i>
-        <h3 class="modal-title">رمز الطلب</h3>
+      <div class="form-group">
+        <label class="form-label">Quantity</label>
+        <input id="qtyInput" type="number" min="1" step="1" />
       </div>
-      <div id="qrCodeContainer" style="margin:20px auto;"></div>
-      <p id="qrOrderId"
-         style="font-weight:700; color:var(--primary); margin-bottom:20px; font-size:1.1rem;"></p>
-      <div style="display:flex; gap:12px; justify-content:center;">
-        <button class="btn btn-outline" onclick="closeQrModal()">إغلاق</button>
-        <button class="btn btn-primary" onclick="printQR()">
-          <i class="fas fa-print"></i> طباعة
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Shift Modal -->
-  <div class="modal" id="shiftModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <i class="fas fa-clock"></i>
-        <h3 class="modal-title">إدارة الوردية</h3>
+      <div class="form-group">
+        <label class="form-label">Note</label>
+        <textarea id="itemNote" rows="3" placeholder="Optional note"></textarea>
       </div>
-      <div id="shiftInfo" style="margin-bottom:20px;"></div>
-      <div id="shiftActions" style="margin-bottom:20px;"></div>
-      <button class="btn btn-outline" style="width:100%;" onclick="closeShiftModal()">إغلاق</button>
-    </div>
-  </div>
 
-  <!-- Supervisor (discount) Modal -->
-  <div class="modal" id="supervisorModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <i class="fas fa-shield-alt"></i>
-        <h3 class="modal-title">صلاحية المشرف</h3>
-      </div>
-      <p style="margin-bottom:16px; color:var(--text-muted);">
-        أدخل كلمة مرور المشرف لتفعيل الخصم
-      </p>
-      <div class="form-group">
-        <input id="superPassInput" type="password" placeholder="كلمة المرور">
-      </div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closeSupervisorModal()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="verifySupervisorForDiscount()">تأكيد</button>
-      </div>
-    </div>
-  </div>
+      <div id="qtyHint" class="helper-text"></div>
 
-  <!-- Payment Modal -->
-  <div class="modal" id="paymentModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <i class="fas fa-credit-card"></i>
-        <h3 class="modal-title">إتمام الدفع</h3>
-      </div>
-      <div class="form-group">
-        <label class="form-label">طريقة الدفع</label>
-        <select id="paymentMethod">
-          <option value="cash">💵 نقدي</option>
-          <option value="later">📋 آجل</option>
-          <option value="gift">🎁 هدية</option>
-          <option value="instapay">📱 إنستاباي</option>
-          <option value="wallet">📲 محفظة</option>
-          <option value="card">💳 فيزا</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">المبلغ المدفوع</label>
-        <input id="paidAmount" type="number" placeholder="0.00">
-      </div>
-      <div class="form-group">
-        <label class="form-label">ملاحظات</label>
-        <input id="paymentNotes" placeholder="ملاحظات إضافية">
-      </div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closePaymentModal()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="confirmPayment()">تأكيد الدفع</button>
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closeQty()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1" onclick="confirmQty()">Confirm</button>
       </div>
     </div>
   </div>
@@ -856,23 +1052,85 @@
   <div class="modal" id="customerModal">
     <div class="modal-card">
       <div class="modal-header">
-        <i class="fas fa-user"></i>
-        <h3 class="modal-title">بيانات العميل</h3>
+        <div class="modal-icon"><i class="fas fa-user"></i></div>
+        <div class="modal-title">Customer Info</div>
       </div>
+
       <div class="form-group">
-        <input id="customerName" placeholder="اسم العميل">
+        <label class="form-label">Customer Name</label>
+        <input id="customerName" type="text" placeholder="Customer name" />
       </div>
+
       <div class="form-group">
-        <input id="customerPhone" placeholder="رقم الهاتف" onblur="loadCustomerData()">
+        <label class="form-label">Phone</label>
+        <input id="customerPhone" type="text" placeholder="Phone" />
       </div>
+
       <div class="form-group">
-        <input id="customerAddress" placeholder="العنوان">
+        <label class="form-label">Address</label>
+        <input id="customerAddress" type="text" placeholder="Address" />
       </div>
-      <div id="customerLoyaltyInfo"
-           style="font-size:13px; color:var(--accent); margin-bottom:16px; font-weight:600;"></div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closeCustomerModal()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="confirmCustomerInfo()">متابعة للدفع</button>
+
+      <div id="customerLoyaltyInfo" class="helper-text"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closeCustomerModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1" onclick="confirmCustomerInfo()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon"><i class="fas fa-credit-card"></i></div>
+        <div class="modal-title">Payment</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Payment Method</label>
+        <select id="paymentMethod">
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="wallet">Wallet</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Paid Amount</label>
+        <input id="paidAmount" type="number" min="0" step="0.5" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input id="paymentNotes" type="text" placeholder="Optional" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closePaymentModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1" onclick="confirmPayment()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modal" id="qrModal">
+    <div class="modal-card" style="text-align:center">
+      <div class="modal-header" style="justify-content:center">
+        <div class="modal-icon"><i class="fas fa-qrcode"></i></div>
+        <div class="modal-title">QR Order</div>
+      </div>
+
+      <div id="qrCodeContainer" style="margin:16px 0"></div>
+      <div id="qrOrderId" style="font-weight:900;color:var(--primary);margin-bottom:12px"></div>
+
+      <div class="modal-actions" style="justify-content:center">
+        <button class="btn btn-outline" onclick="closeQrModal()">Close</button>
+        <button class="btn btn-primary" onclick="printQR()">
+          <i class="fas fa-print"></i>
+          Print
+        </button>
       </div>
     </div>
   </div>
@@ -881,46 +1139,56 @@
   <div class="modal" id="complaintModal">
     <div class="modal-card">
       <div class="modal-header">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h3 class="modal-title">إضافة شكوى</h3>
+        <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="modal-title">New Complaint</div>
       </div>
+
       <div class="form-group">
-        <input id="complaintPhone" placeholder="رقم هاتف العميل">
+        <label class="form-label">Phone</label>
+        <input id="complaintPhone" type="text" />
       </div>
+
       <div class="form-group">
-        <input id="complaintName" placeholder="اسم العميل">
+        <label class="form-label">Customer Name</label>
+        <input id="complaintName" type="text" />
       </div>
+
       <div class="form-group">
+        <label class="form-label">Complaint Type</label>
         <select id="complaintType">
-          <option value="تأخر توصيل">🚚 تأخر توصيل</option>
-          <option value="منتج تالف">🍰 منتج تالف</option>
-          <option value="خطأ في الفاتورة">🧾 خطأ في الفاتورة</option>
-          <option value="سلوك الموظف">👤 سلوك الموظف</option>
-          <option value="أخرى">❓ أخرى</option>
+          <option value="Delivery Delay">Delivery Delay</option>
+          <option value="Product Quality">Product Quality</option>
+          <option value="Customer Service">Customer Service</option>
+          <option value="Other">Other</option>
         </select>
       </div>
+
       <div class="form-group">
-        <textarea id="complaintDesc"
-                  placeholder="وصف الشكوى بالتفصيل"
-                  rows="3"></textarea>
+        <label class="form-label">Description</label>
+        <textarea id="complaintDesc" rows="3"></textarea>
       </div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closeComplaintModal()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="saveComplaint()">حفظ الشكوى</button>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closeComplaintModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveComplaint()">Save</button>
       </div>
     </div>
   </div>
 
-  <!-- Parked Orders Modal -->
-  <div class="modal" id="parkedOrdersModal">
+  <!-- Shift Modal -->
+  <div class="modal" id="shiftModal">
     <div class="modal-card">
       <div class="modal-header">
-        <i class="fas fa-pause-circle"></i>
-        <h3 class="modal-title">الفواتير المعلقة</h3>
+        <div class="modal-icon"><i class="fas fa-clock"></i></div>
+        <div class="modal-title">Shift Management</div>
       </div>
-      <div id="parkedList"
-           style="max-height:400px; overflow-y:auto; margin-bottom:16px;"></div>
-      <button class="btn btn-outline" style="width:100%;" onclick="closeParkedModal()">إغلاق</button>
+
+      <div id="shiftInfo" class="helper-text" style="margin-bottom:14px"></div>
+      <div id="shiftActions"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="width:100%" onclick="closeShiftModal()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -928,754 +1196,970 @@
   <div class="modal" id="shiftCashModal">
     <div class="modal-card">
       <div class="modal-header">
-        <i class="fas fa-cash-register"></i>
-        <h3 class="modal-title">تسوية كاش الوردية</h3>
+        <div class="modal-icon"><i class="fas fa-cash-register"></i></div>
+        <div class="modal-title">Close Shift</div>
       </div>
-      <div style="background:var(--blue-soft); padding:16px; border-radius:var(--radius); margin-bottom:16px;">
-        المتوقع: <span id="expectedCash">0.00</span> ج.م
+
+      <div class="card" style="background:var(--blue-soft);border-color:#dbe7ff;margin-bottom:14px">
+        <div class="muted" style="margin-bottom:6px;font-weight:700">Expected Cash</div>
+        <div id="expectedCash" style="font-size:2rem;font-weight:900;color:var(--blue)">0.00</div>
       </div>
+
       <div class="form-group">
-        <label class="form-label">الكاش الفعلي</label>
-        <input id="actualCash" type="number" placeholder="0.00">
+        <label class="form-label">Actual Cash</label>
+        <input id="actualCash" type="number" min="0" step="0.5" />
       </div>
-      <div style="display:flex; gap:12px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="closeShiftCashModal()">إلغاء</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="saveShiftCash()">حفظ</button>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closeShiftCashModal()">Cancel</button>
+        <button class="btn btn-danger" style="flex:1" onclick="saveShiftCash()">Save & Close</button>
       </div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="toast"></div>
-  <!-- Toast -->
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast info"></div>
 
-  <!-- سكربت التطبيق -->
   <script>
-// =============== CONFIG ===============
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCLWlTpNkh4Ry3qIbHbfpQnfwb9poJacndY2jf1BxCaD3oHwZBihXNg7TKKibnVCf3Sg/exec';
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhQQcK9zmBoazYmOrnfsLRVMk3jb6j7YIFrGpw_ID56QYLZX6KlCn2pAMuQ3HmDak14Q/exec";
 
-// =============== GLOBAL STATE ===============
-const State = {
-  currentUser: null,
-  currentShift: null,
-  db: {},
-  cart: [],
-  currentCat: null,
-  pendingProduct: null,
-  pendingEditIndex: -1,
-  currentQROrderId: null,
-  discountEnabled: false,
-  customerData: {}
-};
+    const State = {
+      currentUser: null,
+      currentShift: null,
+      db: {
+        users: [],
+        products: [],
+        stock: [],
+        complaints: [],
+        forecast: [],
+        loyalty: [],
+        expenses: [],
+        returns: [],
+        sales: []
+      },
+      cart: [],
+      crmCart: [],
+      currentCat: "",
+      crmCurrentCat: "",
+      pendingProduct: null,
+      pendingEditIndex: -1,
+      currentQROrderId: null,
+      customerData: { name:"", phone:"", address:"" }
+    };
 
-// =============== HELPERS ===============
-function $(id) { return document.getElementById(id); }
+    function $(id){ return document.getElementById(id); }
+    function money(v){ return Number(v || 0).toFixed(2); }
 
-function setText(id, value) {
-  const el = $(id);
-  if (el) el.textContent = value;
-}
-
-function toast(msg, type = 'info') {
-  const el = $('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.remove('error', 'success');
-  if (type === 'error') el.classList.add('error');
-  if (type === 'success') el.classList.add('success');
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 3000);
-}
-
-function money(v) { return Number(v || 0).toFixed(2); }
-
-function isWeight(p) {
-  const u = (p.unit || '').toLowerCase();
-  return u.includes('kg') || u.includes('كجم') || u.includes('كيلو');
-}
-
-// HTTP helpers
-async function apiGet(action, params = {}) {
-  const url = new URL(SCRIPT_URL);
-  url.searchParams.set('action', action);
-  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error('network');
-  return res.json();
-}
-
-async function apiPost(action, payload = {}) {
-  const res = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...payload })
-  });
-  if (!res.ok) throw new Error('network');
-  return res.json();
-}
-
-// =============== LOGIN FLOW ===============
-async function loadInitialLoginData() {
-  try {
-    const res = await apiGet('initLogin');
-    if (!res.ok) throw new Error('init failed');
-    State.db.users = res.users || [];
-
-    const ptSelect = $('pointTypeSelect');
-    ptSelect.innerHTML = '<option value="">اختر النوع</option>' +
-      (res.pointTypes || []).map(pt => `<option value="${pt}">${pt}</option>`).join('');
-  } catch (e) {
-    toast('خطأ في تحميل بيانات الدخول', 'error');
-  }
-}
-
-function onPointTypeChanged() {
-  const pt = $('pointTypeSelect').value;
-  const userSelect = $('branchSelect');
-  userSelect.innerHTML = '<option value="">اختر المستخدم</option>';
-  if (!pt || !State.db.users) return;
-  const users = State.db.users.filter(u => u.pointType === pt);
-  userSelect.innerHTML =
-    '<option value="">اختر المستخدم</option>' +
-    users.map(u =>
-      `<option value="${u.username}">${u.branch} - ${u.username}</option>`
-    ).join('');
-}
-
-async function login() {
-  const pt = $('pointTypeSelect').value;
-  const username = $('branchSelect').value;
-  const pass = $('passInput').value.trim();
-  const msgEl = $('loginMsg');
-
-  msgEl.textContent = '';
-  if (!pt || !username || !pass) {
-    msgEl.textContent = 'من فضلك اختر النوع والمستخدم وأدخل كلمة المرور';
-    return;
-  }
-
-  $('loginLoading').style.display = 'block';
-
-  try {
-    const res = await apiPost('login', { username, password: pass });
-    $('loginLoading').style.display = 'none';
-
-    if (!res.ok || !res.user) {
-      msgEl.textContent = 'بيانات الدخول غير صحيحة';
-      return;
+    function showToast(msg, type="info"){
+      const t = $("toast");
+      t.textContent = msg;
+      t.className = "toast " + type;
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        t.className = "toast";
+        t.style.display = "none";
+      }, 3000);
     }
 
-    State.currentUser  = res.user;
-    State.currentShift = res.shift || null;
-    State.db           = res.db || {};
+    function safeShowToast(msg, type="info"){
+      const t = $("toast");
+      t.style.display = "block";
+      showToast(msg, type);
+    }
 
-    setText('whoami', State.currentUser.username || '');
-    updateShiftDisplay();
-    $('logoutBtn').classList.remove('hidden');
+    function toggleSidebar(){
+      $("sidebar").classList.toggle("collapsed");
+      $("mainContent").classList.toggle("expanded");
+      $("toggleIcon").classList.toggle("fa-chevron-left");
+      $("toggleIcon").classList.toggle("fa-chevron-right");
+    }
 
-    $('loginScreen').classList.add('hidden');
-    $('appWrapper').classList.remove('hidden');
-    $('appSections').classList.remove('hidden');
+    function buildNav(){
+      const nav = $("navMenu");
+      const items = [
+        ["dashboard","Dashboard","fa-chart-pie"],
+        ["pos","POS","fa-cash-register"],
+        ["crm","CRM","fa-headset"],
+        ["delivery","Delivery","fa-motorcycle"],
+        ["search","Search","fa-search"],
+        ["stock","Stock","fa-warehouse"],
+        ["products","Products","fa-tags"],
+        ["users","Users","fa-user-cog"],
+        ["reports","Reports","fa-chart-column"],
+        ["complaints","Complaints","fa-triangle-exclamation"],
+        ["forecast","Forecast","fa-chart-line"],
+        ["loyalty","Loyalty","fa-gift"],
+        ["expenses","Expenses","fa-money-bill-wave"],
+        ["returns","Returns","fa-rotate-left"]
+      ];
 
-    buildSidebar();
-    renderDashboard();
-    renderPOS();
-    activateSection('sec-pos');
-  } catch (e) {
-    $('loginLoading').style.display = 'none';
-    msgEl.textContent = 'خطأ في الاتصال بالخادم، حاول مرة أخرى';
-  }
-}
+      nav.innerHTML = items.map(([id,label,icon]) => `
+        <button class="nav-item ${id === 'dashboard' ? 'active' : ''}" data-sec="${id}" onclick="showSection('${id}')">
+          <i class="fas ${icon}"></i>
+          <span>${label}</span>
+        </button>
+      `).join("");
+    }
 
-function logout() {
-  State.currentUser = null;
-  State.currentShift = null;
-  State.cart = [];
-  $('appWrapper').classList.add('hidden');
-  $('loginScreen').classList.remove('hidden');
-  $('passInput').value = '';
-  $('loginMsg').textContent = '';
-}
+    function showSection(id){
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
 
-// =============== NAVIGATION ===============
-function buildSidebar() {
-  const nav = $('navMenu');
-  if (!nav) return;
-  const items = [
-    { id: 'sec-dashboard',  icon: 'fa-home',              label: 'الرئيسية' },
-    { id: 'sec-pos',        icon: 'fa-cash-register',     label: 'نقطة البيع' },
-    { id: 'sec-complaints', icon: 'fa-exclamation-triangle', label: 'الشكاوى' },
-    { id: 'sec-forecast',   icon: 'fa-chart-line',        label: 'التنبؤ' },
-    { id: 'sec-loyalty',    icon: 'fa-gift',              label: 'نقاط الولاء' },
-    { id: 'sec-expenses',   icon: 'fa-money-bill',        label: 'المصروفات' },
-    { id: 'sec-returns',    icon: 'fa-undo',              label: 'المرتجعات' }
-  ];
-  nav.innerHTML = items.map(it => `
-    <div class="nav-item" onclick="activateSection('${it.id}')">
-      <i class="fas ${it.icon}"></i>
-      <span>${it.label}</span>
-    </div>
-  `).join('');
-}
+      const sec = $("sec-" + id);
+      if(sec) sec.classList.add("active");
 
-function activateSection(id) {
-  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-  const sec = $(id);
-  if (sec) sec.classList.add('active');
+      const nav = document.querySelector(`.nav-item[data-sec="${id}"]`);
+      if(nav) nav.classList.add("active");
 
-  if (id === 'sec-dashboard')  renderDashboard();
-  if (id === 'sec-pos')        renderPOS();
-  if (id === 'sec-complaints') renderComplaints();
-  if (id === 'sec-forecast')   renderForecast();
-  if (id === 'sec-loyalty')    renderLoyalty();
-  if (id === 'sec-expenses')   renderExpenses();
-  if (id === 'sec-returns')    renderReturns();
-}
+      const renders = {
+        dashboard: renderDashboard,
+        pos: renderPOS,
+        crm: renderCRM,
+        delivery: renderDelivery,
+        search: renderSearch,
+        stock: renderStock,
+        products: renderProductsManagement,
+        users: renderUsersManagement,
+        reports: renderReports,
+        complaints: renderComplaints,
+        forecast: renderForecast,
+        loyalty: renderLoyalty,
+        expenses: renderExpenses,
+        returns: renderReturns
+      };
 
-// =============== DASHBOARD (بسيط) ===============
-function renderDashboard() {
-  const sec = $('sec-dashboard');
-  if (!sec) return;
-  sec.innerHTML = `
-    <div class="top-bar">
-      <div class="page-title">
-        <i class="fas fa-home"></i>
-        <div>الرئيسية</div>
-      </div>
-    </div>
-    <div class="card">
-      <p>لوحة تحكم بسيطة يمكن توسيعها لاحقاً لمتابعة المبيعات والورديات.</p>
-    </div>
-  `;
-}
+      if(renders[id]) renders[id]();
+    }
 
-// =============== POS HELPERS ===============
-function stockFor(itemName) {
-  const row = (State.db.stock || []).find(
-    s => s.branch === State.currentUser.branch && s.item === itemName
-  );
-  return row ? Number(row.qty || 0) : 0;
-}
-
-// =============== POS RENDER ===============
-function renderPOS() {
-  const sec = $('sec-pos');
-  if (!sec || !State.currentUser) return;
-
-  const pt = State.currentUser.pointType;
-  const isSeller = pt === 'seller';
-
-  const feeDiscountControls = isSeller
-    ? (
-      '<div style="display:flex;gap:12px;margin-bottom:16px">' +
-        '<div style="flex:1">' +
-          '<label class="form-label">رسوم التوصيل</label>' +
-          '<input id="deliveryFee" type="number" value="0" readonly ' +
-                 'style="padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
-        '</div>' +
-        '<div style="flex:1">' +
-          '<label class="form-label">الخصم</label>' +
-          '<div style="display:flex;gap:4px">' +
-            '<select id="discountType" disabled ' +
-                    'style="width:80px;padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
-              '<option value="fixed">ثابت</option>' +
-            '</select>' +
-            '<input id="discountVal" type="number" value="0" readonly ' +
-                   'style="padding:10px;background:#f5f5f5;color:#999;cursor:not-allowed">' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    )
-    : (
-      '<div style="display:flex;gap:12px;margin-bottom:16px">' +
-        '<div style="flex:1">' +
-          '<label class="form-label">رسوم التوصيل</label>' +
-          '<input id="deliveryFee" type="number" value="0" min="0" step="0.5" ' +
-                 'oninput="renderCart()" style="padding:10px">' +
-        '</div>' +
-        '<div style="flex:1">' +
-          '<label class="form-label">الخصم</label>' +
-          '<div style="display:flex;gap:4px">' +
-            '<select id="discountType" onchange="renderCart()" style="width:80px;padding:10px">' +
-              '<option value="fixed">ثابت</option>' +
-              '<option value="percent">%</option>' +
-            '</select>' +
-            '<input id="discountVal" type="number" value="0" min="0" step="0.5" ' +
-                   'oninput="renderCart()" style="padding:10px">' +
-          '</div>' +
-        '</div>' +
-      '</div>'
-    );
-
-  sec.innerHTML = `
-    <div class="top-bar">
-      <div class="page-title">
-        <i class="fas fa-cash-register"></i>
-        <div>
-          <div>${State.currentUser.branch || ''}</div>
-          <div style="font-size:0.85rem; color:var(--text-muted);">نقطة البيع</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pos-layout">
-      <div class="pos-cart-panel">
-        <div class="card">
-          <div class="card-header">
-            <span><i class="fas fa-shopping-cart" style="color:var(--primary);margin-left:8px"></i> السلة الحالية</span>
-          </div>
-          <div id="cartList" class="cart-items"></div>
-          <div class="total-section">
-            ${feeDiscountControls}
-            <div class="total-row">
-              <span>الإجمالي قبل الخصم</span>
-              <span id="subTotal" style="font-weight:700">0.00</span>
+    function renderDashboard(){
+      $("sec-dashboard").innerHTML = `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title">
+              <i class="fas fa-chart-pie"></i>
+              <span>Dashboard</span>
             </div>
-            <div class="total-row grand">
-              <span>الإجمالي النهائي</span>
-              <span id="grandTotal" style="color:var(--primary)">0.00</span>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:20px">
-              <button class="btn btn-outline" style="flex:1" onclick="clearCart()">إلغاء</button>
-              <button class="btn btn-primary" style="flex:2" onclick="proceedToPayment()">
-                <i class="fas fa-check-circle"></i>
-                إتمام الطلب
+            <div class="action-buttons">
+              <button class="btn btn-outline" onclick="renderDashboard()">
+                <i class="fas fa-rotate"></i> Refresh
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="pos-products-panel">
-        <div class="card">
-          <div class="card-header">
-            <span><i class="fas fa-tags" style="color:var(--primary);margin-left:8px"></i> المنتجات</span>
-            <div style="position:relative;flex:1;max-width:300px">
-              <i class="fas fa-search"
-                 style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-light)"></i>
-              <input type="text" id="searchInput"
-                     placeholder="ابحث عن منتج..."
-                     oninput="renderProducts()"
-                     style="padding-right:40px">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+              <div class="kpi-value">0.00</div>
+              <div class="kpi-label">Today Sales</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--accent-soft);color:var(--accent)">
+                <i class="fas fa-receipt"></i>
+              </div>
+              <div class="kpi-value">0</div>
+              <div class="kpi-label">Invoices</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--warn-soft);color:#9a6700">
+                <i class="fas fa-box"></i>
+              </div>
+              <div class="kpi-value">0</div>
+              <div class="kpi-label">Low Stock Items</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:var(--blue-soft);color:var(--blue)">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="kpi-value">${State.currentShift ? "Open" : "Closed"}</div>
+              <div class="kpi-label">Shift Status</div>
             </div>
           </div>
-          <div id="catsList" style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap"></div>
-          <div id="productsGrid" class="product-grid"></div>
-        </div>
-      </div>
-    </div>
-  `;
 
-  renderCats();
-  renderProducts();
-  renderCart();
-}
+          <div class="stats-row">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fas fa-chart-line"></i> Sales Trend</div>
+              </div>
+              <div class="chart-box">Chart area</div>
+            </div>
 
-// =============== POS CATEGORIES & PRODUCTS ===============
-function renderCats() {
-  const container = $('catsList');
-  if (!container) return;
-  const products = State.db.products || [];
-  const cats = ['', ...new Set(products.map(p => p.cat).filter(Boolean))];
-  container.innerHTML = cats.map(c => `
-    <span class="badge ${State.currentCat === c ? 'badge-primary' : ''}"
-          onclick="setCategory('${c}')">
-      ${c || 'الكل'}
-    </span>
-  `).join('');
-}
-
-function setCategory(cat) {
-  State.currentCat = cat || null;
-  renderCats();
-  renderProducts();
-}
-
-function renderProducts() {
-  const grid = $('productsGrid');
-  if (!grid) return;
-
-  let products = (State.db.products || []).slice();
-  if (State.currentCat) {
-    products = products.filter(p => p.cat === State.currentCat);
-  }
-  const term = ($('searchInput')?.value || '').trim().toLowerCase();
-  if (term) {
-    products = products.filter(p => (p.name || '').toLowerCase().includes(term));
-  }
-
-  if (!products.length) {
-    grid.innerHTML = `
-      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">
-        لا توجد منتجات مطابقة للبحث.
-      </div>
-    `;
-    return;
-  }
-
-  grid.innerHTML = products.map(p => {
-    const stock = stockFor(p.name);
-    return `
-      <div class="product-card" onclick="askQty('${p.name}')">
-        <div class="product-name">${p.name}</div>
-        <div class="product-meta">${money(p.price)} ${isWeight(p) ? '/ كجم' : ''}</div>
-        <div style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);">
-          متاح: ${stock}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// =============== POS QTY MODAL & CART ===============
-function askQty(name) {
-  const p = (State.db.products || []).find(x => x.name === name);
-  if (!p) return;
-  State.pendingProduct = p;
-  State.pendingEditIndex = -1;
-
-  $('qtyTitle').textContent = isWeight(p)
-    ? `الكمية بالجرام - ${p.name}`
-    : `الكمية - ${p.name}`;
-
-  const input = $('qtyInput');
-  input.value = isWeight(p) ? 1000 : 1;
-  input.step  = isWeight(p) ? 50   : 1;
-  input.min   = isWeight(p) ? 50   : 1;
-
-  $('itemNote').value = '';
-  $('qtyHint').textContent = isWeight(p)
-    ? 'أدخل الكمية بالجرام - مثال 1000 = 1 كجم'
-    : 'الكمية بالعدد';
-
-  $('qtyModal').style.display = 'flex';
-}
-
-function closeQty() {
-  $('qtyModal').style.display = 'none';
-  State.pendingProduct = null;
-  State.pendingEditIndex = -1;
-}
-
-function confirmQty() {
-  const input = $('qtyInput');
-  let qty = parseFloat(input.value || '0');
-  if (!State.pendingProduct || isNaN(qty) || qty <= 0) return;
-
-  const note = $('itemNote').value.trim();
-  const p    = State.pendingProduct;
-  const chargeQty = isWeight(p) ? qty / 1000 : qty;
-  const total     = chargeQty * Number(p.price || 0);
-
-  if (State.pendingEditIndex >= 0) {
-    const item = State.cart[State.pendingEditIndex];
-    if (item) {
-      item.qty        = qty;
-      item.chargeQty  = chargeQty;
-      item.total      = total;
-      item.note       = note;
-    }
-  } else {
-    const existing = State.cart.find(i => i.name === p.name);
-    if (existing) {
-      existing.qty       = qty;
-      existing.chargeQty = chargeQty;
-      existing.total     = chargeQty * existing.price;
-      if (note) existing.note = note;
-    } else {
-      State.cart.push({
-        name: p.name,
-        unit: p.unit,
-        price: p.price,
-        qty,
-        chargeQty,
-        total,
-        note
-      });
-    }
-  }
-
-  closeQty();
-  renderCart();
-  toast('تم إضافة الصنف للسلة', 'success');
-}
-
-function editCartItem(idx) {
-  const item = State.cart[idx];
-  if (!item) return;
-  const p = (State.db.products || []).find(x => x.name === item.name);
-  if (!p) return;
-
-  State.pendingProduct   = p;
-  State.pendingEditIndex = idx;
-
-  $('qtyTitle').textContent = isWeight(p)
-    ? `الكمية بالجرام - ${p.name}`
-    : `الكمية - ${p.name}`;
-
-  const input = $('qtyInput');
-  input.value = item.qty;
-  input.step  = isWeight(p) ? 50 : 1;
-  input.min   = isWeight(p) ? 50 : 1;
-  $('itemNote').value = item.note || '';
-  $('qtyHint').textContent = isWeight(p)
-    ? 'أدخل الكمية بالجرام'
-    : 'الكمية بالعدد';
-
-  $('qtyModal').style.display = 'flex';
-}
-
-function removeFromCart(idx) {
-  State.cart.splice(idx, 1);
-  renderCart();
-  toast('تم حذف الصنف من السلة');
-}
-
-function renderCart() {
-  const box = $('cartList');
-  if (!box) return;
-
-  if (!State.cart.length) {
-    box.innerHTML = `
-      <div style="text-align:center; padding:32px; color:var(--text-muted);">
-        السلة فارغة، أضف منتجات من القائمة.
-      </div>
-    `;
-  } else {
-    box.innerHTML = State.cart.map((i, idx) => `
-      <div class="cart-row"
-           style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); gap:8px;">
-        <div style="flex:1;">
-          <div style="font-weight:700; color:var(--text);">${i.name}</div>
-          <div style="color:var(--text-muted); font-size:0.9rem; margin-top:4px;">
-            ${isWeight(i) ? `${i.qty} جم` : `${i.qty} قطعة`} × ${money(i.price)} = ${money(i.total)}
-          </div>
-          ${i.note ? `<div style="font-size:12px;color:var(--primary);margin-top:4px;">${i.note}</div>` : ''}
-        </div>
-        <div style="text-align:left;">
-          <div style="font-weight:700;color:var(--primary);font-size:1.05rem;margin-bottom:6px;">
-            ${money(i.total)}
-          </div>
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-outline" onclick="editCartItem(${idx})">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-sm btn-outline"
-                    style="color:#d32f2f;border-color:#ffcdd2;"
-                    onclick="removeFromCart(${idx})">
-              <i class="fas fa-trash"></i>
-            </button>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+              </div>
+              <div style="display:grid;gap:10px">
+                <button class="btn btn-primary" onclick="showSection('pos')"><i class="fas fa-cash-register"></i> Open POS</button>
+                <button class="btn btn-outline" onclick="showSection('crm')"><i class="fas fa-headset"></i> Open CRM</button>
+                <button class="btn btn-outline" onclick="showSection('delivery')"><i class="fas fa-motorcycle"></i> Delivery Panel</button>
+                <button class="btn btn-outline" onclick="openShiftModal()"><i class="fas fa-clock"></i> Shift</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
-  }
-
-  const sub = State.cart.reduce((a, b) => a + (b.total || 0), 0);
-  let fee   = parseFloat($('deliveryFee')?.value || '0');
-  let discType = $('discountType')?.value || 'fixed';
-  let disc     = parseFloat($('discountVal')?.value || '0');
-
-  if (State.currentUser.pointType === 'seller') {
-    fee  = 0;
-    disc = 0;
-    if ($('deliveryFee')) $('deliveryFee').value = '0';
-    if ($('discountVal')) $('discountVal').value = '0';
-  } else if (discType === 'percent') {
-    disc = sub * disc / 100;
-  }
-
-  const total = Math.max(0, sub + fee - disc);
-  setText('subTotal', money(sub));
-  const grandEl = $('grandTotal');
-  if (grandEl) {
-    grandEl.innerHTML =
-      `<span style="font-size:1.4rem;">${money(total)}</span> <span style="font-size:0.9rem;">ج.م</span>`;
-  }
-}
-
-function clearCart() {
-  State.cart = [];
-  State.currentQROrderId = null;
-  if ($('deliveryFee')) $('deliveryFee').value = '0';
-  if ($('discountVal')) $('discountVal').value = '0';
-  renderCart();
-  toast('تم إفراغ السلة');
-}
-
-// =============== PAYMENT & QR (جزء 1) ===============
-function proceedToPayment() {
-  if (!State.cart.length) {
-    toast('السلة فارغة', 'error');
-    return;
-  }
-  const pt = State.currentUser.pointType;
-  if (pt === 'seller') {
-    createQROrder();
-    return;
-  }
-  openCustomerModal();
-}
-
-async function createQROrder() {
-  if (!State.cart.length) {
-    toast('السلة فارغة', 'error');
-    return;
-  }
-  const sub = State.cart.reduce((a, b) => a + (b.total || 0), 0);
-  const fee = 0;
-  const disc = 0;
-  const total = Math.max(0, sub + fee - disc);
-  const order = {
-    branch:      State.currentUser.branch,
-    creator:     State.currentUser.username,
-    salesmanName:State.currentUser.username,
-    items: State.cart.map(i => ({
-      name:  i.name,
-      qty:   i.qty,
-      price: i.price,
-      total: i.total
-    })),
-    subtotal: sub,
-    discount: disc,
-    delivery: fee,
-    total
-  };
-  try {
-    const res = await apiPost('createQROrder', { order });
-    if (!res.ok) {
-      toast('فشل إنشاء QR', 'error');
-      return;
+      `;
     }
-    const orderId = res.orderId || ('QR-' + Date.now().toString(36).toUpperCase());
-    State.currentQROrderId = orderId;
-    setText('qrOrderId', orderId);
-    const container = $('qrCodeContainer');
-    container.innerHTML = '';
-    QRCode.toCanvas(orderId, { width: 260, margin: 2 }, (err, canvas) => {
-      if (err) {
-        toast('فشل إنشاء QR', 'error');
+
+    function stockFor(branch, itemName){
+      const row = State.db.stock.find(s => s.branch === branch && s.item === itemName);
+      return row ? Number(row.qty || 0) : 0;
+    }
+
+    function currentBranch(){
+      return State.currentUser?.branch || "";
+    }
+
+    function renderPOS(){
+      $("sec-pos").innerHTML = `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title">
+              <i class="fas fa-cash-register"></i>
+              <span>POS - ${currentBranch() || "Branch"}</span>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-outline" onclick="clearCart()"><i class="fas fa-trash"></i> New Sale</button>
+              <button class="btn btn-outline" onclick="openShiftModal()"><i class="fas fa-clock"></i> Shift</button>
+              <button class="btn btn-primary" onclick="proceedToPayment()"><i class="fas fa-check-circle"></i> Checkout</button>
+            </div>
+          </div>
+
+          <div class="pos-layout">
+            <div class="pos-cart-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-basket-shopping"></i> Current Cart</div>
+                  <span class="pill">${State.currentShift ? "Shift Open" : "No Shift"}</span>
+                </div>
+
+                <div id="cartList" class="cart-items">
+                  <div class="empty-state">
+                    <i class="fas fa-cart-shopping"></i>
+                    <div>No items added yet</div>
+                  </div>
+                </div>
+
+                <div class="totals">
+                  <div class="form-group">
+                    <label class="form-label">Delivery Fee</label>
+                    <input id="deliveryFee" type="number" value="0" oninput="renderCart()" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Discount</label>
+                    <div style="display:flex;gap:8px">
+                      <select id="discountType" style="max-width:100px" onchange="renderCart()">
+                        <option value="fixed">Fixed</option>
+                        <option value="percent">%</option>
+                      </select>
+                      <input id="discountVal" type="number" value="0" oninput="renderCart()" />
+                    </div>
+                  </div>
+
+                  <div class="total-row">
+                    <span>Subtotal</span>
+                    <span id="subTotal">0.00</span>
+                  </div>
+                  <div class="total-row grand">
+                    <span>Total</span>
+                    <span id="grandTotal">0.00</span>
+                  </div>
+
+                  <div style="display:flex;gap:10px;margin-top:14px">
+                    <button class="btn btn-outline" style="flex:1" onclick="clearCart()">Clear</button>
+                    <button class="btn btn-primary" style="flex:2" onclick="proceedToPayment()">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pos-products-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-tags"></i> Products</div>
+
+                  <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input id="searchInput" type="text" placeholder="Search product..." oninput="renderProducts()" />
+                  </div>
+                </div>
+
+                <div id="catsList" class="chips"></div>
+                <div id="productsGrid" class="product-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderCats();
+      renderProducts();
+      renderCart();
+    }
+
+    function renderCRM(){
+      $("sec-crm").innerHTML = `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title">
+              <i class="fas fa-headset"></i>
+              <span>CRM</span>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-outline" onclick="renderCRM()"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
+          </div>
+
+          <div class="crm-layout">
+            <div class="crm-cart-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-user-group"></i> Customer Request</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Customer Name</label>
+                  <input id="crmCustomer" type="text" placeholder="Customer name" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input id="crmPhone" type="text" placeholder="Phone" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Address</label>
+                  <input id="crmAddress" type="text" placeholder="Address" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Branch</label>
+                  <select id="crmBranchSelect" onchange="renderCrmProducts()">
+                    <option value="">Select branch</option>
+                    ${getBranchesOptions()}
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Notes</label>
+                  <textarea id="crmNotes" rows="3" placeholder="Order notes"></textarea>
+                </div>
+
+                <div id="crmCartList" class="cart-items">
+                  <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <div>No CRM items added yet</div>
+                  </div>
+                </div>
+
+                <div class="totals">
+                  <div class="total-row grand">
+                    <span>Total</span>
+                    <span id="crmGrandTotal">0.00</span>
+                  </div>
+
+                  <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="saveCrmOrderFromCart()">
+                    <i class="fas fa-paper-plane"></i>
+                    Save CRM Order
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="crm-products-panel">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fas fa-layer-group"></i> CRM Products</div>
+
+                  <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input id="crmSearchInput" type="text" placeholder="Search product..." oninput="renderCrmProducts()" />
+                  </div>
+                </div>
+
+                <div id="crmCatsList" class="chips"></div>
+                <div id="crmProductsGrid" class="product-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderCrmCats();
+      renderCrmProducts();
+      renderCrmCart();
+    }
+
+    function renderDelivery(){
+      $("sec-delivery").innerHTML = sectionTableTemplate("Delivery Panel","fa-motorcycle",[
+        "Order ID","Date","Customer","Phone","Address","Total","Status","Actions"
+      ]);
+    }
+
+    function renderSearch(){
+      $("sec-search").innerHTML = `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title"><i class="fas fa-search"></i><span>Invoice Search</span></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+              <div class="search-box" style="max-width:none;min-width:280px">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search by invoice / customer / phone" />
+              </div>
+              <input type="date" style="max-width:180px" />
+              <input type="date" style="max-width:180px" />
+              <button class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="empty-state"><i class="fas fa-file-invoice"></i><div>No results yet</div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStock(){
+      $("sec-stock").innerHTML = sectionTableTemplate("Branch Stock","fa-warehouse",[
+        "Branch","Item","Qty","Last Update"
+      ]);
+    }
+
+    function renderProductsManagement(){
+      $("sec-products").innerHTML = sectionTableTemplate("Products Management","fa-tags",[
+        "Name","Category","Price","Unit"
+      ]);
+    }
+
+    function renderUsersManagement(){
+      $("sec-users").innerHTML = sectionTableTemplate("Users Management","fa-user-cog",[
+        "Branch","Username","Point Type","Status"
+      ]);
+    }
+
+    function renderReports(){
+      $("sec-reports").innerHTML = sectionTableTemplate("Reports","fa-chart-column",[
+        "Invoice","Date","Customer","Total","Cashier"
+      ]);
+    }
+
+    function renderComplaints(){
+      $("sec-complaints").innerHTML = `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title"><i class="fas fa-triangle-exclamation"></i><span>Complaints</span></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="openComplaintModal()">
+                <i class="fas fa-plus"></i> New Complaint
+              </button>
+            </div>
+          </div>
+          ${tableShell(["Date","Customer","Phone","Branch","Type","Description","Handled By"])}
+        </div>
+      `;
+    }
+
+    function renderForecast(){
+      $("sec-forecast").innerHTML = sectionTableTemplate("Sales Forecast","fa-chart-line",[
+        "Date","Branch","Predicted","Actual","Error"
+      ]);
+    }
+
+    function renderLoyalty(){
+      $("sec-loyalty").innerHTML = sectionTableTemplate("Loyalty","fa-gift",[
+        "Phone","Points","Last Update","Expiry"
+      ]);
+    }
+
+    function renderExpenses(){
+      $("sec-expenses").innerHTML = sectionTableTemplate("Expenses","fa-money-bill-wave",[
+        "ID","Date","User","Type","Amount"
+      ]);
+    }
+
+    function renderReturns(){
+      $("sec-returns").innerHTML = sectionTableTemplate("Returns","fa-rotate-left",[
+        "ID","Date","User","Original Sale","Amount","Reason"
+      ]);
+    }
+
+    function sectionTableTemplate(title, icon, headers){
+      return `
+        <div class="section-shell">
+          <div class="top-bar">
+            <div class="page-title"><i class="fas ${icon}"></i><span>${title}</span></div>
+            <div class="action-buttons">
+              <button class="btn btn-outline"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
+          </div>
+          ${tableShell(headers)}
+        </div>
+      `;
+    }
+
+    function tableShell(headers){
+      return `
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="${headers.length}">
+                    <div class="empty-state">
+                      <i class="fas fa-table"></i>
+                      <div>No data available</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function getBranchesOptions(){
+      const branches = [...new Set((State.db.users || []).map(u => u.branch).filter(Boolean))];
+      return branches.map(b => `<option value="${b}">${b}</option>`).join("");
+    }
+
+    function renderCats(){
+      const cats = ["All", ...new Set((State.db.products || []).map(p => p.cat).filter(Boolean))];
+      $("catsList").innerHTML = cats.map(cat => `
+        <button class="chip ${((State.currentCat || "All") === cat) ? "active" : ""}" onclick="setCategory('${cat}')">${cat}</button>
+      `).join("");
+    }
+
+    function setCategory(cat){
+      State.currentCat = cat;
+      renderCats();
+      renderProducts();
+    }
+
+    function renderProducts(){
+      const term = ($("searchInput")?.value || "").toLowerCase().trim();
+      let products = [...(State.db.products || [])];
+
+      if(State.currentCat && State.currentCat !== "All"){
+        products = products.filter(p => p.cat === State.currentCat);
+      }
+
+      if(term){
+        products = products.filter(p => String(p.name || "").toLowerCase().includes(term));
+      }
+
+      const grid = $("productsGrid");
+      if(!grid) return;
+
+      if(!products.length){
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <i class="fas fa-search"></i>
+            <div>No products found</div>
+          </div>
+        `;
         return;
       }
-      container.appendChild(canvas);
-    });
-    $('qrModal').style.display = 'flex';
-  } catch (e) {
-    toast('فشل إنشاء QR', 'error');
-  }
-}
 
-function closeQrModal() {
-  $('qrModal').style.display = 'none';
-}
-
-function printQR() {
-  window.print();
-}
-
-// =============== CUSTOMER & PAYMENT (جزء 2) ===============
-function openCustomerModal() {
-  $('customerName').value    = State.customerData.name    || '';
-  $('customerPhone').value   = State.customerData.phone   || '';
-  $('customerAddress').value = State.customerData.address || '';
-  $('customerLoyaltyInfo').textContent = '';
-  $('customerModal').style.display = 'flex';
-}
-
-function closeCustomerModal() {
-  $('customerModal').style.display = 'none';
-}
-
-function confirmCustomerInfo() {
-  State.customerData = {
-    name:    $('customerName').value.trim() || 'عميل نقدي',
-    phone:   $('customerPhone').value.trim(),
-    address: $('customerAddress').value.trim()
-  };
-  $('customerModal').style.display = 'none';
-  openPaymentModal();
-}
-
-function openPaymentModal() {
-  $('paymentModal').style.display = 'flex';
-  const grandText = $('grandTotal')?.textContent || '0';
-  const grand = parseFloat(grandText.replace(/[^\d.]/g, '')) || 0;
-  $('paidAmount').value = grand;
-}
-
-function closePaymentModal() {
-  $('paymentModal').style.display = 'none';
-}
-
-async function confirmPayment() {
-  if (!State.cart.length) {
-    toast('السلة فارغة', 'error');
-    return;
-  }
-  const method = $('paymentMethod').value;
-  let paid     = parseFloat($('paidAmount').value || '0');
-  const notes  = $('paymentNotes').value;
-
-  const sub = State.cart.reduce((a, b) => a + (b.total || 0), 0);
-  let fee   = parseFloat($('deliveryFee')?.value || '0');
-  let discType = $('discountType')?.value || 'fixed';
-  let disc     = parseFloat($('discountVal')?.value || '0');
-  if (discType === 'percent') disc = sub * disc / 100;
-  const total = Math.max(0, sub + fee - disc);
-  if (paid < total) paid = total;
-
-  const order = {
-    saleId:  State.currentQROrderId || ('SALE-' + Date.now().toString(36).toUpperCase()),
-    date:    new Date().toLocaleDateString('ar-EG'),
-    branch:  State.currentUser.branch,
-    customer: State.customerData?.name    || '',
-    phone:    State.customerData?.phone   || '',
-    address:  State.customerData?.address || '',
-    channel:  State.currentQROrderId ? 'QR' : 'POS',
-    subtotal: sub,
-    discount: disc,
-    delivery: fee,
-    total,
-    cashier:  State.currentUser.username,
-    username: State.currentUser.username,
-    notes,
-    shiftId:  State.currentShift?.id || '',
-    paymentMethod: method,
-    paidAmount:    paid,
-    qrOrderId:     State.currentQROrderId || '',
-    itemsJson: JSON.stringify(State.cart.map(i => ({
-      name: i.name,
-      qty:  i.qty,
-      price:i.price,
-      total:i.total,
-      note: i.note
-    })))
-  };
-
-  try {
-    const res = await apiPost('saveOrder', { order });
-    if (!res.ok) {
-      toast('فشل حفظ الفاتورة', 'error');
-      return;
+      grid.innerHTML = products.map(p => {
+        const qty = stockFor(currentBranch(), p.name);
+        const cls = qty <= 0 ? "out" : qty <= 5 ? "low" : "";
+        return `
+          <div class="product-card" onclick="askQty('${String(p.name).replace(/'/g, "\\'")}')">
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${money(p.price)}</div>
+            <div class="product-unit">${p.unit || ""}</div>
+            <div class="stock-chip ${cls}">
+              <i class="fas fa-box"></i>
+              Available: ${qty}
+            </div>
+          </div>
+        `;
+      }).join("");
     }
-    toast('تم حفظ الفاتورة بنجاح', 'success');
-    closePaymentModal();
-    clearCart();
-  } catch (e) {
-    toast('فشل حفظ الفاتورة', 'error');
-  }
-}
 
-// =============== SHIFT / COMPLAINTS / FORECAST / LOYALTY / EXPENSES / RETURNS ===============
-// (نفس الدوال التي عندك الآن بدون أي تغيير)
-// ...
+    function renderCrmCats(){
+      const cats = ["All", ...new Set((State.db.products || []).map(p => p.cat).filter(Boolean))];
+      $("crmCatsList").innerHTML = cats.map(cat => `
+        <button class="chip ${((State.crmCurrentCat || "All") === cat) ? "active" : ""}" onclick="setCrmCategory('${cat}')">${cat}</button>
+      `).join("");
+    }
 
-// =============== INIT ===============
-document.addEventListener('DOMContentLoaded', () => {
-  loadInitialLoginData();
-  $('pointTypeSelect').addEventListener('change', onPointTypeChanged);
-});
+    function setCrmCategory(cat){
+      State.crmCurrentCat = cat;
+      renderCrmCats();
+      renderCrmProducts();
+    }
+
+    function renderCrmProducts(){
+      const term = ($("crmSearchInput")?.value || "").toLowerCase().trim();
+      const branch = $("crmBranchSelect")?.value || "";
+      let products = [...(State.db.products || [])];
+
+      if(State.crmCurrentCat && State.crmCurrentCat !== "All"){
+        products = products.filter(p => p.cat === State.crmCurrentCat);
+      }
+
+      if(term){
+        products = products.filter(p => String(p.name || "").toLowerCase().includes(term));
+      }
+
+      const grid = $("crmProductsGrid");
+      if(!grid) return;
+
+      if(!products.length){
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <i class="fas fa-search"></i>
+            <div>No CRM products found</div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = products.map(p => {
+        const qty = branch ? stockFor(branch, p.name) : "-";
+        const cls = qty === "-" ? "" : qty <= 0 ? "out" : qty <= 5 ? "low" : "";
+        return `
+          <div class="product-card" onclick="crmAskQty('${String(p.name).replace(/'/g, "\\'")}')">
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${money(p.price)}</div>
+            <div class="product-unit">${p.unit || ""}</div>
+            <div class="stock-chip ${cls}">
+              <i class="fas fa-warehouse"></i>
+              ${branch ? `Branch Stock: ${qty}` : "Select branch first"}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCart(){
+      const box = $("cartList");
+      if(!box) return;
+
+      if(!State.cart.length){
+        box.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-cart-shopping"></i>
+            <div>No items added yet</div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = State.cart.map((item, idx) => `
+          <div class="cart-row">
+            <div style="flex:1">
+              <div class="name">${item.name}</div>
+              <div class="meta">
+                Qty: ${item.qty} · Price: ${money(item.price)}<br>
+                ${item.note ? "Note: " + item.note : ""}
+              </div>
+              <div class="cart-actions">
+                <button class="btn btn-outline btn-sm" onclick="editCartItem(${idx})"><i class="fas fa-pen"></i></button>
+                <button class="btn btn-outline btn-sm" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div style="font-weight:900;color:var(--primary)">${money(item.total)}</div>
+          </div>
+        `).join("");
+      }
+
+      const sub = State.cart.reduce((a,b) => a + Number(b.total || 0), 0);
+      const fee = Number($("deliveryFee")?.value || 0);
+      let discount = Number($("discountVal")?.value || 0);
+      if(($("discountType")?.value || "fixed") === "percent"){
+        discount = sub * discount / 100;
+      }
+      const total = Math.max(0, sub + fee - discount);
+
+      $("subTotal").textContent = money(sub);
+      $("grandTotal").textContent = money(total);
+    }
+
+    function renderCrmCart(){
+      const box = $("crmCartList");
+      if(!box) return;
+
+      if(!State.crmCart.length){
+        box.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <div>No CRM items added yet</div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = State.crmCart.map((item, idx) => `
+          <div class="cart-row">
+            <div style="flex:1">
+              <div class="name">${item.name}</div>
+              <div class="meta">
+                Qty: ${item.qty} · Price: ${money(item.price)}
+              </div>
+              <div class="cart-actions">
+                <button class="btn btn-outline btn-sm" onclick="removeCrmItem(${idx})"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div style="font-weight:900;color:var(--primary)">${money(item.total)}</div>
+          </div>
+        `).join("");
+      }
+
+      const total = State.crmCart.reduce((a,b) => a + Number(b.total || 0), 0);
+      $("crmGrandTotal").textContent = money(total);
+    }
+
+    function askQty(name){
+      const product = State.db.products.find(p => p.name === name);
+      if(!product) return;
+      State.pendingProduct = product;
+      State.pendingEditIndex = -1;
+      $("qtyTitle").textContent = product.name;
+      $("qtyInput").value = 1;
+      $("itemNote").value = "";
+      $("qtyHint").textContent = "Enter quantity then confirm.";
+      $("qtyModal").style.display = "flex";
+      window.__qtyMode = "pos";
+    }
+
+    function crmAskQty(name){
+      const product = State.db.products.find(p => p.name === name);
+      if(!product) return;
+      State.pendingProduct = product;
+      State.pendingEditIndex = -1;
+      $("qtyTitle").textContent = product.name + " - CRM";
+      $("qtyInput").value = 1;
+      $("itemNote").value = "";
+      $("qtyHint").textContent = "Enter quantity for CRM order.";
+      $("qtyModal").style.display = "flex";
+      window.__qtyMode = "crm";
+    }
+
+    function closeQty(){
+      $("qtyModal").style.display = "none";
+    }
+
+    function confirmQty(){
+      const qty = Number($("qtyInput").value || 0);
+      const note = $("itemNote").value.trim();
+      const p = State.pendingProduct;
+      if(!p || qty <= 0) return;
+
+      const item = {
+        name: p.name,
+        price: Number(p.price || 0),
+        unit: p.unit || "",
+        qty,
+        total: qty * Number(p.price || 0),
+        note
+      };
+
+      if(window.__qtyMode === "crm"){
+        const branch = $("crmBranchSelect")?.value || "";
+        const available = stockFor(branch, p.name);
+        if(branch && qty > available){
+          safeShowToast("Quantity exceeds branch stock", "error");
+          return;
+        }
+        State.crmCart.push(item);
+        renderCrmCart();
+      } else {
+        State.cart.push(item);
+        renderCart();
+      }
+
+      closeQty();
+      safeShowToast("Item added successfully", "success");
+    }
+
+    function editCartItem(idx){
+      const item = State.cart[idx];
+      if(!item) return;
+      State.pendingProduct = { name:item.name, price:item.price, unit:item.unit };
+      State.pendingEditIndex = idx;
+      $("qtyTitle").textContent = item.name;
+      $("qtyInput").value = item.qty;
+      $("itemNote").value = item.note || "";
+      $("qtyHint").textContent = "Edit quantity";
+      $("qtyModal").style.display = "flex";
+      window.__qtyMode = "edit-pos";
+    }
+
+    function removeFromCart(idx){
+      State.cart.splice(idx,1);
+      renderCart();
+    }
+
+    function removeCrmItem(idx){
+      State.crmCart.splice(idx,1);
+      renderCrmCart();
+    }
+
+    function clearCart(){
+      State.cart = [];
+      renderCart();
+    }
+
+    function proceedToPayment(){
+      $("customerModal").style.display = "flex";
+    }
+
+    function closeCustomerModal(){ $("customerModal").style.display = "none"; }
+    function closePaymentModal(){ $("paymentModal").style.display = "none"; }
+    function closeQrModal(){ $("qrModal").style.display = "none"; }
+    function closeComplaintModal(){ $("complaintModal").style.display = "none"; }
+    function closeShiftModal(){ $("shiftModal").style.display = "none"; }
+    function closeShiftCashModal(){ $("shiftCashModal").style.display = "none"; }
+
+    function confirmCustomerInfo(){
+      State.customerData = {
+        name: $("customerName").value.trim(),
+        phone: $("customerPhone").value.trim(),
+        address: $("customerAddress").value.trim()
+      };
+      closeCustomerModal();
+      $("paymentModal").style.display = "flex";
+      $("paidAmount").value = $("grandTotal")?.textContent || "0";
+    }
+
+    function confirmPayment(){
+      safeShowToast("Ready to connect saveOrder with Apps Script", "info");
+      closePaymentModal();
+    }
+
+    function openComplaintModal(){
+      $("complaintModal").style.display = "flex";
+    }
+
+    function saveComplaint(){
+      safeShowToast("Ready to connect saveComplaint", "info");
+      closeComplaintModal();
+    }
+
+    function openShiftModal(){
+      $("shiftInfo").textContent = State.currentShift ? "Current shift is open." : "No active shift.";
+      $("shiftActions").innerHTML = State.currentShift
+        ? `<button class="btn btn-danger" style="width:100%" onclick="openShiftCashModal()">Close Current Shift</button>`
+        : `<button class="btn btn-primary" style="width:100%" onclick="openNewShift()">Open New Shift</button>`;
+      $("shiftModal").style.display = "flex";
+    }
+
+    function openNewShift(){
+      State.currentShift = { id: "SHIFT-DEMO", startTime: new Date().toLocaleString() };
+      updateShiftDisplay();
+      closeShiftModal();
+      safeShowToast("Shift opened", "success");
+    }
+
+    function openShiftCashModal(){
+      $("expectedCash").textContent = $("grandTotal")?.textContent || "0.00";
+      $("shiftCashModal").style.display = "flex";
+    }
+
+    function saveShiftCash(){
+      State.currentShift = null;
+      updateShiftDisplay();
+      closeShiftCashModal();
+      closeShiftModal();
+      safeShowToast("Shift closed", "success");
+    }
+
+    function updateShiftDisplay(){
+      $("shiftStatus").textContent = State.currentShift ? "Shift Open" : "No shift opened";
+    }
+
+    function printQR(){
+      window.print();
+    }
+
+    function saveCrmOrderFromCart(){
+      safeShowToast("Ready to connect saveCrmOrder", "info");
+    }
+
+    async function login(){
+      const pointType = $("pointTypeSelect").value;
+      const branch = $("branchSelect").value;
+      const pass = $("passInput").value.trim();
+
+      if(!pointType || !branch || !pass){
+        $("loginMsg").textContent = "Please complete login data.";
+        return;
+      }
+
+      State.currentUser = { pointType, branch, username: branch };
+      $("whoami").textContent = branch + " - " + pointType;
+      updateShiftDisplay();
+
+      $("loginScreen").classList.add("hidden");
+      $("appWrapper").classList.remove("hidden");
+      $("appSections").classList.remove("hidden");
+      $("logoutBtn").classList.remove("hidden");
+
+      buildNav();
+      renderDashboard();
+    }
+
+    function logout(){
+      State.currentUser = null;
+      State.currentShift = null;
+      $("appWrapper").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+      $("passInput").value = "";
+    }
+
+    function fillPointTypes(){
+      const types = [...new Set((State.db.users || []).map(u => u.pointType).filter(Boolean))];
+      $("pointTypeSelect").innerHTML = `<option value="">Select user type</option>` +
+        types.map(t => `<option value="${t}">${t}</option>`).join("");
+    }
+
+    function fillBranchesByType(){
+      const type = $("pointTypeSelect").value;
+      const users = (State.db.users || []).filter(u => u.pointType === type);
+      $("branchSelect").innerHTML = `<option value="">Select branch</option>` +
+        users.map(u => `<option value="${u.branch}">${u.branch}</option>`).join("");
+    }
+
+    function seedDemoData(){
+      State.db.users = [
+        { branch:"Branch 1", username:"seller1", pointType:"seller" },
+        { branch:"Branch 1", username:"cashier1", pointType:"cashier" },
+        { branch:"Branch 1", username:"delivery1", pointType:"delivery" },
+        { branch:"Branch 2", username:"seller2", pointType:"seller" },
+        { branch:"Branch 2", username:"cashier2", pointType:"cashier" },
+        { branch:"CRM", username:"crm1", pointType:"crm" }
+      ];
+
+      State.db.products = [
+        { name:"Sugar 1kg", cat:"Sugar", price:45, unit:"piece" },
+        { name:"Brown Sugar", cat:"Sugar", price:60, unit:"piece" },
+        { name:"Candy Mix", cat:"Candy", price:80, unit:"kg" },
+        { name:"Jelly Box", cat:"Candy", price:35, unit:"piece" },
+        { name:"Premium Dates", cat:"Dates", price:120, unit:"kg" },
+        { name:"Mini Pack", cat:"Offers", price:25, unit:"piece" }
+      ];
+
+      State.db.stock = [
+        { branch:"Branch 1", item:"Sugar 1kg", qty:12 },
+        { branch:"Branch 1", item:"Brown Sugar", qty:4 },
+        { branch:"Branch 1", item:"Candy Mix", qty:9 },
+        { branch:"Branch 1", item:"Jelly Box", qty:0 },
+        { branch:"Branch 2", item:"Sugar 1kg", qty:7 },
+        { branch:"Branch 2", item:"Brown Sugar", qty:13 },
+        { branch:"Branch 2", item:"Candy Mix", qty:2 },
+        { branch:"Branch 2", item:"Jelly Box", qty:5 },
+        { branch:"Branch 2", item:"Premium Dates", qty:8 }
+      ];
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      seedDemoData();
+      fillPointTypes();
+      $("pointTypeSelect").addEventListener("change", fillBranchesByType);
+    });
   </script>
 </body>
 </html>
