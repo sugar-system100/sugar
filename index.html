@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
   <meta name="theme-color" content="#b81b5c">
-  <meta name="description" content="سكّر 33 - نظام متكامل لإدارة المبيعات والمخازن والتوصيل">
-  <title>سكّر 33 · نظام متكامل</title>
+  <meta name="description" content="سكّر - نظام متكامل لإدارة المبيعات والمخازن والتوصيل">
+  <title>سكّر نظام متكامل</title>
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi2LPZiNix2YrYr9in2YUiLCJzaG9ydF9uYW1lIjoi2LPZiNix2YoiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y5ZjZmOCIsInRoZW1lX2NvbG9yIjoiI2I4MWI1YyIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWwsJTNjc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnJTNlJTNjY2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc0NScgZmlsbD0nI2I4MWI1YyclM2UlM2Mvc3ZnJTNlIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
@@ -1100,7 +1100,7 @@
   <div class="login-card">
     <div class="login-logo">
       <i class="fas fa-candy-cane"></i>
-      <h1>سكّر 33</h1>
+      <h1>سكر</h1>
       <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.95rem;">نظام متكامل لإدارة المبيعات والمخازن</p>
     </div>
     
@@ -1153,7 +1153,7 @@
   <div class="sidebar" id="sidebar">
     <div class="logo-area">
       <i class="fas fa-candy-cane logo-icon"></i>
-      <div class="logo-text">سكّر 33</div>
+      <div class="logo-text">سُكر </div>
       <div class="copyright">برمجة م/ محمود سلامة</div>
       <div class="toggle-sidebar" onclick="toggleSidebar()">
         <i class="fas fa-chevron-right" id="toggleIcon"></i>
@@ -2684,7 +2684,7 @@ async function confirmPayment() {
     await postForm('saveOrder', { order: orderData });
     toast('تم إتمام البيع بنجاح', 'success');
     printReceipt(orderData);
-    if (State.thermalPort) printThermal(`سكّر 33\nم/ محمود سلامة\n${orderData.date}\n${orderData.customer}\n${orderData.total}\nشكراً`);
+    if (State.thermalPort) printThermal(`سُكر\nم/ محمود سلامة\n${orderData.date}\n${orderData.customer}\n${orderData.total}\nشكراً`);
     clearCart();
     await refreshData();
     renderPOS();
@@ -3171,7 +3171,7 @@ async function checkNewDeliveryOrders() {
       
       if (Notification.permission === 'granted') {
         new Notification('🔔 طلب توصيل جديد', { 
-          body: `لديك ${newCount} طلب جديد في سكّر 33`,
+          body: `لديك ${newCount}طلب جديد في سكّر33`,
           icon: 'https://cdn-icons-png.flaticon.com/512/3081/3081840.png'
         });
       }
