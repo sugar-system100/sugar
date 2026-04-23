@@ -1732,11 +1732,12 @@ async function login() {
   
   try {
     // ✅ SECURE: Send password to server for verification
-    const res = await jsonp('authenticate', { 
+       const res = await jsonp('authenticate', { 
       pointType, 
       branch, 
-      pass: await hashPassword(pass) 
+      pass: pass 
     });
+
     
     if (!res.ok || !res.token) {
       toast('بيانات الدخول غير صحيحة', 'error');
