@@ -1936,12 +1936,6 @@ function renderAll() {
   showSection(active); 
 }
 
-with open('/mnt/agents/output/sokar_optimized_part2.html', 'w', encoding='utf-8') as f:
-    f.write(part2)
-
-# Part 3: Dashboard, POS, and Core Functions
-
-part3 = '''
 // ======================== DASHBOARD (NEW - INTERACTIVE) ========================
 function renderDashboard() {
   const sec = document.getElementById('sec-dashboard');
@@ -2534,13 +2528,7 @@ function proceedToPayment() {
   if (!State.currentShift) return toast('الرجاء فتح وردية أولاً', 'error'); 
   openCustomerModal((parseFloat(document.getElementById('deliveryFee')?.value) || 0) > 0); 
 }
-'''
 
-with open('/mnt/agents/output/sokar_optimized_part3.html', 'w', encoding='utf-8') as f:
-    f.write(part3)
-# Part 4: Payment, Customer, CRM, Delivery, and Management Functions
-
-part4 = '''
 // ======================== CUSTOMER & PAYMENT ========================
 function openCustomerModal(requireAddress) { 
   document.getElementById('customerName').value = State.customerData.name || ''; 
@@ -2997,14 +2985,7 @@ async function saveCrmOrderFromCart() {
     toast(e.message, 'error'); 
   }
 }
-'''
 
-with open('/mnt/agents/output/sokar_optimized_part4.html', 'w', encoding='utf-8') as f:
-    f.write(part4)
-
-# Part 5: Delivery, Search, Stock, Management, and Final Functions
-
-part5 = '''
 // ======================== DELIVERY PANEL ========================
 async function renderDeliveryPanel() {
   const sec = document.getElementById('sec-delivery');
@@ -3624,14 +3605,7 @@ async function saveComplaint() {
     toast(e.message, 'error'); 
   }
 }
-'''
 
-with open('/mnt/agents/output/sokar_optimized_part5.html', 'w', encoding='utf-8') as f:
-    f.write(part5)
-
-# Part 6: Forecast, Loyalty, Expenses, Returns, Shifts, QR, and Final Bootstrap
-
-part6 = '''
 // ======================== FORECAST ========================
 function renderForecast() {
   const sec = document.getElementById('sec-forecast');
