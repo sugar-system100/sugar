@@ -201,7 +201,7 @@
 <div class="modal" id="chatModal">... (مودال الدردشة الداخلية)</div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGUF39CZF44Ev31ghqbPtAxLTZh1kyHdnNltj34Xwdv09Ti0pYWtUUjsTkd2HbzURTUA/exec'; // ← غيّر هذا
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVMAIONRqQUmYGRpa32AjFl4_EyKaGoR4XyN_dQNXoGQdSf0HNf98mEiZ1jRBfSRR_mw/exec'; // ← غيّر هذا
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[], messages:[] },
@@ -975,8 +975,7 @@ function renderChat() {
         <button class="btn btn-primary" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>`;
-  loadCha
-      tMessages();
+  loadChatMessages();
 }
 
 async function loadChatMessages() {
