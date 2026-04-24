@@ -685,7 +685,7 @@
         'expenses': renderExpenses, 'returns': renderReturns,
         'products': renderProductsManagement, 'users': renderUsersManagement,
         'admin-monitor': renderAdminMonitor, 'branch-detail': renderBranchDetail,
-        'branch-shifts': renderBranchShifts, 'branch-stock': renderBranchStock,
+    
         'branch-reports': renderBranchReports
       };
       if (renderers[id]) {
@@ -694,8 +694,6 @@
         dc.innerHTML = '<div class="empty-state"><i class="fas fa-candy-cane"></i><h3>🍰 القسم قيد التطوير</h3></div>';
       }
     }
-
-    // ========== الورديات ==========
     function loadCurrentShift() {
       State.currentShift = State.db.shifts.find(s => s.branch === State.currentUser?.branch && s.cashier === State.currentUser?.branch && s.status === 'مفتوحة') || null;
       const el = document.getElementById('shiftStatus');
