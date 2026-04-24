@@ -1447,7 +1447,7 @@
 
 <script>
 // ======================== CONFIGURATION ========================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtaDyxkfnuTwFOJOkmSEH1k3u5MRQ65CWtIn9VmItZMc5zjG2uGlYI1IoxSF9Iw-gm5g/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5m3tFmdYNfUoqDe0iKti_tY5czsL-mG2VtCLJkwcPyS_sfck8iIZUenZ_uC2fReArgA/exec';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const OFFLINE_KEY = 'SOKAR_OFFLINE_DATA';
 
@@ -1935,6 +1935,11 @@ function renderAll() {
   const active = document.querySelector('.section.active')?.id?.replace('sec-','') || 'dashboard';
   showSection(active); 
 }
+'''
+
+with open('/mnt/agents/output/sokar_optimized_part2.html', 'w', encoding='utf-8') as f:
+    f.write(part2)
+
 # Part 3: Dashboard, POS, and Core Functions
 
 part3 = '''
