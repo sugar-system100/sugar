@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <meta name="theme-color" content="#b81b5c">
     <title>سُكّر 33 - نظام إدارة الحلويات</title>
+    
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <!-- HTML5 QR Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+
     <style>
         :root {
             --primary: #b81b5c;
@@ -27,6 +34,7 @@
             --radius-sm: 12px;
             --glow: 0 0 12px rgba(184,27,92,0.25);
         }
+
         * { margin:0; padding:0; box-sizing:border-box; }
         body { 
             font-family: 'Cairo', 'Segoe UI', sans-serif; 
@@ -35,7 +43,10 @@
             overflow: hidden; 
             font-size: 15px;
         }
+
         .app-container { display: flex; height: 100vh; overflow: hidden; }
+
+        /* الشريط الجانبي */
         .sidebar { 
             width: 265px; min-width: 265px; 
             background: var(--surface); 
@@ -63,9 +74,11 @@
             justify-content: center; gap: 8px; transition: 0.2s; font-size: 15px;
         }
         .logout-btn:hover { border-color: #d32f2f; color: #d32f2f; background: #fff5f5; }
+
         .main-content { flex: 1; overflow-y: auto; padding: 20px 24px; }
         .breadcrumb { font-size: 15px; color: var(--text-muted); margin-bottom: 16px; }
         .breadcrumb span { color: var(--primary); font-weight: 600; }
+
         .pos-layout { display: flex; gap: 16px; height: calc(100vh - 180px); }
         .col-categories { width: 200px; min-width: 180px; background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); overflow-y: auto; }
         .category-item { padding: 13px 14px; border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 6px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 15px; }
@@ -94,6 +107,7 @@
         .summary-row.grand { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
         .cart-discount-row { display: flex; gap: 10px; margin-top: 12px; }
         .cart-discount-row input { padding: 10px 14px; border: 2px solid var(--border); border-radius: 30px; font-family: inherit; font-size: 1rem; outline: none; width: 50%; }
+
         .btn { padding: 12px 22px; border-radius: 35px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-family: inherit; font-size: 0.95rem; }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(184,27,92,0.25); }
         .btn-outline { background: white; border: 2px solid var(--border); color: var(--text); }
@@ -112,6 +126,8 @@
     </style>
 </head>
 <body>
+
+<!-- شاشة الدخول -->
 <div id="loginScreen" style="height:100vh; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #fff0f5, #fce4f0);">
   <div style="background:white; border-radius:36px; padding:44px; width:100%; max-width:440px; box-shadow:0 25px 70px rgba(0,0,0,0.15); text-align:center;">
     <div style="font-size:52px; margin-bottom:12px;">🍰</div>
@@ -124,6 +140,8 @@
     <div id="loginMsg" style="margin-top:16px;"></div>
   </div>
 </div>
+
+<!-- التطبيق الرئيسي -->
 <div id="appContainer" class="app-container hidden">
   <div class="sidebar">
     <div class="sidebar-header"><div class="logo-icon"><i class="fas fa-candy-cane"></i></div><div class="logo-text">سُكّر 33</div><div class="programmer">برمجة م/ محمود سلامة</div></div>
@@ -132,7 +150,10 @@
   </div>
   <div class="main-content"><div id="dynamicContent"></div></div>
 </div>
+
 <div id="toast" class="toast"></div>
+
+<!-- ======================== المودالات ======================== -->
 <div class="modal" id="qtyModal">
   <div class="modal-card">
     <div class="modal-header"><i class="fas fa-weight-hanging"></i><h3 id="qtyTitle">الكمية</h3></div>
@@ -298,15 +319,28 @@
     <button class="btn btn-outline btn-block" style="margin-top:14px;" onclick="closeModal('thermalPrinterModal')">إغلاق</button>
   </div>
 </div>
-<script>    
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoLjw0ECorj3yV4xJ92FK8RWVl1MXBTxct3Mz_5i0H48xi4wc5HtOr3cNVkBKFbtZgnw/exec'';
+
+<script>
+// ======================== تهيئة ========================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoLjw0ECorj3yV4xJ92FK8RWVl1MXBTxct3Mz_5i0H48xi4wc5HtOr3cNVkBKFbtZgnw/exec';
+
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
-  currentUser: null, currentCat: '🍰 الكل', crmCurrentCat: '🍰 الكل',
-  cart: [], crmCart: [], pendingProduct: null, pendingEditIndex: -1,
-  currentShift: null, discountEnabled: false, currentQROrderId: null,
-  customerData: { name:'', phone:'', address:'' }, selectedBranch: null,
-  deliveryPollingInterval: null, html5QrScanner: null, thermalPort: null
+  currentUser: null,
+  currentCat: '🍰 الكل',
+  crmCurrentCat: '🍰 الكل',
+  cart: [],
+  crmCart: [],
+  pendingProduct: null,
+  pendingEditIndex: -1,
+  currentShift: null,
+  discountEnabled: false,
+  currentQROrderId: null,
+  customerData: { name:'', phone:'', address:'' },
+  selectedBranch: null,
+  deliveryPollingInterval: null,
+  html5QrScanner: null,
+  thermalPort: null
 };
 
 function toast(msg, type='info') {
@@ -323,6 +357,7 @@ function openModal(id) { document.getElementById(id).classList.add('active'); }
 const money = n => (Number(n||0)).toFixed(2);
 const isWeight = p => String(p.unit||'').trim() === 'كيلو';
 
+// ======================== اتصال ========================
 function jsonp(action, params={}) {
   return new Promise((resolve, reject) => {
     const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
@@ -360,6 +395,7 @@ function postForm(action, payload={}) {
   });
 }
 
+// ======================== تحميل أولي ========================
 async function loadInitialDataForLogin() {
   try {
     const res = await jsonp('getInitialData', { userType:'', branch:'', username:'' });
@@ -437,6 +473,7 @@ async function refreshData() {
   } catch(e) {}
 }
 
+// ======================== قائمة جانبية ========================
 function buildNav() {
   const pt = State.currentUser?.pointType;
   let items = [];
@@ -470,6 +507,7 @@ function showSection(id) {
   }
 }
 
+// ======================== ورديات ========================
 function loadCurrentShift() {
   State.currentShift = State.db.shifts.find(s => s.branch === State.currentUser?.branch && s.cashier === State.currentUser?.branch && s.status === 'مفتوحة') || null;
   const el = document.getElementById('shiftStatus');
@@ -514,7 +552,8 @@ async function saveShiftCash() {
   closeModal('shiftCashModal');
   toast('💰 تم حفظ تقرير الخزنة', 'success');
 }
-// ========== نقطة البيع (POS) ==========
+
+// ======================== نقطة البيع ========================
 function renderPOS() {
   const cats = ['🍰 الكل', ...new Set(State.db.products.map(p => p.cat).filter(Boolean))];
   document.getElementById('dynamicContent').innerHTML = `
@@ -797,7 +836,7 @@ function attachAddressAutocomplete() {
       const res = await jsonp('getDeliveryZones', { branch: State.currentUser.branch, searchText: val });
       if (res.zones && res.zones.length && suggestionsDiv) {
         suggestionsDiv.innerHTML = res.zones.map(z =>
-          `<div class="suggestion-item" style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;" onclick="selectAddress('${z.area}', ${z.price})">📍 ${z.area} - <strong>${z.price} ج.م</strong></div>`
+          `<div style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;" onclick="selectAddress('${z.area}', ${z.price})">📍 ${z.area} - <strong>${z.price} ج.م</strong></div>`
         ).join('');
         suggestionsDiv.classList.remove('hidden');
       } else if (suggestionsDiv) suggestionsDiv.classList.add('hidden');
@@ -833,7 +872,7 @@ async function loadCustomerData() {
   } catch(e) {}
 }
 
-// ========== QR ==========
+// ======================== QR ========================
 async function createQROrder() {
   if (!State.cart.length) return toast('⚠️ السلة فارغة', 'error');
   const sub = State.cart.reduce((a,b) => a + b.total, 0);
@@ -894,7 +933,7 @@ async function loadQROrder(orderId) {
   } catch(e) { toast(e.message, 'error'); }
 }
 
-// ========== فواتير معلقة ==========
+// ======================== فواتير معلقة ========================
 async function parkCurrentOrder() {
   if (!State.cart.length) return toast('⚠️ السلة فارغة', 'error');
   await postForm('parkOrder', { orderData: { branch: State.currentUser.branch, cashier: State.currentUser.branch, cart: State.cart, customerData: State.customerData } });
@@ -933,7 +972,7 @@ async function deleteParkedOrder(id) {
   loadParkedOrders();
 }
 
-// ========== CRM ==========
+// ======================== CRM ========================
 function renderCRM() {
   const branches = [...new Set(State.db.users.filter(u => u.pointType==='دليفري' && u.active).map(u => u.branch))];
   document.getElementById('dynamicContent').innerHTML = `
@@ -958,7 +997,10 @@ function renderCRM() {
       </div>
     </div>
   `;
-  renderCrmCats(); renderCrmProducts(); renderCrmCart();
+  if (!State.crmCurrentCat) State.crmCurrentCat = '🍰 الكل';
+  renderCrmCats();
+  renderCrmProducts();
+  renderCrmCart();
 }
 
 async function loadCrmStock() {
@@ -980,9 +1022,10 @@ function renderCrmCats() {
 
 function renderCrmProducts() {
   const q = (document.getElementById('crmSearch')?.value||'').trim();
-  let list = State.db.products.filter(p => State.crmCurrentCat === '🍰 الكل' || p.cat === State.crmCurrentCat.slice(2));
+  let list = State.db.products.filter(p => (State.crmCurrentCat||'🍰 الكل') === '🍰 الكل' || p.cat === (State.crmCurrentCat||'🍰 الكل').slice(2));
   if (q) list = list.filter(p => p.name.includes(q));
-  document.getElementById('crmProductsGrid').innerHTML = list.length ? list.map(p => `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج</div></div>`).join('') : '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>';
+  const grid = document.getElementById('crmProductsGrid');
+  if (grid) grid.innerHTML = list.length ? list.map(p => `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج</div></div>`).join('') : '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>';
 }
 
 function crmAddItem(name) {
@@ -1040,7 +1083,7 @@ function selectCrmAddress(addr, fee) {
   document.getElementById('crmAddressSuggestions').classList.add('hidden');
 }
 
-// ========== توصيل ==========
+// ======================== توصيل ========================
 async function renderDelivery() {
   try {
     const res = await jsonp('getDeliveryOrders', { username: State.currentUser.branch, branch: State.currentUser.branch });
@@ -1084,7 +1127,7 @@ function startDeliveryPolling() {
   }, 15000);
 }
 
-// ========== مراقبة وباقي الأقسام ==========
+// ======================== إدارة ========================
 function renderAdminMonitor() {
   const users = State.db.users.filter(u => u.active);
   document.getElementById('dynamicContent').innerHTML = `
@@ -1093,6 +1136,57 @@ function renderAdminMonitor() {
   `;
 }
 
+function renderBranchDetail() {
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 الرئيسية » 🌐 مراقبة » <span>${State.selectedBranch}</span></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="showSection('branch-shifts')"><i class="fas fa-clock"></i> الورديات</button>
+      <button class="btn btn-outline" onclick="showSection('branch-stock')"><i class="fas fa-boxes"></i> المخزون</button>
+      <button class="btn btn-outline" onclick="showSection('branch-reports')"><i class="fas fa-chart-bar"></i> تقرير المبيعات</button>
+      <button class="btn btn-outline" onclick="State.selectedBranch=null;showSection('admin-monitor');"><i class="fas fa-arrow-right"></i> رجوع</button>
+    </div>
+  `;
+}
+
+function renderBranchShifts() {
+  const shifts = State.db.shifts.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>🕐 الورديات</span></div>
+    <select style="width:100%;padding:12px;border-radius:12px;" onchange="showShiftDetails(this.value)"><option value="">اختر وردية</option>${shifts.map(s => `<option value="${s.id}">${s.openTime} - ${s.status}</option>`).join('')}</select>
+    <div id="shiftDetails" style="margin-top:16px;"></div>
+  `;
+}
+
+function showShiftDetails(shiftId) {
+  if (!shiftId) return;
+  const shift = State.db.shifts.find(s => s.id === shiftId);
+  if (!shift) return;
+  document.getElementById('shiftDetails').innerHTML = `
+    <div style="background:#fdf6f9;padding:16px;border-radius:12px;">
+      <strong>الحالة:</strong> ${shift.status}<br>
+      <strong>إجمالي المبيعات:</strong> ${money(shift.totalSales)} ج<br>
+      <strong>عدد الفواتير:</strong> ${shift.invoicesCount}
+    </div>
+  `;
+}
+
+function renderBranchStock() {
+  const stock = State.db.stock.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📦 المخزون</span></div>
+    <div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${stock.map(s => `<tr><td>${s.item}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div>
+  `;
+}
+
+function renderBranchReports() {
+  const sales = State.db.sales.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📊 تقارير</span></div>
+    <div class="table-wrapper"><table><thead><tr><th>كود</th><th>عميل</th><th>إجمالي</th></tr></thead><tbody>${sales.slice(0,30).map(s => `<tr><td>${s.saleId}</td><td>${s.customer}</td><td>${money(s.total)} ج</td></tr>`).join('')}</tbody></table></div>
+  `;
+}
+
+// ======================== الأقسام الأخرى ========================
 function renderStock() {
   const stock = State.db.stock.filter(s => s.branch === State.currentUser.branch);
   document.getElementById('dynamicContent').innerHTML = `
@@ -1212,24 +1306,10 @@ async function addReturn() {
   await refreshData(); renderReturns(); toast('✅ تم إضافة المرتجع', 'success');
 }
 
-function renderProductsManagement() { /* ... عرض جدول المنتجات ... */ }
-function renderUsersManagement() { /* ... عرض جدول المستخدمين ... */ }
-function editUser(username, branch) { /* ... فتح مودال التحرير ... */ }
-async function saveUserChanges() { /* ... حفظ تغييرات المستخدم ... */ }
-
-// ========== الطابعة ==========
-function showThermalPrinterModal() { openModal('thermalPrinterModal'); }
-async function connectThermalPrinter() { /* ... */ }
-async function printLastReceipt() { /* ... */ }
-
-// ========== بدء التشغيل ==========
-window.onload = () => { loadInitialDataForLogin(); };
-setInterval(refreshData, 300000);
 function renderProductsManagement() {
   document.getElementById('dynamicContent').innerHTML = `
     <div class="breadcrumb">🍭 الرئيسية » <span>🍰 المنتجات</span></div>
-    <div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th></tr></thead>
-    <tbody>${State.db.products.map(p => `<tr><td>${p.name}</td><td>${p.cat}</td><td style="color:var(--primary);">${money(p.price)} ج</td></tr>`).join('')}</tbody></table></div>
+    <div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>القسم</th><th>السعر</th></tr></thead><tbody>${State.db.products.map(p => `<tr><td>${p.name}</td><td>${p.cat}</td><td style="color:var(--primary);">${money(p.price)} ج</td></tr>`).join('')}</tbody></table></div>
   `;
 }
 
@@ -1273,11 +1353,11 @@ async function saveUserChanges() {
     active: document.getElementById('editActive').checked,
     originalUsername: document.getElementById('editUsername').value
   }});
-  toast('✅ تم الحفظ', 'success');
-  closeModal('userEditModal');
-  await refreshData();
-  renderUsersManagement();
+  toast('✅ تم الحفظ', 'success'); closeModal('userEditModal'); await refreshData(); renderUsersManagement();
 }
+
+// ======================== الطابعة ========================
+function showThermalPrinterModal() { openModal('thermalPrinterModal'); }
 
 async function connectThermalPrinter() {
   const statusDiv = document.getElementById('printerStatus');
@@ -1298,53 +1378,27 @@ async function printLastReceipt() {
   if (!lastSale) return toast('⚠️ لا توجد فواتير', 'error');
   if (State.thermalPort) {
     const writer = State.thermalPort.writable.getWriter();
-    await writer.write(new TextEncoder().encode(`سُكّر 33\n${lastSale.date}\n${lastSale.customer}\n${lastSale.total} ج.م\nشكراً\n\n\n`));
+    const receipt = `سُكّر 33\n${lastSale.date}\n${lastSale.customer}\n${lastSale.total} ج.م\nشكراً\n\n\n`;
+    await writer.write(new TextEncoder().encode(receipt));
     writer.releaseLock();
   }
   toast('🖨️ تم إرسال الطباعة', 'success');
 }
 
-function renderBranchShifts() {
-  const shifts = State.db.shifts.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `
-    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>🕐 الورديات</span></div>
-    <select style="width:100%;padding:12px;border-radius:12px;" onchange="showShiftDetails(this.value)"><option value="">اختر وردية</option>${shifts.map(s => `<option value="${s.id}">${s.openTime} - ${s.status}</option>`).join('')}</select>
-    <div id="shiftDetails" style="margin-top:16px;"></div>
-  `;
-}
-
-function renderBranchStock() {
-  const stock = State.db.stock.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `
-    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📦 المخزون</span></div>
-    <div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${stock.map(s => `<tr><td>${s.item}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div>
-  `;
-}
-
-function renderBranchReports() {
-  const sales = State.db.sales.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `
-    <div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📊 تقارير</span></div>
-    <div class="table-wrapper"><table><thead><tr><th>كود</th><th>عميل</th><th>إجمالي</th></tr></thead><tbody>${sales.slice(0,30).map(s => `<tr><td>${s.saleId}</td><td>${s.customer}</td><td>${money(s.total)} ج</td></tr>`).join('')}</tbody></table></div>
-  `;
-}
-
-function showShiftDetails(shiftId) {
-  if (!shiftId) return;
-  const shift = State.db.shifts.find(s => s.id === shiftId);
-  if (!shift) return;
-  document.getElementById('shiftDetails').innerHTML = `
-    <div style="background:#fdf6f9;padding:16px;border-radius:12px;">
-      <strong>الحالة:</strong> ${shift.status}<br>
-      <strong>إجمالي المبيعات:</strong> ${money(shift.totalSales)} ج<br>
-      <strong>عدد الفواتير:</strong> ${shift.invoicesCount}
-    </div>
-  `;
-}
-
 function viewDeliveryOrder(orderId) {
   toast(`تفاصيل الطلب: ${orderId}`);
 }
+
+// ======================== بدء التشغيل ========================
+window.onload = () => { loadInitialDataForLogin(); };
+setInterval(refreshData, 300000);
+
+document.addEventListener('keydown', (e) => {
+  if (!State.currentUser) return;
+  if (e.key === 'F1') { e.preventDefault(); showSection('pos'); }
+  if (e.key === 'F2' && State.cart.length) { e.preventDefault(); proceedToPayment(); }
+  if (e.key === 'Escape') { document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active')); }
+});
 </script>
 </body>
 </html>
