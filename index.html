@@ -1935,8 +1935,6 @@ function renderAll() {
   const active = document.querySelector('.section.active')?.id?.replace('sec-','') || 'dashboard';
   showSection(active); 
 }
-'''
-
 with open('/mnt/agents/output/sokar_optimized_part2.html', 'w', encoding='utf-8') as f:
     f.write(part2)
 
