@@ -753,7 +753,6 @@
       toast('💰 تم حفظ تقرير الخزنة وإغلاق الوردية', 'success');
     }
         <!-- ========== نقطة البيع (POS) ========== -->
-<script>
 function renderPOS() {
   const cats = ['🍰 الكل', ...new Set(State.db.products.map(p => p.cat).filter(Boolean))];
   document.getElementById('dynamicContent').innerHTML = `
