@@ -36,7 +36,8 @@
             overflow: hidden;
             font-size: 15px;
             word-break: normal;
-            overflow-wrap: break-word;
+            overflow-wrap: normal;
+            hyphens: manual;
         }
         .app-container { display: flex; height: 100vh; overflow: hidden; }
         .sidebar {
@@ -55,6 +56,7 @@
             display: flex; align-items: center; padding: 14px 20px; margin: 6px 12px;
             border-radius: var(--radius-sm); color: var(--text-muted); font-weight: 600;
             gap: 12px; cursor: pointer; transition: 0.2s; font-size: 16px;
+            white-space: nowrap;
         }
         .nav-item:hover, .nav-item.active { background: var(--primary-soft); color: var(--primary); border-right: 4px solid var(--primary); }
         .nav-item i { width: 24px; font-size: 18px; text-align: center; }
@@ -71,7 +73,7 @@
         .breadcrumb span { color: var(--primary); font-weight: 600; }
         .pos-layout { display: flex; gap: 16px; height: calc(100vh - 180px); }
         .col-categories { width: 200px; min-width: 180px; background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); overflow-y: auto; }
-        .category-item { padding: 13px 14px; border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 6px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 15px; }
+        .category-item { padding: 13px 14px; border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 6px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 15px; white-space: nowrap; }
         .category-item:hover, .category-item.active { background: var(--primary-soft); color: var(--primary); }
         .col-products { flex: 1; background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); overflow-y: auto; }
         .search-box { position: relative; margin-bottom: 16px; }
@@ -80,14 +82,14 @@
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 14px; }
         .product-card { background: #fdf6f9; border: 1px solid var(--border); border-radius: 18px; padding: 20px 14px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .product-card:hover { background: var(--primary-soft); border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 8px 25px rgba(184,27,92,0.2); }
-        .product-name { font-weight: 700; margin-bottom: 8px; font-size: 16px; }
-        .product-price { color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+        .product-name { font-weight: 700; margin-bottom: 8px; font-size: 16px; word-break: normal; overflow-wrap: normal; }
+        .product-price { color: var(--primary); font-weight: 700; font-size: 1.2rem; word-break: normal; overflow-wrap: normal; }
         .col-cart { width: 370px; min-width: 340px; background: var(--surface); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
         .cart-header { font-weight: 700; font-size: 1.3rem; margin-bottom: 14px; }
         .cart-items { flex: 1; overflow-y: auto; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed var(--border); gap: 10px; }
-        .cart-item-info .name { font-weight: 700; font-size: 1rem; }
-        .cart-item-info .detail { font-size: 0.9rem; color: var(--text-muted); }
+        .cart-item-info .name { font-weight: 700; font-size: 1rem; word-break: normal; overflow-wrap: normal; }
+        .cart-item-info .detail { font-size: 0.9rem; color: var(--text-muted); word-break: normal; overflow-wrap: normal; }
         .note-badge { font-size: 0.8rem; color: var(--primary); background: var(--primary-soft); padding: 4px 12px; border-radius: 24px; display: inline-block; margin-top: 6px; }
         .cart-item-total { font-weight: 700; color: var(--text); white-space: nowrap; font-size: 1rem; }
         .cart-item-actions i { cursor: pointer; color: var(--text-muted); padding: 6px; font-size: 1rem; }
@@ -135,7 +137,7 @@
         .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: white; }
         table { width: 100%; border-collapse: collapse; }
         th { background: var(--primary-soft); color: var(--primary-dark); padding: 16px 18px; font-weight: 700; font-size: 0.95rem; text-align: right; white-space: nowrap; }
-        td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 0.95rem; word-break: normal; overflow-wrap: normal; }
         tr:hover td { background: #fdf6f9; }
         @media (max-width: 1024px) {
             .sidebar { width: 220px; min-width: 220px; }
@@ -225,7 +227,7 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmeuhURd3TtuFujnfdRQYCfuiuujlD4gAku02yoll30HZZ9a7SQhTL63VQUEteRL_R/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ3reO_j6Kz1hM0dVrm3G8IVOaTtrUFvEgEigIBlePyZTqQ3a55k_wKvGMWOv8KmBUrA/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
@@ -247,7 +249,11 @@ function toast(msg, type='info') {
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 
-const money = n => (Number(n||0)).toFixed(2);
+const money = n => {
+  const val = Number(n);
+  return isNaN(val) ? '0.00' : val.toFixed(2);
+};
+
 const isWeight = p => String(p.unit||'').trim() === 'كيلو';
 
 async function jsonp(action, params={}) {
@@ -478,7 +484,8 @@ function renderProducts() {
     const stock = State.db.stock.find(s => s.branch === State.currentUser?.branch && s.item === p.name);
     const qty = stock ? Number(stock.qty) : 0;
     const isLow = qty < 5;
-    return `<div class="product-card" onclick="askQty('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج${p.unit==='كيلو' ? '/كجم' : ''}</div><div class="stock-badge" style="background:${isLow ? '#ffebee' : '#e6f4ea'}; color:${isLow ? '#c62828' : '#2e7d32'};">${qty} ${isLow ? '⚠️' : '✅'}</div></div>`;
+    const unitLabel = p.unit === 'كيلو' ? '/كجم' : '';
+    return `<div class="product-card" onclick="askQty('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج${unitLabel}</div><div class="stock-badge" style="background:${isLow ? '#ffebee' : '#e6f4ea'}; color:${isLow ? '#c62828' : '#2e7d32'};">${qty} ${isLow ? '⚠️' : '✅'}</div></div>`;
   }).join('');
 }
 
@@ -523,7 +530,7 @@ function clearCart() { State.cart = []; State.currentQROrderId = null; State.dis
 function renderCart() {
   const panel = document.getElementById('cartPanel');
   if (!panel) return;
-  const sub = State.cart.reduce((a,b) => a + b.total, 0);
+  const sub = State.cart.reduce((a,b) => a + (b.total||0), 0);
   const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
   const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
   const total = Math.max(0, sub + fee - disc);
@@ -561,7 +568,7 @@ function proceedToPayment() {
 function confirmCustomerInfo() {
   State.customerData = { name: document.getElementById('customerName').value.trim(), phone: document.getElementById('customerPhone').value.trim(), address: document.getElementById('customerAddress').value.trim() };
   closeModal('customerModal'); openModal('paymentModal');
-  const sub = State.cart.reduce((a,b) => a + b.total, 0);
+  const sub = State.cart.reduce((a,b) => a + (b.total||0), 0);
   const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
   const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
   document.getElementById('paidAmount').value = Math.max(0, sub + fee - disc).toFixed(2);
@@ -573,7 +580,7 @@ async function confirmPayment() {
   const method = document.getElementById('paymentMethod').value;
   const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
   const notes = document.getElementById('paymentNotes').value;
-  const sub = State.cart.reduce((a,b) => a + b.total, 0);
+  const sub = State.cart.reduce((a,b) => a + (b.total||0), 0);
   const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
   const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
   const total = Math.max(0, sub + fee - disc);
@@ -665,7 +672,7 @@ async function loadCustomerData() {
 
 async function createQROrder() {
   if (!State.cart.length) return toast('⚠️ السلة فارغة', 'error');
-  const sub = State.cart.reduce((a,b) => a + b.total, 0);
+  const sub = State.cart.reduce((a,b) => a + (b.total||0), 0);
   const fee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
   const disc = parseFloat(document.getElementById('discountVal')?.value) || 0;
   const total = Math.max(0, sub + fee - disc);
