@@ -906,8 +906,7 @@ function renderCrmCart() {
   if (list) list.innerHTML = State.crmCart.length ? State.crmCart.map((i,idx) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border);"><span>${i.name} ×${i.qty}</span><span>${money(i.total)} ج <i class="fas fa-trash" style="color:#d32f2f;cursor:pointer;" onclick="State.crmCart.splice(${idx},1);renderCrmCart();"></i></span></div>`).join('') : '<div style="text-align:center;padding:20px;color:var(--text-muted);">🛒 السلة فارغة</div>';
   document.getElementById('crmTotal').textContent = money(total);
 }
-
-async async function saveCrmOrderFromCart() {
+async function saveCrmOrderFromCart()
   const branch = document.getElementById('crmTargetBranch').value;
   if (!branch) return toast('⚠️ اختر فرع التوصيل', 'error');
   if (!State.crmCart.length) return toast('⚠️ أضف أصناف للطلب', 'error');
