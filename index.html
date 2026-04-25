@@ -227,7 +227,7 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3pCI4fqGBx_SduudJYfB7wnOA28taBx174D1nGN6CdAZKJ5I4tA-2MpxuvWrVhxseqA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2wx6uzCv1PnpUhCZKsoOMr9Yp9IDxr082ytn5pMpXpN81s0HciSz_CmSBk9pLgJBbwQ/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
@@ -411,22 +411,65 @@ function loadCurrentShift() {
   if (el) el.textContent = State.currentShift ? '🟢 وردية مفتوحة' : '⚪ لا توجد وردية';
 }
 
+// ========== الورديات ==========
 function showShiftModal() {
   const info = document.getElementById('shiftInfo');
   const actions = document.getElementById('shiftActions');
   if (State.currentShift) {
-    info.innerHTML = `<div style="background:#e6f4ea;padding:18px;border-radius:14px;">🟢 مفتوحة<br>🕐 ${State.currentShift.openTime}<br>💰 ${money(State.currentShift.totalSales)} ج</div>`;
-    actions.innerHTML = `<button class="btn btn-danger" onclick="showShiftCashReport()">🔒 إغلاق مع تقرير</button>`;
+    info.innerHTML = `<div style="background:#e8f5e9;padding:18px;border-radius:14px;text-align:center;">
+      <span style="font-size:24px;">🟢</span>
+      <p style="font-weight:700;color:#2e7d32;">الوردية مفتوحة</p>
+      <p style="font-size:0.85rem;">🕐 ${State.currentShift.openTime}</p>
+      <p style="font-weight:700;">💰 ${money(State.currentShift.totalSales)} ج</p>
+    </div>`;
+    actions.innerHTML = `<button class="btn btn-danger btn-block" onclick="showShiftCashReport()"><i class="fas fa-lock"></i> 🔒 إغلاق مع تقرير</button>`;
   } else {
-    info.innerHTML = `<p>⚪ لا توجد وردية</p>`;
-    actions.innerHTML = `<button class="btn btn-primary btn-block" onclick="openShift()">🔓 فتح وردية</button>`;
+    info.innerHTML = `<div style="background:#fff3e0;padding:18px;border-radius:14px;text-align:center;">
+      <span style="font-size:24px;">⚪</span>
+      <p style="color:#e65100;font-weight:700;">لا توجد وردية مفتوحة</p>
+      <p style="font-size:0.85rem;color:var(--text-muted);">يجب فتح وردية قبل البدء في البيع</p>
+    </div>`;
+    actions.innerHTML = `<button class="btn btn-primary btn-block" onclick="openShift()"><i class="fas fa-play"></i> 🔓 فتح وردية جديدة</button>`;
   }
   openModal('shiftModal');
 }
 
 async function openShift() {
-  await postForm('openShift', { branch: State.currentUser.branch, cashier: State.currentUser.branch });
-  await refreshData(); closeModal('shiftModal'); toast('✅ تم فتح الوردية', 'success');
+  const actions = document.getElementById('shiftActions');
+  actions.innerHTML = '<div class="spinner"></div><p style="text-align:center;">⏳ جاري فتح الوردية...</p>';
+  try {
+    const res = await postForm('openShift', { branch: State.currentUser.branch, cashier: State.currentUser.branch });
+    await refreshData();
+    closeModal('shiftModal');
+    showShiftSuccessModal(res.shiftId);
+  } catch(e) {
+    toast('❌ ' + e.message, 'error');
+    showShiftModal();
+  }
+}
+
+function showShiftSuccessModal(shiftId) {
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'shiftSuccessModal';
+  modal.innerHTML = `
+    <div class="modal-card" style="text-align:center;max-width:380px;">
+      <div style="font-size:64px;margin-bottom:16px;">🔓</div>
+      <h3 style="color:#2e7d32;margin-bottom:8px;">تم فتح الوردية بنجاح</h3>
+      <p style="color:var(--text-muted);margin-bottom:8px;">🕐 ${new Date().toLocaleString('ar-EG')}</p>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">كود الوردية: ${shiftId}</p>
+      <div style="background:#e8f5e9;padding:14px;border-radius:12px;margin-bottom:18px;">
+        <span style="color:#2e7d32;font-weight:700;">🟢 الوردية مفتوحة الآن</span>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="closeShiftSuccess()"><i class="fas fa-check"></i> متابعة العمل</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function closeShiftSuccess() {
+  const modal = document.getElementById('shiftSuccessModal');
+  if (modal) modal.remove();
+  loadCurrentShift();
 }
 
 async function closeShiftConfirmed() {
@@ -450,6 +493,7 @@ async function saveShiftCash() {
   toast('💰 تم حفظ تقرير الخزنة', 'success');
 }
 
+// ========== نقطة البيع ==========
 function getCategories() {
   const activeProducts = State.db.products.filter(p => p.active !== false);
   const cats = activeProducts.map(p => p.cat).filter(Boolean);
@@ -461,7 +505,7 @@ function renderPOS() {
   document.getElementById('dynamicContent').innerHTML = `
     <div class="breadcrumb">🍭 الرئيسية » <span>نقطة البيع</span></div>
     <div class="pos-layout">
-      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? '🍰 الكل' : c}</div>`).join('')}</div>
+      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')">${c==='الكل' ? '🍰 الكل' : c}</div>`).join('')}</div>
       <div class="col-products"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="🔍 بحث في الحلويات..." oninput="renderProducts()"></div><div class="products-grid" id="productsGrid"></div></div>
       <div class="col-cart" id="cartPanel"></div>
     </div>`;
@@ -545,7 +589,7 @@ function renderCart() {
         <button class="btn btn-outline btn-sm" onclick="clearCart()"><i class="fas fa-trash"></i> مسح</button>
         <button class="btn btn-outline btn-sm" onclick="parkCurrentOrder()"><i class="fas fa-pause"></i> تعليق</button>
         <button class="btn btn-outline btn-sm" onclick="loadParkedOrders()"><i class="fas fa-list"></i> معلقة</button>
-        ${State.currentUser?.pointType==='مندوب_بيع' ? `<button class="btn btn-primary btn-sm" onclick="createQROrder()"><i class="fas fa-qrcode"></i> QR</button>` : ''}
+        ${State.currentUser?.pointType==='مندوب_بيع' ? `<button class="btn btn-primary btn-sm" onclick="createQROrder()"><i class="fas fa-qrcode"></i> تسجيل الأوردر</button>` : ''}
         ${['كاشير','دليفري','مندوب_بيع'].includes(State.currentUser?.pointType) ? `<button class="btn btn-outline btn-sm" onclick="openQRScanner()"><i class="fas fa-camera"></i> مسح</button>` : ''}
         <button class="btn btn-outline btn-sm" onclick="showShiftModal()"><i class="fas fa-clock"></i> وردية</button>
         <button class="btn btn-outline btn-sm" onclick="showThermalPrinterModal()"><i class="fas fa-print"></i> طباعة</button>
@@ -668,6 +712,7 @@ async function loadCustomerData() {
   } catch(e) {}
 }
 
+// ========== QR (مندوب البيع) ==========
 async function createQROrder() {
   if (!State.cart.length) return toast('⚠️ السلة فارغة', 'error');
   const sub = State.cart.reduce((a,b) => a + (b.total||0), 0);
@@ -677,11 +722,42 @@ async function createQROrder() {
   try {
     const res = await postForm('createQROrder', { order: { branch: State.currentUser.branch, creator: State.currentUser.branch, items: State.cart, subtotal: sub, discount: disc, delivery: fee, total }});
     const orderId = res.orderId || 'QR-' + Date.now().toString(36);
-    document.getElementById('qrOrderId').textContent = orderId;
-    const container = document.getElementById('qrCodeContainer'); container.innerHTML = '';
-    QRCode.toCanvas(document.createElement('canvas'), orderId, { width: 240, margin: 2 }, (err, canvas) => { if (!err) { canvas.style.borderRadius = '16px'; container.appendChild(canvas); } });
-    openModal('qrModal'); toast('📱 تم إنشاء رمز QR', 'success');
-  } catch(e) { toast(e.message, 'error'); }
+    State.currentQROrderId = orderId;
+    showQRChoiceModal(orderId);
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+}
+
+function showQRChoiceModal(orderId) {
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'qrChoiceModal';
+  modal.innerHTML = `
+    <div class="modal-card" style="text-align:center;max-width:400px;">
+      <div class="modal-header" style="justify-content:center;"><i class="fas fa-qrcode"></i><h3>📱 تسجيل الأوردر</h3></div>
+      <p style="margin-bottom:8px;font-weight:700;color:var(--primary);">${orderId}</p>
+      <p style="color:var(--text-muted);margin-bottom:20px;">تم تسجيل الأوردر بنجاح</p>
+      <div id="qrCodeContainer" style="margin:0 auto 16px;display:inline-block;"></div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn btn-outline btn-sm" onclick="closeQRChoice()"><i class="fas fa-times"></i> إلغاء</button>
+        <button class="btn btn-primary btn-sm" onclick="printQRCode()"><i class="fas fa-print"></i> طباعة الباركود</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  const container = modal.querySelector('#qrCodeContainer');
+  QRCode.toCanvas(document.createElement('canvas'), orderId, { width: 200, margin: 2 }, (err, canvas) => { if (!err) { canvas.style.borderRadius = '12px'; container.appendChild(canvas); } });
+}
+
+function closeQRChoice() { const modal = document.getElementById('qrChoiceModal'); if (modal) modal.remove(); clearCart(); }
+
+function printQRCode() {
+  const container = document.getElementById('qrChoiceModal')?.querySelector('#qrCodeContainer');
+  if (!container) return;
+  const canvas = container.querySelector('canvas');
+  if (!canvas) return;
+  const win = window.open('', '_blank', 'width=400,height=500');
+  win.document.write(`<html dir="rtl"><head><title>QR Code - ${State.currentQROrderId}</title><style>body{text-align:center;padding:20px;font-family:'Cairo',sans-serif;}h2{color:#b81b5c;}@media print{body{padding:0;}}</style></head><body><h2>🍬 سُكّر 33</h2><p style="font-size:18px;font-weight:700;">${State.currentQROrderId}</p><img src="${canvas.toDataURL()}"><p style="margin-top:20px;">برمجة م/ محمود سلامة</p><script>window.onload=function(){window.print();}<` + `/script></body></html>`);
+  win.document.close();
+  setTimeout(() => { closeQRChoice(); toast('🖨️ تم طباعة الباركود', 'success'); }, 1000);
 }
 
 function openQRScanner() {
@@ -735,10 +811,14 @@ function renderCRM() {
       <div style="width:370px;min-width:300px;background:white;border-radius:16px;padding:20px;box-shadow:var(--shadow);">
         <h3 style="margin-bottom:16px;"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> طلب جديد</h3>
         <div class="form-group"><input id="crmCustomer" placeholder="👤 اسم العميل"></div>
-        <div class="form-group"><input id="crmPhone" placeholder="📞 رقم الهاتف"></div>
+        <div class="form-group"><input id="crmPhone" placeholder="📞 رقم الهاتف" onblur="loadCrmCustomerData()"></div>
         <div class="form-group" style="position:relative;">
           <input id="crmAddress" placeholder="📍 العنوان" oninput="crmSearchAddress()">
           <div id="crmAddressSuggestions" class="hidden" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;z-index:10;"></div>
+        </div>
+        <div class="form-group">
+          <label>🚚 رسوم التوصيل</label>
+          <input id="crmDeliveryFee" type="number" min="0" step="0.5" value="0" placeholder="رسوم التوصيل (ج.م)">
         </div>
         <div class="form-group">
           <select id="crmTargetBranch" onchange="loadCrmStock()">
@@ -761,14 +841,26 @@ function renderCRM() {
   renderCrmCats(); renderCrmProducts(); renderCrmCart();
 }
 
+async function loadCrmCustomerData() {
+  const phone = document.getElementById('crmPhone')?.value.trim();
+  if (!phone || phone.length < 5) return;
+  try {
+    const res = await jsonp('getCustomerByPhone', { phone });
+    if (res.ok && res.customer) {
+      if (document.getElementById('crmCustomer') && !document.getElementById('crmCustomer').value) {
+        document.getElementById('crmCustomer').value = res.customer.name || '';
+      }
+      if (document.getElementById('crmAddress') && !document.getElementById('crmAddress').value) {
+        document.getElementById('crmAddress').value = res.customer.address || '';
+      }
+      toast('✅ تم تحميل بيانات العميل', 'success');
+    }
+  } catch(e) {}
+}
+
 async function loadCrmStock() {
   const branch = document.getElementById('crmTargetBranch').value;
-  if (!branch) {
-    document.getElementById('crmStockInfo').style.display = 'none';
-    State.crmCurrentBranchStock = [];
-    renderCrmProducts();
-    return;
-  }
+  if (!branch) { document.getElementById('crmStockInfo').style.display = 'none'; State.crmCurrentBranchStock = []; renderCrmProducts(); return; }
   try {
     const res = await jsonp('getStockByBranch', { branch });
     const stock = res.stock || [];
@@ -777,15 +869,12 @@ async function loadCrmStock() {
     infoDiv.style.display = 'block';
     infoDiv.innerHTML = `<i class="fas fa-boxes"></i> مخزون ${branch}: ` + (stock.length ? stock.map(s => `<span style="margin:0 4px;font-weight:600;">${s.item}: ${s.qty}</span>`).join(' | ') : 'لا يوجد مخزون');
     renderCrmProducts();
-  } catch(e) {
-    State.crmCurrentBranchStock = [];
-    renderCrmProducts();
-  }
+  } catch(e) { State.crmCurrentBranchStock = []; renderCrmProducts(); }
 }
 
 function renderCrmCats() {
   const cats = getCategories();
-  document.getElementById('crmCats').innerHTML = cats.map(c => `<span class="category-item ${State.crmCurrentCat===c?'active':''}" onclick="State.crmCurrentCat='${c}';renderCrmCats();renderCrmProducts();" style="font-size:0.85rem;padding:8px 14px;">${c}</span>`).join('');
+  document.getElementById('crmCats').innerHTML = cats.map(c => `<span class="category-item ${State.crmCurrentCat===c?'active':''}" onclick="State.crmCurrentCat='${c}';renderCrmCats();renderCrmProducts();" style="font-size:0.85rem;padding:8px 14px;">${c==='الكل' ? '🍰 الكل' : c}</span>`).join('');
 }
 
 function renderCrmProducts() {
@@ -795,21 +884,12 @@ function renderCrmProducts() {
   if (q) list = list.filter(p => p.name.includes(q));
   const grid = document.getElementById('crmProductsGrid');
   if (!grid) return;
-  if (!list.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>';
-    return;
-  }
+  if (!list.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>'; return; }
   grid.innerHTML = list.map(p => {
     const stockItem = State.crmCurrentBranchStock.find(s => s.item === p.name);
     const qty = stockItem ? stockItem.qty : 0;
     const inStock = qty > 0;
-    return `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')">
-      <div class="product-name">🍪 ${p.name}</div>
-      <div class="product-price">${money(p.price)} ج</div>
-      <div class="stock-badge" style="background:${inStock ? '#e6f4ea' : '#ffebee'}; color:${inStock ? '#2e7d32' : '#c62828'};">
-        ${inStock ? `✅ متوفر (${qty})` : '❌ غير متوفر'}
-      </div>
-    </div>`;
+    return `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج</div><div class="stock-badge" style="background:${inStock ? '#e6f4ea' : '#ffebee'}; color:${inStock ? '#2e7d32' : '#c62828'};">${inStock ? `✅ متوفر (${qty})` : '❌ غير متوفر'}</div></div>`;
   }).join('');
 }
 
@@ -831,8 +911,24 @@ async function saveCrmOrderFromCart() {
   const branch = document.getElementById('crmTargetBranch').value;
   if (!branch) return toast('⚠️ اختر فرع التوصيل', 'error');
   if (!State.crmCart.length) return toast('⚠️ أضف أصناف للطلب', 'error');
-  const order = { branch, customer: document.getElementById('crmCustomer').value || 'عميل', phone: document.getElementById('crmPhone').value || '', address: document.getElementById('crmAddress').value || '', itemsJson: JSON.stringify(State.crmCart), total: State.crmCart.reduce((a,b) => a + (b.total||0), 0), notes: document.getElementById('crmNotes').value || '', createdBy: State.currentUser.branch };
-  try { await postForm('saveCrmOrder', { order }); toast('📤 تم إرسال الطلب للدليفري', 'success'); State.crmCart = []; renderCRM(); } catch(e) { toast('❌ ' + e.message, 'error'); }
+  const deliveryFee = parseFloat(document.getElementById('crmDeliveryFee')?.value) || 0;
+  const order = {
+    branch,
+    customer: document.getElementById('crmCustomer').value || 'عميل',
+    phone: document.getElementById('crmPhone').value || '',
+    address: document.getElementById('crmAddress').value || '',
+    itemsJson: JSON.stringify(State.crmCart),
+    total: State.crmCart.reduce((a,b) => a + (b.total||0), 0) + deliveryFee,
+    notes: document.getElementById('crmNotes').value || '',
+    createdBy: State.currentUser.branch,
+    deliveryFee: deliveryFee
+  };
+  try {
+    await postForm('saveCrmOrder', { order });
+    toast('📤 تم إرسال الطلب للدليفري', 'success');
+    State.crmCart = [];
+    renderCRM();
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
 }
 
 function crmSearchAddress() {
@@ -845,86 +941,36 @@ function crmSearchAddress() {
   }).catch(() => {});
 }
 
-function selectCrmAddress(addr, fee) { document.getElementById('crmAddress').value = addr; document.getElementById('crmAddressSuggestions').classList.add('hidden'); }
+function selectCrmAddress(addr, fee) {
+  document.getElementById('crmAddress').value = addr;
+  document.getElementById('crmAddressSuggestions').classList.add('hidden');
+  document.getElementById('crmDeliveryFee').value = fee;
+}
 
 // ========== متابعة الأوردرات (خدمة العملاء) ==========
 async function renderCrmOrdersTracking() {
   const dc = document.getElementById('dynamicContent');
   dc.innerHTML = `<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse" style="font-size:40px;color:var(--primary);"></i><p>📋 جاري تحميل الأوردرات...</p></div>`;
-  
   try {
     const res = await jsonp('getCrmOrdersForTracking', { username: State.currentUser.branch });
     const orders = res.orders || [];
-    
     if (!orders.length) {
-      dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
-        <div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>📋 لا توجد أوردرات مرسلة</h3><p>لم تقم بإرسال أي طلب للفروع بعد</p></div>`;
+      dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div><div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>📋 لا توجد أوردرات مرسلة</h3><p>لم تقم بإرسال أي طلب للفروع بعد</p></div>`;
       return;
     }
-    
-    dc.innerHTML = `
-      <div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>كود الطلب</th><th>العميل</th><th>الهاتف</th><th>الفرع</th><th>الحالة</th><th>الإجمالي</th><th>التاريخ</th><th>عرض</th></tr></thead>
-          <tbody>
-            ${orders.map(o => `
-              <tr>
-                <td><strong>${o.id}</strong></td>
-                <td>${o.customer}</td>
-                <td>${o.phone || '-'}</td>
-                <td>${o.branch}</td>
-                <td><span style="background:${o.status==='جديد'?'#e3f2fd':o.status==='تم الاستلام'?'#fff3e0':o.status==='جاري التحضير'?'#fce4ec':o.status==='خرج للتوصيل'?'#e8f5e9':o.status==='مكتمل'?'#e0f2f1':'#fafafa'};padding:4px 12px;border-radius:20px;font-weight:600;">${o.status}</span></td>
-                <td style="font-weight:700;color:var(--primary);">${money(o.total)} ج.م</td>
-                <td>${o.date}</td>
-                <td><button class="btn btn-outline btn-sm" onclick="renderCrmOrderDetail('${o.id}')"><i class="fas fa-eye"></i> تفاصيل</button></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  } catch(e) {
-    dc.innerHTML = `<div style="color:#d32f2f;text-align:center;padding:40px;">⚠️ خطأ: ${e.message}</div>`;
-  }
+    dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div><div class="table-wrapper"><table><thead><tr><th>كود الطلب</th><th>العميل</th><th>الهاتف</th><th>الفرع</th><th>الحالة</th><th>الإجمالي</th><th>التاريخ</th><th>عرض</th></tr></thead><tbody>${orders.map(o => `<tr><td><strong>${o.id}</strong></td><td>${o.customer}</td><td>${o.phone || '-'}</td><td>${o.branch}</td><td><span style="background:${o.status==='جديد'?'#e3f2fd':o.status==='تم الاستلام'?'#fff3e0':o.status==='جاري التحضير'?'#fce4ec':o.status==='خرج للتوصيل'?'#e8f5e9':o.status==='مكتمل'?'#e0f2f1':'#fafafa'};padding:4px 12px;border-radius:20px;font-weight:600;">${o.status}</span></td><td style="font-weight:700;color:var(--primary);">${money(o.total)} ج.م</td><td>${o.date}</td><td><button class="btn btn-outline btn-sm" onclick="renderCrmOrderDetail('${o.id}')"><i class="fas fa-eye"></i> تفاصيل</button></td></tr>`).join('')}</tbody></table></div>`;
+  } catch(e) { dc.innerHTML = `<div style="color:#d32f2f;text-align:center;padding:40px;">⚠️ خطأ: ${e.message}</div>`; }
 }
 
 function renderCrmOrderDetail(orderId) {
   const order = State.db.crmOrders.find(o => o.id === orderId);
   if (!order) return toast('⚠️ الطلب غير موجود', 'error');
-  
   let items = [];
   try { items = JSON.parse(order.itemsJson || '[]'); } catch(e) {}
-  
-  document.getElementById('dynamicContent').innerHTML = `
-    <div class="breadcrumb">🍭 الرئيسية » 📋 متابعة » <span>${order.id}</span></div>
-    <div style="max-width:700px;margin:0 auto;">
-      <div style="background:white;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
-        <h2 style="color:var(--primary);margin-bottom:20px;"><i class="fas fa-receipt"></i> تفاصيل الطلب</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-          <div><strong>الكود:</strong> ${order.id}</div>
-          <div><strong>التاريخ:</strong> ${order.date}</div>
-          <div><strong>العميل:</strong> ${order.customer}</div>
-          <div><strong>الهاتف:</strong> ${order.phone || '-'}</div>
-          <div><strong>الفرع:</strong> ${order.branch}</div>
-          <div><strong>الحالة:</strong> <span style="color:var(--primary);font-weight:700;">${order.status}</span></div>
-        </div>
-        ${order.address ? `<div style="margin-bottom:16px;"><strong>📍 العنوان:</strong> ${order.address}</div>` : ''}
-        ${order.notes ? `<div style="margin-bottom:16px;background:var(--accent-soft);padding:12px;border-radius:8px;"><strong>📝 ملاحظات:</strong> ${order.notes}</div>` : ''}
-        <hr style="border-color:var(--border);margin:16px 0;">
-        <h3>🍰 الأصناف:</h3>
-        <div class="table-wrapper" style="margin-top:12px;">
-          <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
-          <tbody>
-            ${items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${money(i.price)} ج</td><td>${money(i.total)} ج</td></tr>`).join('')}
-          </tbody>
-        </div>
-        <div style="text-align:left;font-size:1.4rem;font-weight:800;color:var(--primary);margin-top:16px;">🧾 الإجمالي: ${money(order.total)} ج.م</div>
-      </div>
-      <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="renderCrmOrdersTracking()"><i class="fas fa-arrow-right"></i> رجوع للقائمة</button>
-    </div>`;
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » 📋 متابعة » <span>${order.id}</span></div><div style="max-width:700px;margin:0 auto;"><div style="background:white;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);"><h2 style="color:var(--primary);margin-bottom:20px;"><i class="fas fa-receipt"></i> تفاصيل الطلب</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;"><div><strong>الكود:</strong> ${order.id}</div><div><strong>التاريخ:</strong> ${order.date}</div><div><strong>العميل:</strong> ${order.customer}</div><div><strong>الهاتف:</strong> ${order.phone || '-'}</div><div><strong>الفرع:</strong> ${order.branch}</div><div><strong>الحالة:</strong> <span style="color:var(--primary);font-weight:700;">${order.status}</span></div></div>${order.address ? `<div style="margin-bottom:16px;"><strong>📍 العنوان:</strong> ${order.address}</div>` : ''}${order.notes ? `<div style="margin-bottom:16px;background:var(--accent-soft);padding:12px;border-radius:8px;"><strong>📝 ملاحظات:</strong> ${order.notes}</div>` : ''}<hr style="border-color:var(--border);margin:16px 0;"><h3>🍰 الأصناف:</h3><div class="table-wrapper" style="margin-top:12px;"><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${money(i.price)} ج</td><td>${money(i.total)} ج</td></tr>`).join('')}</tbody></table></div><div style="text-align:left;font-size:1.4rem;font-weight:800;color:var(--primary);margin-top:16px;">🧾 الإجمالي: ${money(order.total)} ج.م</div></div><button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="renderCrmOrdersTracking()"><i class="fas fa-arrow-right"></i> رجوع للقائمة</button></div>`;
 }
 
-// ========== التوصيل (دليفري) ==========
+// ========== التوصيل ==========
 async function renderDelivery() {
   try {
     const res = await jsonp('getDeliveryOrders', { username: State.currentUser.branch, branch: State.currentUser.branch });
@@ -947,45 +993,56 @@ function startDeliveryPolling() {
 
 function viewDeliveryOrder(orderId) { toast(`تفاصيل الطلب: ${orderId}`); }
 
-// ========== الإدارة ==========
-function renderAdminMonitor() {
-  const users = State.db.users.filter(u => u.active);
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>🌐 مراقبة الفروع</span></div><div class="branch-grid">${users.map(u => `<div class="branch-card" onclick="State.selectedBranch='${u.branch}';showSection('branch-detail');"><div class="branch-card-header"><span class="status-dot"></span> ${u.branch}</div><div class="branch-card-body"><i class="fas fa-user"></i> ${u.username}<br><i class="fas fa-phone"></i> ${u.phone||''}</div></div>`).join('')}</div>`;
-}
-
-function renderBranchDetail() {
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » 🌐 مراقبة » <span>${State.selectedBranch}</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="showSection('branch-shifts')"><i class="fas fa-clock"></i> الورديات</button><button class="btn btn-outline" onclick="showSection('branch-stock')"><i class="fas fa-boxes"></i> المخزون</button><button class="btn btn-outline" onclick="showSection('branch-reports')"><i class="fas fa-chart-bar"></i> تقرير المبيعات</button><button class="btn btn-outline" onclick="State.selectedBranch=null;showSection('admin-monitor');"><i class="fas fa-arrow-right"></i> رجوع</button></div>`;
-}
-
-function renderBranchShifts() {
-  const shifts = State.db.shifts.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>🕐 الورديات</span></div><select style="width:100%;padding:12px;border-radius:12px;" onchange="showShiftDetails(this.value)"><option value="">اختر وردية</option>${shifts.map(s => `<option value="${s.id}">${s.openTime} - ${s.status}</option>`).join('')}</select><div id="shiftDetails" style="margin-top:16px;"></div>`;
-}
-
-function showShiftDetails(shiftId) {
-  if (!shiftId) return; const shift = State.db.shifts.find(s => s.id === shiftId); if (!shift) return;
-  document.getElementById('shiftDetails').innerHTML = `<div style="background:#fdf6f9;padding:16px;border-radius:12px;"><strong>الحالة:</strong> ${shift.status}<br><strong>إجمالي المبيعات:</strong> ${money(shift.totalSales)} ج<br><strong>عدد الفواتير:</strong> ${shift.invoicesCount}</div>`;
-}
-
-function renderBranchStock() {
-  const stock = State.db.stock.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📦 المخزون</span></div><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${stock.map(s => `<tr><td>${s.item}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div>`;
-}
-
-function renderBranchReports() {
-  const sales = State.db.sales.filter(s => s.branch === State.selectedBranch);
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📊 تقارير</span></div><div class="table-wrapper"><table><thead><tr><th>كود</th><th>عميل</th><th>إجمالي</th></tr></thead><tbody>${sales.slice(0,30).map(s => `<tr><td>${s.saleId}</td><td>${s.customer}</td><td>${money(s.total)} ج</td></tr>`).join('')}</tbody></table></div>`;
-}
-
+// ========== المخزون ==========
 function renderStock() {
   const stock = State.db.stock.filter(s => s.branch === State.currentUser.branch);
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📦 المخزون</span></div><button class="btn btn-primary" onclick="addStockItem()">➕ إضافة مخزون</button><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${stock.map(s => `<tr><td>${s.item}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div>`;
+  const products = State.db.products.filter(p => p.active !== false);
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 الرئيسية » <span>📦 المخزون</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:300px;">
+        <h3 style="margin-bottom:16px;"><i class="fas fa-boxes"></i> المخزون الحالي</h3>
+        <div class="table-wrapper">
+          <table><thead><tr><th>الصنف</th><th>الرصيد</th><th>حذف</th></tr></thead>
+            <tbody>${stock.length ? stock.map(s => `<tr><td>${s.item}</td><td><input type="number" value="${s.qty}" onchange="updateStockItem('${s.item.replace(/'/g, "\\'")}', this.value)" style="width:80px;padding:6px;border-radius:8px;border:1px solid var(--border);text-align:center;"></td><td><button class="btn btn-outline btn-sm" onclick="deleteStockItem('${s.item.replace(/'/g, "\\'")}')" style="color:#d32f2f;"><i class="fas fa-trash"></i></button></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;">لا يوجد مخزون</td></tr>'}</tbody></table>
+        </div>
+      </div>
+      <div style="width:350px;min-width:300px;">
+        <h3 style="margin-bottom:16px;"><i class="fas fa-plus-circle"></i> إضافة منتج للمخزون</h3>
+        <div class="form-group">
+          <label>اختر المنتج</label>
+          <select id="stockProductSelect">
+            <option value="">اختر منتج...</option>
+            ${products.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>الكمية</label>
+          <input id="stockQtyInput" type="number" min="0" value="1" step="1">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addStockFromForm()"><i class="fas fa-plus"></i> إضافة للمخزون</button>
+      </div>
+    </div>`;
 }
 
-async function addStockItem() {
-  const item = prompt('اسم الصنف:'); if (!item) return;
-  const qty = parseFloat(prompt('الكمية:')); if (isNaN(qty) || qty < 0) return;
-  await postForm('updateStock', { branch: State.currentUser.branch, item, qty }); await refreshData(); renderStock(); toast('✅ تم تحديث المخزون', 'success');
+async function updateStockItem(item, qty) {
+  await postForm('updateStock', { branch: State.currentUser.branch, item, qty: parseFloat(qty)||0 });
+  toast('✅ تم تحديث المخزون', 'success');
+}
+
+async function deleteStockItem(item) {
+  if (!confirm(`حذف "${item}" من المخزون؟`)) return;
+  await postForm('updateStock', { branch: State.currentUser.branch, item, qty: 0 });
+  await refreshData(); renderStock(); toast('🗑️ تم حذف المخزون', 'success');
+}
+
+async function addStockFromForm() {
+  const item = document.getElementById('stockProductSelect').value;
+  const qty = parseFloat(document.getElementById('stockQtyInput').value) || 0;
+  if (!item) return toast('⚠️ اختر منتج', 'error');
+  if (qty <= 0) return toast('⚠️ الكمية غير صحيحة', 'error');
+  await postForm('updateStock', { branch: State.currentUser.branch, item, qty });
+  await refreshData(); renderStock(); toast('✅ تم إضافة المخزون', 'success');
 }
 
 function renderReports() {
@@ -1117,6 +1174,35 @@ async function saveUserChanges() {
   toast('✅ تم الحفظ', 'success'); closeModal('userEditModal'); await refreshData(); renderUsersManagement();
 }
 
+function renderAdminMonitor() {
+  const users = State.db.users.filter(u => u.active);
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>🌐 مراقبة الفروع</span></div><div class="branch-grid">${users.map(u => `<div class="branch-card" onclick="State.selectedBranch='${u.branch}';showSection('branch-detail');"><div class="branch-card-header"><span class="status-dot"></span> ${u.branch}</div><div class="branch-card-body"><i class="fas fa-user"></i> ${u.username}<br><i class="fas fa-phone"></i> ${u.phone||''}</div></div>`).join('')}</div>`;
+}
+
+function renderBranchDetail() {
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » 🌐 مراقبة » <span>${State.selectedBranch}</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="showSection('branch-shifts')"><i class="fas fa-clock"></i> الورديات</button><button class="btn btn-outline" onclick="showSection('branch-stock')"><i class="fas fa-boxes"></i> المخزون</button><button class="btn btn-outline" onclick="showSection('branch-reports')"><i class="fas fa-chart-bar"></i> تقرير المبيعات</button><button class="btn btn-outline" onclick="State.selectedBranch=null;showSection('admin-monitor');"><i class="fas fa-arrow-right"></i> رجوع</button></div>`;
+}
+
+function renderBranchShifts() {
+  const shifts = State.db.shifts.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>🕐 الورديات</span></div><select style="width:100%;padding:12px;border-radius:12px;" onchange="showShiftDetails(this.value)"><option value="">اختر وردية</option>${shifts.map(s => `<option value="${s.id}">${s.openTime} - ${s.status}</option>`).join('')}</select><div id="shiftDetails" style="margin-top:16px;"></div>`;
+}
+
+function showShiftDetails(shiftId) {
+  if (!shiftId) return; const shift = State.db.shifts.find(s => s.id === shiftId); if (!shift) return;
+  document.getElementById('shiftDetails').innerHTML = `<div style="background:#fdf6f9;padding:16px;border-radius:12px;"><strong>الحالة:</strong> ${shift.status}<br><strong>إجمالي المبيعات:</strong> ${money(shift.totalSales)} ج<br><strong>عدد الفواتير:</strong> ${shift.invoicesCount}</div>`;
+}
+
+function renderBranchStock() {
+  const stock = State.db.stock.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📦 المخزون</span></div><div class="table-wrapper"><table><thead><tr><th>الصنف</th><th>الرصيد</th></tr></thead><tbody>${stock.map(s => `<tr><td>${s.item}</td><td>${s.qty}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function renderBranchReports() {
+  const sales = State.db.sales.filter(s => s.branch === State.selectedBranch);
+  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 ${State.selectedBranch} » <span>📊 تقارير</span></div><div class="table-wrapper"><table><thead><tr><th>كود</th><th>عميل</th><th>إجمالي</th></tr></thead><tbody>${sales.slice(0,30).map(s => `<tr><td>${s.saleId}</td><td>${s.customer}</td><td>${money(s.total)} ج</td></tr>`).join('')}</tbody></table></div>`;
+}
+
 function showThermalPrinterModal() { openModal('thermalPrinterModal'); }
 
 async function connectThermalPrinter() {
@@ -1135,82 +1221,6 @@ async function printLastReceipt() {
 
 window.onload = () => { loadInitialDataForLogin(); };
 setInterval(refreshData, 300000);
-    // ========== متابعة الأوردرات (خدمة العملاء) ==========
-async function renderCrmOrdersTracking() {
-  const dc = document.getElementById('dynamicContent');
-  dc.innerHTML = `<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse" style="font-size:40px;color:var(--primary);"></i><p>📋 جاري تحميل الأوردرات...</p></div>`;
-  
-  try {
-    const res = await jsonp('getCrmOrdersForTracking', { username: State.currentUser.branch });
-    const orders = res.orders || [];
-    
-    if (!orders.length) {
-      dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
-        <div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>📋 لا توجد أوردرات مرسلة</h3><p>لم تقم بإرسال أي طلب للفروع بعد</p></div>`;
-      return;
-    }
-    
-    dc.innerHTML = `
-      <div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>كود الطلب</th><th>العميل</th><th>الهاتف</th><th>الفرع</th><th>الحالة</th><th>الإجمالي</th><th>التاريخ</th><th>عرض</th></tr></thead>
-          <tbody>
-            ${orders.map(o => `
-              <tr>
-                <td><strong>${o.id}</strong></td>
-                <td>${o.customer}</td>
-                <td>${o.phone || '-'}</td>
-                <td>${o.branch}</td>
-                <td><span style="background:${o.status==='جديد'?'#e3f2fd':o.status==='تم الاستلام'?'#fff3e0':o.status==='جاري التحضير'?'#fce4ec':o.status==='خرج للتوصيل'?'#e8f5e9':o.status==='مكتمل'?'#e0f2f1':'#fafafa'};padding:4px 12px;border-radius:20px;font-weight:600;">${o.status}</span></td>
-                <td style="font-weight:700;color:var(--primary);">${money(o.total)} ج.م</td>
-                <td>${o.date}</td>
-                <td><button class="btn btn-outline btn-sm" onclick="renderCrmOrderDetail('${o.id}')"><i class="fas fa-eye"></i> تفاصيل</button></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  } catch(e) {
-    dc.innerHTML = `<div style="color:#d32f2f;text-align:center;padding:40px;">⚠️ خطأ: ${e.message}</div>`;
-  }
-}
-
-function renderCrmOrderDetail(orderId) {
-  const order = State.db.crmOrders.find(o => o.id === orderId);
-  if (!order) return toast('⚠️ الطلب غير موجود', 'error');
-  
-  let items = [];
-  try { items = JSON.parse(order.itemsJson || '[]'); } catch(e) {}
-  
-  document.getElementById('dynamicContent').innerHTML = `
-    <div class="breadcrumb">🍭 الرئيسية » 📋 متابعة » <span>${order.id}</span></div>
-    <div style="max-width:700px;margin:0 auto;">
-      <div style="background:white;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
-        <h2 style="color:var(--primary);margin-bottom:20px;"><i class="fas fa-receipt"></i> تفاصيل الطلب</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-          <div><strong>الكود:</strong> ${order.id}</div>
-          <div><strong>التاريخ:</strong> ${order.date}</div>
-          <div><strong>العميل:</strong> ${order.customer}</div>
-          <div><strong>الهاتف:</strong> ${order.phone || '-'}</div>
-          <div><strong>الفرع:</strong> ${order.branch}</div>
-          <div><strong>الحالة:</strong> <span style="color:var(--primary);font-weight:700;">${order.status}</span></div>
-        </div>
-        ${order.address ? `<div style="margin-bottom:16px;"><strong>📍 العنوان:</strong> ${order.address}</div>` : ''}
-        ${order.notes ? `<div style="margin-bottom:16px;background:var(--accent-soft);padding:12px;border-radius:8px;"><strong>📝 ملاحظات:</strong> ${order.notes}</div>` : ''}
-        <hr style="border-color:var(--border);margin:16px 0;">
-        <h3>🍰 الأصناف:</h3>
-        <div class="table-wrapper" style="margin-top:12px;">
-          <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
-          <tbody>
-            ${items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${money(i.price)} ج</td><td>${money(i.total)} ج</td></tr>`).join('')}
-          </tbody>
-        </div>
-        <div style="text-align:left;font-size:1.4rem;font-weight:800;color:var(--primary);margin-top:16px;">🧾 الإجمالي: ${money(order.total)} ج.م</div>
-      </div>
-      <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="renderCrmOrdersTracking()"><i class="fas fa-arrow-right"></i> رجوع للقائمة</button>
-    </div>`;
-}
 </script>
 </body>
 </html>
