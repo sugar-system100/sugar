@@ -227,7 +227,7 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ3reO_j6Kz1hM0dVrm3G8IVOaTtrUFvEgEigIBlePyZTqQ3a55k_wKvGMWOv8KmBUrA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg0QjCAYlqg6jUKAHZGUb4r6zbO6V9yXyyNShHoNrx2zf25AA5vA-AYnw2n8UOyxGQpQ/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
@@ -461,7 +461,7 @@ function renderPOS() {
   document.getElementById('dynamicContent').innerHTML = `
     <div class="breadcrumb">🍭 الرئيسية » <span>نقطة البيع</span></div>
     <div class="pos-layout">
-      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ?  الكل' : c}</div>`).join('')}</div>
+      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? '🍰 الكل' : c}</div>`).join('')}</div>
       <div class="col-products"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="🔍 بحث في الحلويات..." oninput="renderProducts()"></div><div class="products-grid" id="productsGrid"></div></div>
       <div class="col-cart" id="cartPanel"></div>
     </div>`;
