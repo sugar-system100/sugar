@@ -212,7 +212,7 @@
 <div class="modal" id="qrScannerModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-camera"></i><h3>📷 مسح QR</h3></div><div id="qrReader" style="margin-bottom:18px;min-height:200px;"></div><div class="form-group"><input id="manualQrInput" placeholder="أو أدخل كود الطلب يدوياً"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeQrScanner()">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="loadManualQR()">تحميل الطلب</button></div></div></div>
 
 <!-- Modal: Forecast -->
-<div class="modal" id="forecastModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-chart-line"></i><h3>📈 توقعات المبيعات</h3></div><div id="forecastContent" style="margin-bottom:18px;"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('forecastModal')">إغلاق</button><button class="btn btn-primary" style="flex:1;" onclick="approveForecast()">✅ موافقة مدير الفرع</button></div></div></div>
+<div class="modal" id="forecastModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-chart-line"></i><h3>📈 توقعات المبيعات</h3></div><div id="forecastContent" style="margin-bottom:18px;"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('forecastModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="approveForecast()">✅ موافقة مدير الفرع</button></div></div></div>
 
 <!-- Modal: Complaint -->
 <div class="modal" id="complaintModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-exclamation-triangle"></i><h3>⚠️ إضافة شكوى</h3></div><div class="form-group"><input id="complaintPhone" placeholder="رقم هاتف العميل"></div><div class="form-group"><input id="complaintName" placeholder="اسم العميل"></div><div class="form-group"><select id="complaintType"><option value="تأخر توصيل">🚚 تأخر توصيل</option><option value="منتج تالف">🍰 منتج تالف</option><option value="خطأ في الفاتورة">🧾 خطأ في الفاتورة</option><option value="سلوك الموظف">👤 سلوك الموظف</option><option value="أخرى">❓ أخرى</option></select></div><div class="form-group"><textarea id="complaintDesc" placeholder="وصف الشكوى بالتفصيل" rows="3"></textarea></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('complaintModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveComplaint()">💾 حفظ</button></div></div></div>
@@ -227,15 +227,16 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg0QjCAYlqg6jUKAHZGUb4r6zbO6V9yXyyNShHoNrx2zf25AA5vA-AYnw2n8UOyxGQpQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3pCI4fqGBx_SduudJYfB7wnOA28taBx174D1nGN6CdAZKJ5I4tA-2MpxuvWrVhxseqA/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
-  currentUser: null, currentCat: 'الكل', crmCurrentCat: '',
+  currentUser: null, currentCat: 'الكل', crmCurrentCat: 'الكل',
   cart: [], crmCart: [], pendingProduct: null, pendingEditIndex: -1,
   currentShift: null, discountEnabled: false, currentQROrderId: null,
   customerData: { name:'', phone:'', address:'' }, selectedBranch: null,
-  deliveryPollingInterval: null, html5QrScanner: null, thermalPort: null
+  deliveryPollingInterval: null, html5QrScanner: null, thermalPort: null,
+  crmCurrentBranchStock: []
 };
 
 function toast(msg, type='info') {
@@ -377,7 +378,7 @@ function buildNav() {
   if (pt === 'مندوب_بيع') items = [['pos','🍬 نقطة البيع','store']];
   else if (pt === 'كاشير') items = [['pos','🍬 نقطة البيع','store'],['stock','📦 المخزون','boxes'],['reports','📊 تقارير','chart-bar'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo'],['loyalty','⭐ ولاء','star']];
   else if (pt === 'دليفري') items = [['pos','🍬 نقطة البيع','store'],['delivery','🛵 توصيل','motorcycle'],['search','🔍 بحث','search'],['stock','📦 المخزون','boxes'],['reports','📊 تقارير','chart-bar'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo'],['loyalty','⭐ ولاء','star']];
-  else if (pt === 'خدمة العملاء') items = [['crm','📞 طلبات','headset'],['complaints','⚠️ شكاوى','exclamation'],['stock','📦 المخزون','boxes']];
+  else if (pt === 'خدمة العملاء') items = [['crm','📞 طلبات جديدة','headset'],['crm-tracking','📋 متابعة الأوردرات','clipboard-list'],['complaints','⚠️ شكاوى','exclamation'],['stock','📦 المخزون','boxes']];
   else if (pt === 'مدير_فرع') items = [['pos','🍬 نقطة البيع','store'],['reports','📊 تقارير','chart-bar'],['forecast','📈 توقعات','chart-line'],['loyalty','⭐ ولاء','star']];
   else if (pt === 'إدارة') items = [['admin-monitor','🌐 مراقبة الفروع','network-wired'],['users','👥 المستخدمون','users-cog'],['products','🍰 المنتجات','cookie'],['pos','🍬 نقطة البيع','store'],['crm','📞 CRM','headset'],['delivery','🛵 توصيل','motorcycle'],['stock','📦 المخزون','boxes'],['reports','📊 تقارير','chart-bar'],['complaints','⚠️ شكاوى','exclamation'],['forecast','📈 توقعات','chart-line'],['loyalty','⭐ ولاء','star'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo']];
   document.getElementById('navMenu').innerHTML = items.map(([id,label,icon]) => `<div class="nav-item" data-sec="${id}" onclick="showSection('${id}')"><i class="fas fa-${icon}"></i> ${label}</div>`).join('');
@@ -388,10 +389,10 @@ function showSection(id) {
   const dc = document.getElementById('dynamicContent');
   dc.innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-pulse" style="font-size:40px; color:var(--primary);"></i><p>🍰 جاري التحميل...</p></div>`;
   const renderers = {
-    'pos': renderPOS, 'crm': renderCRM, 'delivery': renderDelivery,
-    'stock': renderStock, 'reports': renderReports, 'search': renderSearch,
-    'complaints': renderComplaints, 'loyalty': renderLoyalty, 'forecast': renderForecast,
-    'expenses': renderExpenses, 'returns': renderReturns,
+    'pos': renderPOS, 'crm': renderCRM, 'crm-tracking': renderCrmOrdersTracking,
+    'delivery': renderDelivery, 'stock': renderStock, 'reports': renderReports,
+    'search': renderSearch, 'complaints': renderComplaints, 'loyalty': renderLoyalty,
+    'forecast': renderForecast, 'expenses': renderExpenses, 'returns': renderReturns,
     'products': renderProductsManagement, 'users': renderUsersManagement,
     'admin-monitor': renderAdminMonitor, 'branch-detail': renderBranchDetail,
     'branch-shifts': renderBranchShifts, 'branch-stock': renderBranchStock,
@@ -449,7 +450,6 @@ async function saveShiftCash() {
   toast('💰 تم حفظ تقرير الخزنة', 'success');
 }
 
-// ============= نقطة البيع والأقسام التلقائية =============
 function getCategories() {
   const activeProducts = State.db.products.filter(p => p.active !== false);
   const cats = activeProducts.map(p => p.cat).filter(Boolean);
@@ -461,7 +461,7 @@ function renderPOS() {
   document.getElementById('dynamicContent').innerHTML = `
     <div class="breadcrumb">🍭 الرئيسية » <span>نقطة البيع</span></div>
     <div class="pos-layout">
-      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? 'الكل' : c}</div>`).join('')}</div>
+      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? '🍰 الكل' : c}</div>`).join('')}</div>
       <div class="col-products"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="🔍 بحث في الحلويات..." oninput="renderProducts()"></div><div class="products-grid" id="productsGrid"></div></div>
       <div class="col-cart" id="cartPanel"></div>
     </div>`;
@@ -473,9 +473,7 @@ function setCategory(c) { State.currentCat = c; renderPOS(); }
 function renderProducts() {
   const q = (document.getElementById('searchInput')?.value||'').trim();
   let list = State.db.products.filter(p => p.active !== false);
-  if (State.currentCat !== 'الكل') {
-    list = list.filter(p => p.cat === State.currentCat);
-  }
+  if (State.currentCat !== 'الكل') list = list.filter(p => p.cat === State.currentCat);
   if (q) list = list.filter(p => p.name.includes(q));
   const grid = document.getElementById('productsGrid');
   if (!grid) return;
@@ -728,21 +726,61 @@ async function restoreParked(id) {
 
 async function deleteParkedOrder(id) { await postForm('deleteParkedOrder', { parkId: id }); loadParkedOrders(); }
 
+// ========== CRM (خدمة العملاء) ==========
 function renderCRM() {
   const branches = [...new Set(State.db.users.filter(u => u.pointType==='دليفري' && u.active).map(u => u.branch))];
-  document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>CRM - طلبات العملاء</span></div><div style="display:flex;gap:20px;flex-wrap:wrap;"><div style="width:370px;min-width:300px;background:white;border-radius:16px;padding:20px;box-shadow:var(--shadow);"><h3 style="margin-bottom:16px;"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> طلب جديد</h3><div class="form-group"><input id="crmCustomer" placeholder="👤 اسم العميل"></div><div class="form-group"><input id="crmPhone" placeholder="📞 رقم الهاتف"></div><div class="form-group" style="position:relative;"><input id="crmAddress" placeholder="📍 العنوان" oninput="crmSearchAddress()"><div id="crmAddressSuggestions" class="hidden" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;z-index:10;"></div></div><div class="form-group"><select id="crmTargetBranch" onchange="loadCrmStock()"><option value="">🎯 اختر فرع التوصيل</option>${branches.map(b => `<option>${b}</option>`).join('')}</select></div><div id="crmStockInfo" style="margin-bottom:12px;padding:10px;background:var(--accent-soft);border-radius:8px;font-size:0.9rem;display:none;"></div><div class="form-group"><textarea id="crmNotes" placeholder="📝 ملاحظات خاصة" rows="2"></textarea></div><div id="crmCartList" style="max-height:200px;overflow-y:auto;"></div><div style="font-weight:700;margin:8px 0;font-size:1.1rem;">🧾 الإجمالي: <span id="crmTotal" style="color:var(--primary);">0</span> ج.م</div><button class="btn btn-primary btn-block" onclick="saveCrmOrderFromCart()"><i class="fas fa-paper-plane"></i> 📤 إرسال للدليفري</button></div><div style="flex:1;min-width:300px;background:white;border-radius:16px;padding:20px;box-shadow:var(--shadow);"><div class="search-box"><i class="fas fa-search"></i><input id="crmSearch" placeholder="🔍 بحث في المنتجات..." oninput="renderCrmProducts()"></div><div id="crmCats" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div><div id="crmProductsGrid" class="products-grid"></div></div></div>`;
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 الرئيسية » <span>CRM - طلبات العملاء</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <div style="width:370px;min-width:300px;background:white;border-radius:16px;padding:20px;box-shadow:var(--shadow);">
+        <h3 style="margin-bottom:16px;"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> طلب جديد</h3>
+        <div class="form-group"><input id="crmCustomer" placeholder="👤 اسم العميل"></div>
+        <div class="form-group"><input id="crmPhone" placeholder="📞 رقم الهاتف"></div>
+        <div class="form-group" style="position:relative;">
+          <input id="crmAddress" placeholder="📍 العنوان" oninput="crmSearchAddress()">
+          <div id="crmAddressSuggestions" class="hidden" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;z-index:10;"></div>
+        </div>
+        <div class="form-group">
+          <select id="crmTargetBranch" onchange="loadCrmStock()">
+            <option value="">🎯 اختر فرع التوصيل</option>
+            ${branches.map(b => `<option>${b}</option>`).join('')}
+          </select>
+        </div>
+        <div id="crmStockInfo" style="margin-bottom:12px;padding:10px;background:var(--accent-soft);border-radius:8px;font-size:0.9rem;display:none;"></div>
+        <div class="form-group"><textarea id="crmNotes" placeholder="📝 ملاحظات خاصة" rows="2"></textarea></div>
+        <div id="crmCartList" style="max-height:200px;overflow-y:auto;"></div>
+        <div style="font-weight:700;margin:8px 0;font-size:1.1rem;">🧾 الإجمالي: <span id="crmTotal" style="color:var(--primary);">0</span> ج.م</div>
+        <button class="btn btn-primary btn-block" onclick="saveCrmOrderFromCart()"><i class="fas fa-paper-plane"></i> 📤 إرسال للدليفري</button>
+      </div>
+      <div style="flex:1;min-width:300px;background:white;border-radius:16px;padding:20px;box-shadow:var(--shadow);">
+        <div class="search-box"><i class="fas fa-search"></i><input id="crmSearch" placeholder="🔍 بحث في المنتجات..." oninput="renderCrmProducts()"></div>
+        <div id="crmCats" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+        <div id="crmProductsGrid" class="products-grid"></div>
+      </div>
+    </div>`;
   renderCrmCats(); renderCrmProducts(); renderCrmCart();
 }
 
 async function loadCrmStock() {
   const branch = document.getElementById('crmTargetBranch').value;
-  if (!branch) { document.getElementById('crmStockInfo').style.display = 'none'; return; }
+  if (!branch) {
+    document.getElementById('crmStockInfo').style.display = 'none';
+    State.crmCurrentBranchStock = [];
+    renderCrmProducts();
+    return;
+  }
   try {
     const res = await jsonp('getStockByBranch', { branch });
-    const stock = res.stock || []; const infoDiv = document.getElementById('crmStockInfo');
+    const stock = res.stock || [];
+    State.crmCurrentBranchStock = stock;
+    const infoDiv = document.getElementById('crmStockInfo');
     infoDiv.style.display = 'block';
     infoDiv.innerHTML = `<i class="fas fa-boxes"></i> مخزون ${branch}: ` + (stock.length ? stock.map(s => `<span style="margin:0 4px;font-weight:600;">${s.item}: ${s.qty}</span>`).join(' | ') : 'لا يوجد مخزون');
-  } catch(e) {}
+    renderCrmProducts();
+  } catch(e) {
+    State.crmCurrentBranchStock = [];
+    renderCrmProducts();
+  }
 }
 
 function renderCrmCats() {
@@ -756,7 +794,23 @@ function renderCrmProducts() {
   if (State.crmCurrentCat !== 'الكل') list = list.filter(p => p.cat === State.crmCurrentCat);
   if (q) list = list.filter(p => p.name.includes(q));
   const grid = document.getElementById('crmProductsGrid');
-  if (grid) grid.innerHTML = list.length ? list.map(p => `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')"><div class="product-name">🍪 ${p.name}</div><div class="product-price">${money(p.price)} ج</div></div>`).join('') : '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>';
+  if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-cookie"></i><h3>🧁 لا توجد منتجات</h3></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => {
+    const stockItem = State.crmCurrentBranchStock.find(s => s.item === p.name);
+    const qty = stockItem ? stockItem.qty : 0;
+    const inStock = qty > 0;
+    return `<div class="product-card" onclick="crmAddItem('${p.name.replace(/'/g, "\\'")}')">
+      <div class="product-name">🍪 ${p.name}</div>
+      <div class="product-price">${money(p.price)} ج</div>
+      <div class="stock-badge" style="background:${inStock ? '#e6f4ea' : '#ffebee'}; color:${inStock ? '#2e7d32' : '#c62828'};">
+        ${inStock ? `✅ متوفر (${qty})` : '❌ غير متوفر'}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function crmAddItem(name) {
@@ -793,6 +847,84 @@ function crmSearchAddress() {
 
 function selectCrmAddress(addr, fee) { document.getElementById('crmAddress').value = addr; document.getElementById('crmAddressSuggestions').classList.add('hidden'); }
 
+// ========== متابعة الأوردرات (خدمة العملاء) ==========
+async function renderCrmOrdersTracking() {
+  const dc = document.getElementById('dynamicContent');
+  dc.innerHTML = `<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse" style="font-size:40px;color:var(--primary);"></i><p>📋 جاري تحميل الأوردرات...</p></div>`;
+  
+  try {
+    const res = await jsonp('getCrmOrdersForTracking', { username: State.currentUser.branch });
+    const orders = res.orders || [];
+    
+    if (!orders.length) {
+      dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
+        <div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>📋 لا توجد أوردرات مرسلة</h3><p>لم تقم بإرسال أي طلب للفروع بعد</p></div>`;
+      return;
+    }
+    
+    dc.innerHTML = `
+      <div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>كود الطلب</th><th>العميل</th><th>الهاتف</th><th>الفرع</th><th>الحالة</th><th>الإجمالي</th><th>التاريخ</th><th>عرض</th></tr></thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td><strong>${o.id}</strong></td>
+                <td>${o.customer}</td>
+                <td>${o.phone || '-'}</td>
+                <td>${o.branch}</td>
+                <td><span style="background:${o.status==='جديد'?'#e3f2fd':o.status==='تم الاستلام'?'#fff3e0':o.status==='جاري التحضير'?'#fce4ec':o.status==='خرج للتوصيل'?'#e8f5e9':o.status==='مكتمل'?'#e0f2f1':'#fafafa'};padding:4px 12px;border-radius:20px;font-weight:600;">${o.status}</span></td>
+                <td style="font-weight:700;color:var(--primary);">${money(o.total)} ج.م</td>
+                <td>${o.date}</td>
+                <td><button class="btn btn-outline btn-sm" onclick="renderCrmOrderDetail('${o.id}')"><i class="fas fa-eye"></i> تفاصيل</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    dc.innerHTML = `<div style="color:#d32f2f;text-align:center;padding:40px;">⚠️ خطأ: ${e.message}</div>`;
+  }
+}
+
+function renderCrmOrderDetail(orderId) {
+  const order = State.db.crmOrders.find(o => o.id === orderId);
+  if (!order) return toast('⚠️ الطلب غير موجود', 'error');
+  
+  let items = [];
+  try { items = JSON.parse(order.itemsJson || '[]'); } catch(e) {}
+  
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 الرئيسية » 📋 متابعة » <span>${order.id}</span></div>
+    <div style="max-width:700px;margin:0 auto;">
+      <div style="background:white;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <h2 style="color:var(--primary);margin-bottom:20px;"><i class="fas fa-receipt"></i> تفاصيل الطلب</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div><strong>الكود:</strong> ${order.id}</div>
+          <div><strong>التاريخ:</strong> ${order.date}</div>
+          <div><strong>العميل:</strong> ${order.customer}</div>
+          <div><strong>الهاتف:</strong> ${order.phone || '-'}</div>
+          <div><strong>الفرع:</strong> ${order.branch}</div>
+          <div><strong>الحالة:</strong> <span style="color:var(--primary);font-weight:700;">${order.status}</span></div>
+        </div>
+        ${order.address ? `<div style="margin-bottom:16px;"><strong>📍 العنوان:</strong> ${order.address}</div>` : ''}
+        ${order.notes ? `<div style="margin-bottom:16px;background:var(--accent-soft);padding:12px;border-radius:8px;"><strong>📝 ملاحظات:</strong> ${order.notes}</div>` : ''}
+        <hr style="border-color:var(--border);margin:16px 0;">
+        <h3>🍰 الأصناف:</h3>
+        <div class="table-wrapper" style="margin-top:12px;">
+          <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+          <tbody>
+            ${items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${money(i.price)} ج</td><td>${money(i.total)} ج</td></tr>`).join('')}
+          </tbody>
+        </div>
+        <div style="text-align:left;font-size:1.4rem;font-weight:800;color:var(--primary);margin-top:16px;">🧾 الإجمالي: ${money(order.total)} ج.م</div>
+      </div>
+      <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="renderCrmOrdersTracking()"><i class="fas fa-arrow-right"></i> رجوع للقائمة</button>
+    </div>`;
+}
+
+// ========== التوصيل (دليفري) ==========
 async function renderDelivery() {
   try {
     const res = await jsonp('getDeliveryOrders', { username: State.currentUser.branch, branch: State.currentUser.branch });
@@ -813,6 +945,9 @@ function startDeliveryPolling() {
   State.deliveryPollingInterval = setInterval(async () => { if (State.currentUser?.pointType === 'دليفري') { const res = await jsonp('getDeliveryOrders', { username: State.currentUser.branch, branch: State.currentUser.branch }); const newCount = (res.orders||[]).filter(o => o.status==='جديد').length; if (newCount > 0) toast(`🔔 ${newCount} طلب جديد`, 'success'); } }, 15000);
 }
 
+function viewDeliveryOrder(orderId) { toast(`تفاصيل الطلب: ${orderId}`); }
+
+// ========== الإدارة ==========
 function renderAdminMonitor() {
   const users = State.db.users.filter(u => u.active);
   document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>🌐 مراقبة الفروع</span></div><div class="branch-grid">${users.map(u => `<div class="branch-card" onclick="State.selectedBranch='${u.branch}';showSection('branch-detail');"><div class="branch-card-header"><span class="status-dot"></span> ${u.branch}</div><div class="branch-card-body"><i class="fas fa-user"></i> ${u.username}<br><i class="fas fa-phone"></i> ${u.phone||''}</div></div>`).join('')}</div>`;
@@ -922,7 +1057,6 @@ async function addReturn() {
   await refreshData(); renderReturns(); toast('✅ تم إضافة المرتجع', 'success');
 }
 
-// ========== إدارة المنتجات (للإدارة) ==========
 function renderProductsManagement() {
   document.getElementById('dynamicContent').innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>🍰 المنتجات</span></div><button class="btn btn-primary" onclick="openProductModal()">➕ إضافة منتج</button><div class="table-wrapper"><table><thead><tr><th>الاسم</th><th>الفئة</th><th>الوحدة</th><th>السعر</th><th>نشط</th><th></th></tr></thead><tbody>${State.db.products.map(p => `<tr><td>${p.name}</td><td>${p.cat}</td><td>${p.unit||''}</td><td>${money(p.price)} ج</td><td>${p.active ? '✅' : '❌'}</td><td><button class="btn btn-outline btn-sm" onclick="editProduct('${p.name.replace(/'/g, "\\'")}')">تحرير</button></td></tr>`).join('')}</tbody></table></div>`;
 }
@@ -999,10 +1133,84 @@ async function printLastReceipt() {
   toast('🖨️ تم إرسال الطباعة', 'success');
 }
 
-function viewDeliveryOrder(orderId) { toast(`تفاصيل الطلب: ${orderId}`); }
-
 window.onload = () => { loadInitialDataForLogin(); };
 setInterval(refreshData, 300000);
+    // ========== متابعة الأوردرات (خدمة العملاء) ==========
+async function renderCrmOrdersTracking() {
+  const dc = document.getElementById('dynamicContent');
+  dc.innerHTML = `<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse" style="font-size:40px;color:var(--primary);"></i><p>📋 جاري تحميل الأوردرات...</p></div>`;
+  
+  try {
+    const res = await jsonp('getCrmOrdersForTracking', { username: State.currentUser.branch });
+    const orders = res.orders || [];
+    
+    if (!orders.length) {
+      dc.innerHTML = `<div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
+        <div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>📋 لا توجد أوردرات مرسلة</h3><p>لم تقم بإرسال أي طلب للفروع بعد</p></div>`;
+      return;
+    }
+    
+    dc.innerHTML = `
+      <div class="breadcrumb">🍭 الرئيسية » <span>📋 متابعة الأوردرات</span></div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>كود الطلب</th><th>العميل</th><th>الهاتف</th><th>الفرع</th><th>الحالة</th><th>الإجمالي</th><th>التاريخ</th><th>عرض</th></tr></thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td><strong>${o.id}</strong></td>
+                <td>${o.customer}</td>
+                <td>${o.phone || '-'}</td>
+                <td>${o.branch}</td>
+                <td><span style="background:${o.status==='جديد'?'#e3f2fd':o.status==='تم الاستلام'?'#fff3e0':o.status==='جاري التحضير'?'#fce4ec':o.status==='خرج للتوصيل'?'#e8f5e9':o.status==='مكتمل'?'#e0f2f1':'#fafafa'};padding:4px 12px;border-radius:20px;font-weight:600;">${o.status}</span></td>
+                <td style="font-weight:700;color:var(--primary);">${money(o.total)} ج.م</td>
+                <td>${o.date}</td>
+                <td><button class="btn btn-outline btn-sm" onclick="renderCrmOrderDetail('${o.id}')"><i class="fas fa-eye"></i> تفاصيل</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    dc.innerHTML = `<div style="color:#d32f2f;text-align:center;padding:40px;">⚠️ خطأ: ${e.message}</div>`;
+  }
+}
+
+function renderCrmOrderDetail(orderId) {
+  const order = State.db.crmOrders.find(o => o.id === orderId);
+  if (!order) return toast('⚠️ الطلب غير موجود', 'error');
+  
+  let items = [];
+  try { items = JSON.parse(order.itemsJson || '[]'); } catch(e) {}
+  
+  document.getElementById('dynamicContent').innerHTML = `
+    <div class="breadcrumb">🍭 الرئيسية » 📋 متابعة » <span>${order.id}</span></div>
+    <div style="max-width:700px;margin:0 auto;">
+      <div style="background:white;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <h2 style="color:var(--primary);margin-bottom:20px;"><i class="fas fa-receipt"></i> تفاصيل الطلب</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div><strong>الكود:</strong> ${order.id}</div>
+          <div><strong>التاريخ:</strong> ${order.date}</div>
+          <div><strong>العميل:</strong> ${order.customer}</div>
+          <div><strong>الهاتف:</strong> ${order.phone || '-'}</div>
+          <div><strong>الفرع:</strong> ${order.branch}</div>
+          <div><strong>الحالة:</strong> <span style="color:var(--primary);font-weight:700;">${order.status}</span></div>
+        </div>
+        ${order.address ? `<div style="margin-bottom:16px;"><strong>📍 العنوان:</strong> ${order.address}</div>` : ''}
+        ${order.notes ? `<div style="margin-bottom:16px;background:var(--accent-soft);padding:12px;border-radius:8px;"><strong>📝 ملاحظات:</strong> ${order.notes}</div>` : ''}
+        <hr style="border-color:var(--border);margin:16px 0;">
+        <h3>🍰 الأصناف:</h3>
+        <div class="table-wrapper" style="margin-top:12px;">
+          <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+          <tbody>
+            ${items.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${money(i.price)} ج</td><td>${money(i.total)} ج</td></tr>`).join('')}
+          </tbody>
+        </div>
+        <div style="text-align:left;font-size:1.4rem;font-weight:800;color:var(--primary);margin-top:16px;">🧾 الإجمالي: ${money(order.total)} ج.م</div>
+      </div>
+      <button class="btn btn-outline btn-block" style="margin-top:16px;" onclick="renderCrmOrdersTracking()"><i class="fas fa-arrow-right"></i> رجوع للقائمة</button>
+    </div>`;
+}
 </script>
 </body>
 </html>
