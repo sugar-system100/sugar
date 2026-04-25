@@ -461,7 +461,7 @@ function renderPOS() {
   document.getElementById('dynamicContent').innerHTML = `
     <div class="breadcrumb">🍭 الرئيسية » <span>نقطة البيع</span></div>
     <div class="pos-layout">
-      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? '🍰 الكل' : c}</div>`).join('')}</div>
+      <div class="col-categories">${cats.map(c => `<div class="category-item ${State.currentCat===c?'active':''}" onclick="setCategory('${c}')"><span class="category-icon">${c.slice(0,2)}</span> ${c==='الكل' ? 'الكل' : c}</div>`).join('')}</div>
       <div class="col-products"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="🔍 بحث في الحلويات..." oninput="renderProducts()"></div><div class="products-grid" id="productsGrid"></div></div>
       <div class="col-cart" id="cartPanel"></div>
     </div>`;
