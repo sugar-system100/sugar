@@ -1,319 +1,1025 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سُكّر 33 - نظام إدارة الحلويات الاحترافي</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
-    <style>
-        :root {
-            --primary: #b81b5c;
-            --primary-light: #e84a8a;
-            --bg: #fff9f5;
-            --surface: #ffffff;
-            --text: #3e2723;
-            --text-muted: #795548;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Cairo', sans-serif; }
-        body { background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.7; } /* تكبير الخط */
-        .app-container { display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 280px; background: white; border-left: 1px solid #eee; overflow-y: auto; }
-        .nav-item { padding: 16px 22px; font-size: 16.5px; white-space: nowrap; } /* إصلاح تقطيع الكلمات + تكبير */
-        .nav-item:hover, .nav-item.active { background: #fff0f5; color: var(--primary); }
-        .main-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .cart { background: white; border-radius: 16px; padding: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 360px; }
-        .customer-info { background: #fff0f5; padding: 14px; border-radius: 12px; margin-bottom: 12px; }
-        .product-card { cursor: pointer; transition: 0.2s; font-size: 16px; }
-        .product-card:hover { transform: scale(1.04); }
-        .toast { position: fixed; bottom: 20px; left: 20px; z-index: 9999; padding: 14px 24px; border-radius: 30px; color: white; font-weight: bold; }
-        .summary-row { font-size: 16px; }
-        .grand { font-size: 1.35rem !important; font-weight: 800; color: var(--primary); }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سُكّر 33</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    :root{
+      --primary:#b81b5c; --primary-dark:#8a1240; --soft:#fff0f5; --bg:#fff9f5;
+      --surface:#fff; --border:#efd9e2; --text:#3e2723; --muted:#7a5d56;
+      --shadow:0 8px 24px rgba(0,0,0,.07); --radius:18px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Cairo,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+    .hidden{display:none!important}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:260px;background:#fff;border-left:1px solid var(--border);padding:20px;box-shadow:var(--shadow)}
+    .brand{font-size:32px;font-weight:800;color:var(--primary);text-align:center}
+    .sub{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+    .nav{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+    .nav button{border:none;background:#fff;padding:14px 16px;border-radius:14px;cursor:pointer;text-align:right;font-weight:700}
+    .nav button.active,.nav button:hover{background:var(--soft);color:var(--primary)}
+    .main{flex:1;padding:22px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .grid-3{grid-template-columns:220px 1fr 370px}
+    .grid-2{grid-template-columns:360px 1fr}
+    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+    .product,.branchCard{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;cursor:pointer}
+    .product:hover,.branchCard:hover{background:var(--soft)}
+    .muted{color:var(--muted)}
+    .btn{border:none;border-radius:14px;padding:11px 14px;font-weight:700;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-outline{background:#fff;border:2px solid var(--border);color:var(--text)}
+    .btn-danger{background:#d32f2f;color:#fff}
+    .btn-block{width:100%}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    input,select,textarea{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:14px;font-family:inherit}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:right}
+    th{background:var(--soft);color:var(--primary-dark)}
+    .tableWrap{overflow:auto;border:1px solid var(--border);border-radius:16px;background:#fff}
+    .cartItem{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border)}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#ffe5ef;color:var(--primary);font-size:12px}
+    .toast{position:fixed;left:20px;bottom:20px;background:#2d2521;color:#fff;padding:14px 18px;border-radius:999px;display:none;z-index:9999}
+    .toast.show{display:block}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:20px;z-index:999}
+    .modal.active{display:flex}
+    .modalCard{width:min(560px,100%);background:#fff;border-radius:24px;padding:22px;box-shadow:0 30px 60px rgba(0,0,0,.2)}
+    .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .loginBox{width:min(420px,100%);background:#fff;border:1px solid var(--border);border-radius:28px;padding:30px;box-shadow:var(--shadow)}
+    .title{font-size:22px;font-weight:800;color:var(--primary);margin-bottom:14px}
+    .cats{display:flex;flex-direction:column;gap:8px}
+    .catBtn{padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--border);cursor:pointer;text-align:right}
+    .catBtn.active{background:var(--soft);border-color:var(--primary);color:var(--primary)}
+    .rightTotal{font-size:24px;font-weight:800;color:var(--primary)}
+    .note{font-size:12px;color:var(--muted)}
+    .newRow{background:#fff7cc}
+    .navBadge{background:#d32f2f;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px;margin-inline-start:6px}
+    @media(max-width:1100px){.grid-3,.grid-2{grid-template-columns:1fr}.sidebar{width:220px}}
+    @media(max-width:800px){.app{display:block}.sidebar{width:auto}.main{padding:12px}}
+  </style>
 </head>
 <body>
 
-<div id="loginScreen" style="height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f5,#fce4f0);">
-    <div style="background:white;border-radius:30px;padding:40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.15);text-align:center;">
-        <h1 style="color:var(--primary);font-size:42px;">سُكّر 33</h1>
-        <p style="color:#666;margin:10px 0 30px;">برمجة م/ محمود سلامة - النسخة النهائية</p>
-        <select id="pointTypeSelect" class="form-control" style="width:100%;padding:12px;margin-bottom:12px;"></select>
-        <select id="branchSelect" class="form-control" style="width:100%;padding:12px;margin-bottom:12px;"></select>
-        <input id="passInput" type="password" placeholder="كلمة المرور" style="width:100%;padding:12px;margin-bottom:20px;">
-        <button onclick="login()" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:30px;font-size:17px;">دخول</button>
-        <div id="loginMsg" style="margin-top:15px;color:red;"></div>
+<div id="loginScreen" class="login">
+  <div class="loginBox">
+    <div class="brand">سُكّر 33</div>
+    <div class="sub">برمجة م/ محمود سلامة</div>
+    <div style="margin-top:18px" class="grid">
+      <div>
+        <label>نوع المستخدم</label>
+        <select id="pointTypeSelect"></select>
+      </div>
+      <div>
+        <label>اسم المستخدم</label>
+        <select id="usernameSelect"></select>
+      </div>
+      <div>
+        <label>كلمة المرور</label>
+        <input id="passInput" type="password" />
+      </div>
+      <button class="btn btn-primary btn-block" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول</button>
+      <div id="loginMsg" class="muted"></div>
     </div>
+  </div>
 </div>
 
-<div id="appContainer" class="app-container hidden">
-    <div class="sidebar">
-        <div style="padding:20px;text-align:center;border-bottom:3px solid var(--primary);">
-            <h1 style="color:var(--primary);font-size:32px;">سُكّر 33</h1>
-            <small>برمجة م/ محمود سلامة</small>
-        </div>
-        <div id="navMenu" style="padding:10px;"></div>
-    </div>
-    <div class="main-content" id="mainContent"></div>
+<div id="appScreen" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">سُكّر 33</div>
+    <div class="sub">برمجة م/ محمود سلامة</div>
+    <div style="margin-top:18px" id="whoami"></div>
+    <div class="muted" id="shiftStatus" style="margin-top:4px"></div>
+    <div class="nav" id="nav"></div>
+    <button class="btn btn-outline btn-block" style="margin-top:18px" onclick="logout()">تسجيل خروج</button>
+  </aside>
+  <main class="main">
+    <div id="content"></div>
+  </main>
 </div>
 
 <div id="toast" class="toast"></div>
 
+<div class="modal" id="qtyModal">
+  <div class="modalCard">
+    <div class="title" id="qtyTitle">الكمية</div>
+    <input id="qtyInput" type="number" min="1" step="1">
+    <textarea id="itemNote" rows="2" placeholder="ملاحظة على الصنف" style="margin-top:12px"></textarea>
+    <div class="note" id="qtyHint" style="margin-top:10px"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('qtyModal')">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmQty()">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="customerModal">
+  <div class="modalCard">
+    <div class="title">بيانات العميل</div>
+    <input id="customerName" placeholder="اسم العميل">
+    <input id="customerPhone" placeholder="رقم الهاتف" style="margin-top:10px" onblur="loadCustomerData()">
+    <div style="position:relative;margin-top:10px">
+      <input id="customerAddress" placeholder="العنوان" oninput="searchAddress()">
+      <div id="addressSuggestions" class="hidden" style="position:absolute;right:0;left:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:12px;z-index:20;max-height:180px;overflow:auto"></div>
+    </div>
+    <div id="customerLoyaltyInfo" class="note" style="margin-top:12px"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('customerModal')">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmCustomerInfo()">متابعة للدفع</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="paymentModal">
+  <div class="modalCard">
+    <div class="title">إتمام الدفع</div>
+    <select id="paymentMethod">
+      <option value="نقدي">نقدي</option>
+      <option value="آجل">آجل</option>
+      <option value="هدية">هدية</option>
+      <option value="إنستاباي">إنستاباي</option>
+      <option value="فودافون كاش">فودافون كاش</option>
+      <option value="فيزا">فيزا</option>
+      <option value="أقساط">أقساط</option>
+      <option value="نقاط_ولاء">نقاط ولاء</option>
+    </select>
+    <input id="paidAmount" type="number" step="0.01" placeholder="المبلغ المدفوع" style="margin-top:10px">
+    <input id="paymentNotes" placeholder="ملاحظات" style="margin-top:10px">
+    <div id="loyaltyBox" class="card hidden" style="margin-top:12px;padding:12px">
+      النقاط المتاحة: <strong id="availablePoints">0</strong>
+      <input id="redeemPoints" type="number" placeholder="عدد النقاط المراد استبدالها" style="margin-top:10px">
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('paymentModal')">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmPayment()">تأكيد الدفع</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="supervisorModal">
+  <div class="modalCard">
+    <div class="title">اعتماد الخصم</div>
+    <input id="superPassInput" type="password" placeholder="كلمة مرور المشرف">
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('supervisorModal')">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="verifySupervisor()">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="shiftCashModal">
+  <div class="modalCard">
+    <div class="title">إغلاق الوردية</div>
+    <div class="card" style="text-align:center;margin-bottom:12px">
+      المتوقع في الخزنة
+      <div class="rightTotal" id="expectedCash">0.00</div>
+    </div>
+    <input id="actualCash" type="number" step="0.01" placeholder="الموجود فعلياً">
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('shiftCashModal')">إلغاء</button>
+      <button class="btn btn-danger" style="flex:1" onclick="saveShiftCash()">تأكيد وإغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="qrModal">
+  <div class="modalCard" style="text-align:center">
+    <div class="title">QR الطلب</div>
+    <div id="qrCodeContainer"></div>
+    <div id="qrOrderId" style="margin-top:12px;font-weight:800;color:var(--primary)"></div>
+    <button class="btn btn-outline" style="margin-top:14px" onclick="closeModal('qrModal')">إغلاق</button>
+  </div>
+</div>
+
+<div class="modal" id="userModal">
+  <div class="modalCard">
+    <div class="title">تحرير مستخدم</div>
+    <input id="editBranch" placeholder="الفرع">
+    <input id="editUsername" placeholder="اسم المستخدم" style="margin-top:10px">
+    <input id="editPass" placeholder="كلمة المرور الجديدة - اختياري" style="margin-top:10px">
+    <input id="editSuperPass" placeholder="سوبر باس جديد - اختياري" style="margin-top:10px">
+    <select id="editPointType" style="margin-top:10px">
+      <option>مندوب_بيع</option>
+      <option>كاشير</option>
+      <option>دليفري</option>
+      <option>خدمة العملاء</option>
+      <option>مدير_فرع</option>
+      <option>إدارة</option>
+    </select>
+    <input id="editPhone" placeholder="الهاتف" style="margin-top:10px">
+    <input id="editAddress" placeholder="العنوان" style="margin-top:10px">
+    <input id="editCenter" placeholder="المركز" style="margin-top:10px">
+    <input id="editGovernorate" placeholder="المحافظة" style="margin-top:10px">
+    <input id="editSalaf" placeholder="السلف" style="margin-top:10px">
+    <label style="display:block;margin-top:12px"><input id="editActive" type="checkbox" checked> نشط</label>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('userModal')">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveUserChanges()">حفظ</button>
+    </div>
+  </div>
+</div>
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkGmAB7CXhlMPbXX8PgLQL9wEZEmRfIyy4MWXl5wf0cRAKCxu1r5QQcOUmU_tTU2mB6Q/exec'; // غيّرها
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgsnhpdyRMFv_yJ-wxOpOd-Y8auaw4CzpvHoXWX8ltiDagM6GNztoAVobHAxkjuW4wrA/exec';
 
 const State = {
-    db: {}, currentUser: null, cart: [], crmCart: [],
-    customerData: {name:'', phone:'', address:''},
-    currentCat: 'الكل', crmCurrentCat: 'الكل',
-    crmTargetBranch: ''
+  db: {products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[]},
+  currentUser: null,
+  currentCat: 'الكل',
+  crmCurrentCat: 'الكل',
+  cart: [],
+  crmCart: [],
+  pendingProduct: null,
+  pendingEditIndex: -1,
+  currentShift: null,
+  currentQROrderId: '',
+  discountEnabled: false,
+  customerData: {name:'', phone:'', address:''},
+  loginUsers: [],
+  selectedBranch: '',
+  deliveryNewCount: 0,
+  lastReceiptHtml: '',
+  thermalPort: null,
+  editOriginalUsername: '',
+  deliveryPollingInterval: null
 };
 
-function toast(msg, type='info') {
-    const t = document.getElementById('toast');
-    t.style.background = type==='success' ? '#2e7d32' : '#d32f2f';
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 3500);
+const money = n => (Number(n || 0)).toFixed(2);
+const esc = s => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const isWeight = p => String(p.unit || '').trim() === 'كيلو';
+
+function toast(msg, type='info'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'error' ? '#d32f2f' : type === 'success' ? '#2e7d32' : '#2d2521';
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-<!-- استمرار الكود من الجزء 1 -->
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
 
-<script>
-// ================== الدوال الأساسية ==================
-async function login() {
-    const pt = document.getElementById('pointTypeSelect').value;
-    const br = document.getElementById('branchSelect').value;
-    const pw = document.getElementById('passInput').value;
-    if (!pt || !br || !pw) return toast('املأ جميع الحقول', 'error');
-
-    try {
-        const res = await jsonp('authenticate', { pointType: pt, branch: br, pass: pw });
-        if (!res.ok) return toast(res.error, 'error');
-
-        State.currentUser = { branch: br, pointType: pt, username: br, token: res.token };
-        localStorage.setItem('SOKAR_USER', JSON.stringify(State.currentUser));
-
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appContainer').classList.remove('hidden');
-
-        await refreshData();
-        buildNav();
-        showSection(pt === 'خدمة العملاء' ? 'crm' : 'pos');
-        toast('✅ تم تسجيل الدخول بنجاح', 'success');
-    } catch(e) { toast('خطأ في الاتصال', 'error'); }
+function server(fn, ...args){
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(err => reject(new Error(err && err.message ? err.message : 'خطأ في الخادم')))
+      [fn](...args);
+  });
 }
 
-async function refreshData() {
-    if (!State.currentUser) return;
-    const res = await jsonp('getInitialData', {
-        userType: State.currentUser.pointType,
-        branch: State.currentUser.branch,
-        username: State.currentUser.username
+async function boot(){
+  try{
+    const res = await server('getLoginUsers');
+    State.loginUsers = res.users || [];
+    loadLoginOptions();
+  }catch(e){
+    document.getElementById('loginMsg').textContent = e.message;
+  }
+}
+
+function loadLoginOptions(){
+  const typeSel = document.getElementById('pointTypeSelect');
+  const userSel = document.getElementById('usernameSelect');
+  const types = [...new Set(State.loginUsers.filter(u => u.active).map(u => u.pointType))];
+  typeSel.innerHTML = `<option value="">اختر نوع المستخدم</option>` + types.map(t => `<option>${esc(t)}</option>`).join('');
+  userSel.innerHTML = `<option value="">اختر اسم المستخدم</option>`;
+
+  typeSel.onchange = () => {
+    const pt = typeSel.value;
+    const list = State.loginUsers.filter(u => u.active && u.pointType === pt);
+    userSel.innerHTML = `<option value="">اختر اسم المستخدم</option>` + list.map(u => `<option value="${esc(u.username)}">${esc(u.username)} - ${esc(u.branch)}</option>`).join('');
+  };
+}
+
+async function login(){
+  const pt = document.getElementById('pointTypeSelect').value;
+  const username = document.getElementById('usernameSelect').value;
+  const pw = document.getElementById('passInput').value;
+  if(!pt || !username || !pw) return toast('املأ كل الحقول', 'error');
+
+  try{
+    const res = await server('authenticateUser', pt, username, pw);
+    if(!res.ok) return toast(res.error || 'فشل الدخول', 'error');
+    State.currentUser = res.user;
+    localStorage.setItem('S33_USER', JSON.stringify(res.user));
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('whoami').innerHTML = `<strong>${esc(res.user.username)}</strong><br><span class="muted">${esc(res.user.branch)} - ${esc(res.user.pointType)}</span>`;
+    await refreshData();
+    buildNav();
+    showSection(res.user.pointType === 'خدمة العملاء' ? 'crm' : res.user.pointType === 'دليفري' ? 'delivery' : 'pos');
+    if(res.user.pointType === 'دليفري') startDeliveryPolling();
+    toast('تم تسجيل الدخول', 'success');
+  }catch(e){
+    toast(e.message, 'error');
+  }
+}
+
+function logout(){
+  localStorage.removeItem('S33_USER');
+  if(State.deliveryPollingInterval) clearInterval(State.deliveryPollingInterval);
+  location.reload();
+}
+
+async function restoreSession(){
+  const raw = localStorage.getItem('S33_USER');
+  if(!raw) return;
+  try{
+    State.currentUser = JSON.parse(raw);
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('whoami').innerHTML = `<strong>${esc(State.currentUser.username)}</strong><br><span class="muted">${esc(State.currentUser.branch)} - ${esc(State.currentUser.pointType)}</span>`;
+    await refreshData();
+    buildNav();
+    showSection(State.currentUser.pointType === 'خدمة العملاء' ? 'crm' : State.currentUser.pointType === 'دليفري' ? 'delivery' : 'pos');
+    if(State.currentUser.pointType === 'دليفري') startDeliveryPolling();
+  }catch(e){}
+}
+
+async function refreshData(){
+  if(!State.currentUser) return;
+  const res = await server('getInitialDataForUser', State.currentUser.pointType, State.currentUser.branch, State.currentUser.username);
+  State.db = {...State.db, ...res};
+  loadCurrentShift();
+}
+
+function loadCurrentShift(){
+  State.currentShift = (State.db.shifts || []).find(s => s.branch === State.currentUser.branch && s.cashier === State.currentUser.username && s.status === 'مفتوحة') || null;
+  document.getElementById('shiftStatus').textContent = State.currentShift ? 'وردية مفتوحة' : 'لا توجد وردية';
+}
+
+function buildNav(){
+  const pt = State.currentUser.pointType;
+  let items = [];
+  if(pt === 'مندوب_بيع') items = [['pos','نقطة البيع']];
+  else if(pt === 'كاشير') items = [['pos','نقطة البيع'],['stock','المخزون'],['reports','التقارير'],['expenses','المصروفات'],['returns','المرتجعات'],['loyalty','الولاء'],['search','بحث']];
+  else if(pt === 'دليفري') items = [['delivery','التوصيل'],['pos','نقطة البيع'],['search','بحث']];
+  else if(pt === 'خدمة العملاء') items = [['crm','CRM'],['complaints','الشكاوى'],['stock','المخزون'],['reports','المبيعات'],['shifts','الورديات']];
+  else if(pt === 'مدير_فرع') items = [['pos','نقطة البيع'],['reports','التقارير'],['forecast','التوقعات'],['loyalty','الولاء'],['stock','المخزون']];
+  else if(pt === 'إدارة') items = [['admin','مراقبة الفروع'],['users','المستخدمون'],['products','المنتجات'],['crm','CRM'],['delivery','التوصيل'],['reports','التقارير'],['forecast','التوقعات'],['complaints','الشكاوى'],['stock','المخزون'],['expenses','المصروفات'],['returns','المرتجعات'],['loyalty','الولاء'],['search','بحث']];
+
+  document.getElementById('nav').innerHTML = items.map(([id,label]) =>
+    `<button id="nav-${id}" onclick="showSection('${id}')">${esc(label)}${id==='delivery'?`<span id="deliveryBadge" class="navBadge hidden">0</span>`:''}</button>`
+  ).join('');
+}
+
+function setActiveNav(id){
+  document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('nav-' + id);
+  if(btn) btn.classList.add('active');
+}
+
+function showSection(id){
+  setActiveNav(id);
+  const map = {
+    pos: renderPOS,
+    crm: renderCRM,
+    delivery: renderDelivery,
+    stock: renderStock,
+    reports: renderReports,
+    search: renderSearch,
+    complaints: renderComplaints,
+    loyalty: renderLoyalty,
+    forecast: renderForecast,
+    expenses: renderExpenses,
+    returns: renderReturns,
+    users: renderUsers,
+    products: renderProductsManagement,
+    admin: renderAdmin
+  };
+  (map[id] || renderPOS)();
+}
+
+// ================= POS =================
+function renderPOS(){
+  const cats = ['الكل', ...new Set((State.db.products || []).map(p => p.cat).filter(Boolean))];
+  document.getElementById('content').innerHTML = `
+    <div class="grid grid-3">
+      <div class="card">
+        <div class="title">الأقسام</div>
+        <div class="cats">
+          ${cats.map(c => `<button class="catBtn ${State.currentCat===c?'active':''}" onclick="setCategory('${esc(c)}')">${esc(c)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div class="title">المنتجات</div>
+          <input id="searchInput" placeholder="بحث..." style="max-width:260px" oninput="renderProductsGrid()">
+        </div>
+        <div id="productsGrid" class="products"></div>
+      </div>
+      <div class="card" id="cartPanel"></div>
+    </div>
+  `;
+  renderProductsGrid();
+  renderCart();
+}
+
+function setCategory(c){ State.currentCat = c; renderPOS(); }
+
+function renderProductsGrid(){
+  const q = (document.getElementById('searchInput')?.value || '').trim();
+  let list = State.db.products || [];
+  if(State.currentCat !== 'الكل') list = list.filter(p => p.cat === State.currentCat);
+  if(q) list = list.filter(p => p.name.includes(q));
+  document.getElementById('productsGrid').innerHTML = list.map(p => {
+    const st = (State.db.stock || []).find(s => s.branch === State.currentUser.branch && s.item === p.name);
+    return `<div class="product" onclick="askQty('${esc(p.name)}')">
+      <div style="font-weight:700">${esc(p.name)}</div>
+      <div class="muted">${esc(p.cat || '')}</div>
+      <div style="margin-top:8px;color:var(--primary);font-weight:800">${money(p.price)} ج${isWeight(p)?'/كجم':''}</div>
+      <div class="note" style="margin-top:6px">رصيد: ${money(st ? st.qty : 0)}</div>
+    </div>`;
+  }).join('') || `<div class="muted">لا توجد منتجات</div>`;
+}
+
+function askQty(name){
+  const p = (State.db.products || []).find(x => x.name === name);
+  if(!p) return;
+  State.pendingProduct = p;
+  State.pendingEditIndex = -1;
+  document.getElementById('qtyTitle').textContent = p.name;
+  document.getElementById('qtyInput').value = isWeight(p) ? 1000 : 1;
+  document.getElementById('qtyInput').step = isWeight(p) ? 50 : 1;
+  document.getElementById('qtyInput').min = isWeight(p) ? 50 : 1;
+  document.getElementById('itemNote').value = '';
+  document.getElementById('qtyHint').textContent = isWeight(p) ? 'أدخل الوزن بالجرام - 1000 جرام = 1 كجم' : '';
+  openModal('qtyModal');
+}
+
+function confirmQty(){
+  const q = parseFloat(document.getElementById('qtyInput').value || 0);
+  if(!State.pendingProduct || q <= 0) return;
+  const note = document.getElementById('itemNote').value.trim();
+  const chargeQty = isWeight(State.pendingProduct) ? q / 1000 : q;
+  const total = chargeQty * Number(State.pendingProduct.price || 0);
+
+  if(State.pendingEditIndex >= 0){
+    const it = State.cart[State.pendingEditIndex];
+    it.qty = q; it.chargeQty = chargeQty; it.total = total; it.note = note;
+  }else{
+    State.cart.push({
+      name: State.pendingProduct.name,
+      unit: State.pendingProduct.unit,
+      price: Number(State.pendingProduct.price || 0),
+      qty: q,
+      chargeQty,
+      total,
+      note
     });
-    if (res.ok) State.db = res;
+  }
+  closeModal('qtyModal');
+  renderCart();
 }
 
-function buildNav() {
-    const pt = State.currentUser.pointType;
-    let menu = [];
+function editCart(idx){
+  const it = State.cart[idx];
+  const p = (State.db.products || []).find(x => x.name === it.name);
+  if(!p) return;
+  State.pendingProduct = p;
+  State.pendingEditIndex = idx;
+  document.getElementById('qtyTitle').textContent = 'تعديل ' + p.name;
+  document.getElementById('qtyInput').value = it.qty;
+  document.getElementById('itemNote').value = it.note || '';
+  document.getElementById('qtyHint').textContent = isWeight(p) ? 'أدخل الوزن بالجرام' : '';
+  openModal('qtyModal');
+}
 
-    if (pt === 'خدمة العملاء') {
-        menu = [
-            ['crm', '📞 خدمة العملاء', 'headset'],
-            ['stock', '📦 المخزون', 'boxes'],
-            ['orders', '📋 متابعة طلبات', 'list-check']
-        ];
-    } else if (pt === 'دليفري') {
-        menu = [
-            ['pos', '🍬 نقطة البيع', 'store'],
-            ['delivery', '🛵 طلباتي', 'motorcycle']
-        ];
-    } else {
-        menu = [
-            ['pos', '🍬 نقطة البيع', 'store'],
-            ['stock', '📦 المخزون', 'boxes'],
-            ['reports', '📊 تقارير', 'chart-bar']
-        ];
+function removeFromCart(idx){ State.cart.splice(idx,1); renderCart(); }
+
+function clearCart(){
+  State.cart = [];
+  State.currentQROrderId = '';
+  State.discountEnabled = false;
+  renderCart();
+}
+
+function renderCart(){
+  const sub = State.cart.reduce((a,b) => a + Number(b.total || 0), 0);
+  const feeInput = document.getElementById('deliveryFee');
+  const discountInput = document.getElementById('discountVal');
+  const fee = Number(feeInput ? feeInput.value : 0) || 0;
+  const disc = Number(discountInput ? discountInput.value : 0) || 0;
+  const total = Math.max(0, sub + fee - disc);
+  const discountLocked = !State.discountEnabled && ['كاشير','دليفري'].includes(State.currentUser.pointType);
+
+  document.getElementById('cartPanel').innerHTML = `
+    <div class="row" style="justify-content:space-between">
+      <div class="title">السلة</div>
+      <div class="badge">${State.cart.length} صنف</div>
+    </div>
+    <div style="max-height:340px;overflow:auto;margin-top:10px">
+      ${State.cart.map((i,idx) => `
+        <div class="cartItem">
+          <div>
+            <div style="font-weight:700">${esc(i.name)}</div>
+            <div class="note">${esc(String(i.qty))} × ${money(i.price)} ${i.note ? ' - ' + esc(i.note) : ''}</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-weight:700">${money(i.total)} ج</div>
+            <div class="row">
+              <button class="btn btn-outline" style="padding:6px 8px" onclick="editCart(${idx})">تعديل</button>
+              <button class="btn btn-outline" style="padding:6px 8px" onclick="removeFromCart(${idx})">حذف</button>
+            </div>
+          </div>
+        </div>`).join('') || `<div class="muted">السلة فارغة</div>`}
+    </div>
+    <div style="margin-top:12px">
+      <div class="row">
+        <input id="deliveryFee" type="number" step="0.5" value="${fee}" placeholder="رسوم التوصيل" oninput="renderCart()">
+        <input id="discountVal" type="number" step="0.5" value="${disc}" placeholder="الخصم" oninput="renderCart()" ${discountLocked ? 'readonly onclick="requestDiscountSupervisor()" style="background:#fff7dc;cursor:pointer"' : ''}>
+      </div>
+      <div style="margin-top:12px" class="row"><span>المجموع</span><strong>${money(sub)} ج</strong></div>
+      <div class="row" style="justify-content:space-between;margin-top:10px"><span>الإجمالي</span><span class="rightTotal">${money(total)}</span></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-outline" onclick="clearCart()">مسح</button>
+        <button class="btn btn-outline" onclick="parkCurrentOrder()">تعليق</button>
+        <button class="btn btn-outline" onclick="loadParkedOrders()">المعلقة</button>
+        ${State.currentUser.pointType === 'مندوب_بيع' ? `<button class="btn btn-primary" onclick="createQROrder()">QR</button>` : ''}
+        ${['كاشير','دليفري','مندوب_بيع'].includes(State.currentUser.pointType) ? `<button class="btn btn-outline" onclick="loadQROrderPrompt()">تحميل QR</button>` : ''}
+      </div>
+      <div class="row" style="margin-top:10px">
+        ${['كاشير','دليفري'].includes(State.currentUser.pointType) ? `<button class="btn btn-outline" onclick="showShiftTools()">الوردية</button>` : ''}
+        <button class="btn btn-outline" onclick="connectThermalPrinter()">الطابعة</button>
+        ${State.currentUser.pointType !== 'مندوب_بيع' ? `<button class="btn btn-primary" style="flex:1" onclick="proceedToPayment()" ${!State.currentShift && ['كاشير','دليفري'].includes(State.currentUser.pointType) ? 'disabled' : ''}>الدفع</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function proceedToPayment(){
+  if(!State.cart.length) return toast('السلة فارغة','error');
+  if(!State.currentShift && ['كاشير','دليفري'].includes(State.currentUser.pointType)) return toast('افتح وردية أولاً','error');
+  document.getElementById('customerName').value = State.customerData.name || '';
+  document.getElementById('customerPhone').value = State.customerData.phone || '';
+  document.getElementById('customerAddress').value = State.customerData.address || '';
+  document.getElementById('customerLoyaltyInfo').textContent = '';
+  openModal('customerModal');
+}
+
+async function loadCustomerData(){
+  const phone = document.getElementById('customerPhone').value.trim();
+  if(!phone) return;
+  try{
+    const res = await server('getCustomerByPhone', phone);
+    if(res.customer){
+      if(!document.getElementById('customerName').value) document.getElementById('customerName').value = res.customer.name || '';
+      if(!document.getElementById('customerAddress').value) document.getElementById('customerAddress').value = res.customer.address || '';
     }
+    document.getElementById('customerLoyaltyInfo').innerHTML = `النقاط الحالية: <strong>${res.points || 0}</strong>`;
+    document.getElementById('availablePoints').textContent = res.points || 0;
+  }catch(e){}
+}
 
-    document.getElementById('navMenu').innerHTML = menu.map(([id, text, icon]) => `
-        <div class="nav-item" onclick="showSection('${id}')">
-            <i class="fas fa-${icon}"></i> ${text}
+async function searchAddress(){
+  const val = document.getElementById('customerAddress').value.trim();
+  const box = document.getElementById('addressSuggestions');
+  if(val.length < 2){ box.classList.add('hidden'); return; }
+  const res = await server('getDeliveryZones', State.currentUser.branch, val);
+  if(!(res.zones || []).length){ box.classList.add('hidden'); return; }
+  box.innerHTML = res.zones.map(z => `<div style="padding:10px;cursor:pointer;border-bottom:1px solid #eee" onclick="selectAddress('${esc(z.area)}', ${Number(z.price||0)})">${esc(z.area)} - <strong>${money(z.price)} ج</strong></div>`).join('');
+  box.classList.remove('hidden');
+}
+
+function selectAddress(area, price){
+  document.getElementById('customerAddress').value = area;
+  document.getElementById('addressSuggestions').classList.add('hidden');
+  const feeInput = document.getElementById('deliveryFee');
+  if(feeInput){ feeInput.value = price; renderCart(); }
+}
+
+function confirmCustomerInfo(){
+  State.customerData = {
+    name: document.getElementById('customerName').value.trim(),
+    phone: document.getElementById('customerPhone').value.trim(),
+    address: document.getElementById('customerAddress').value.trim()
+  };
+  closeModal('customerModal');
+  const sub = State.cart.reduce((a,b) => a + Number(b.total || 0), 0);
+  const fee = Number(document.getElementById('deliveryFee')?.value || 0);
+  const disc = Number(document.getElementById('discountVal')?.value || 0);
+  document.getElementById('paidAmount').value = Math.max(0, sub + fee - disc).toFixed(2);
+  document.getElementById('loyaltyBox').classList.toggle('hidden', !State.customerData.phone);
+  openModal('paymentModal');
+}
+
+function requestDiscountSupervisor(){ openModal('supervisorModal'); }
+
+async function verifySupervisor(){
+  const pass = document.getElementById('superPassInput').value;
+  if(!pass) return toast('أدخل كلمة مرور المشرف', 'error');
+  const res = await server('verifySupervisor', State.currentUser.branch, pass);
+  if(!res.ok) return toast('السوبر باس غير صحيح', 'error');
+  State.discountEnabled = true;
+  closeModal('supervisorModal');
+  renderCart();
+  setTimeout(() => {
+    const inp = document.getElementById('discountVal');
+    if(inp){ inp.readOnly = false; inp.focus(); }
+  }, 50);
+  toast('تم تفعيل الخصم', 'success');
+}
+
+async function confirmPayment(){
+  const method = document.getElementById('paymentMethod').value;
+  const paid = Number(document.getElementById('paidAmount').value || 0);
+  const notes = document.getElementById('paymentNotes').value.trim();
+  const sub = State.cart.reduce((a,b) => a + Number(b.total || 0), 0);
+  const delivery = Number(document.getElementById('deliveryFee')?.value || 0);
+  const discount = Number(document.getElementById('discountVal')?.value || 0);
+  const redeemedPoints = method === 'نقاط_ولاء' ? Number(document.getElementById('redeemPoints').value || 0) : 0;
+
+  const order = {
+    saleId: 'SALE-' + Date.now().toString(36).toUpperCase(),
+    date: new Date().toISOString().slice(0,10),
+    branch: State.currentUser.branch,
+    customer: State.customerData.name || 'عميل نقدي',
+    phone: State.customerData.phone || '',
+    address: State.customerData.address || '',
+    channel: State.currentQROrderId ? 'QR' : 'نقطة بيع',
+    status: 'مكتمل',
+    subtotal: sub,
+    discount,
+    delivery,
+    total: Math.max(0, sub + delivery - discount),
+    cashier: State.currentUser.username,
+    username: State.currentUser.username,
+    notes,
+    shiftId: State.currentShift ? State.currentShift.id : '',
+    paymentMethod: method,
+    paidAmount: paid,
+    qrOrderId: State.currentQROrderId || '',
+    itemsJson: JSON.stringify(State.cart.map(i => ({
+      name: i.name,
+      qty: i.qty,
+      chargeQty: i.chargeQty,
+      price: i.price,
+      total: i.total,
+      unit: i.unit || '',
+      note: i.note || ''
+    }))),
+    redeemedPoints
+  };
+
+  try{
+    const res = await server('saveOrder', order);
+    if(!res.ok) return toast(res.error || 'فشل الحفظ', 'error');
+    closeModal('paymentModal');
+    printReceipt(order);
+    await printThermal(order);
+    clearCart();
+    await refreshData();
+    renderPOS();
+    toast('تم إتمام البيع', 'success');
+  }catch(e){
+    toast(e.message, 'error');
+  }
+}
+
+function printReceipt(order){
+  const itemsHtml = State.cart.map(i => `<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${esc(i.name)} ${i.note ? '(' + esc(i.note) + ')' : ''}</span><span>${esc(String(i.qty))} × ${money(i.price)} = ${money(i.total)}</span></div>`).join('');
+  const html = `
+    <html dir="rtl"><head><meta charset="UTF-8"><title>${esc(order.saleId)}</title>
+    <style>body{font-family:Cairo,Segoe UI,sans-serif;padding:16px;max-width:390px;margin:auto} .h{text-align:center;border-bottom:2px solid #b81b5c;padding-bottom:10px;margin-bottom:10px} .t{font-size:23px;font-weight:800;color:#b81b5c} .r{display:flex;justify-content:space-between;padding:4px 0} .sum{font-size:24px;font-weight:800;color:#b81b5c;text-align:center;margin-top:12px}</style>
+    </head><body>
+      <div class="h"><div class="t">سُكّر 33</div><div>برمجة م/ محمود سلامة</div><div>${esc(order.date)}</div></div>
+      <div class="r"><strong>الفرع</strong><span>${esc(order.branch)}</span></div>
+      <div class="r"><strong>العميل</strong><span>${esc(order.customer)}</span></div>
+      ${order.phone ? `<div class="r"><strong>الهاتف</strong><span>${esc(order.phone)}</span></div>` : ''}
+      ${order.address ? `<div class="r"><strong>العنوان</strong><span>${esc(order.address)}</span></div>` : ''}
+      <hr>${itemsHtml}<hr>
+      ${order.discount > 0 ? `<div class="r"><strong>الخصم</strong><span>${money(order.discount)} ج</span></div>` : ''}
+      ${order.delivery > 0 ? `<div class="r"><strong>التوصيل</strong><span>${money(order.delivery)} ج</span></div>` : ''}
+      <div class="sum">الإجمالي ${money(order.total)} ج</div>
+      <div style="text-align:center;margin-top:10px">${esc(order.paymentMethod)}</div>
+      <div style="text-align:center;margin-top:10px;font-size:12px">${esc(order.saleId)}</div>
+    </body></html>`;
+  State.lastReceiptHtml = html;
+  const w = window.open('', '_blank', 'width=420,height=700');
+  if(!w) return;
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
+async function connectThermalPrinter(){
+  if(!('serial' in navigator)) return toast('المتصفح لا يدعم Web Serial', 'error');
+  try{
+    State.thermalPort = await navigator.serial.requestPort();
+    await State.thermalPort.open({ baudRate: 9600 });
+    toast('تم الاتصال بالطابعة', 'success');
+  }catch(e){
+    toast(e.message, 'error');
+  }
+}
+
+async function printThermal(order){
+  if(!State.thermalPort) return;
+  try{
+    const writer = State.thermalPort.writable.getWriter();
+    const lines = [
+      'سُكّر 33',
+      'برمجة م/ محمود سلامة',
+      order.date,
+      '------------------------------',
+      'العميل: ' + order.customer,
+      order.phone ? 'الهاتف: ' + order.phone : '',
+      order.address ? 'العنوان: ' + order.address : '',
+      '------------------------------',
+      ...State.cart.map(i => `${i.name} ${i.qty} x ${money(i.price)} = ${money(i.total)}`),
+      '------------------------------',
+      order.discount > 0 ? `خصم: ${money(order.discount)}` : '',
+      order.delivery > 0 ? `توصيل: ${money(order.delivery)}` : '',
+      `الإجمالي: ${money(order.total)}`,
+      order.paymentMethod,
+      order.saleId,
+      '',
+      '',
+      ''
+    ].filter(Boolean).join('\n');
+    await writer.write(new TextEncoder().encode(lines));
+    writer.releaseLock();
+  }catch(e){}
+}
+
+// ================= QR =================
+async function createQROrder(){
+  if(!State.cart.length) return toast('السلة فارغة', 'error');
+  const subtotal = State.cart.reduce((a,b) => a + Number(b.total || 0), 0);
+  const discount = Number(document.getElementById('discountVal')?.value || 0);
+  const delivery = Number(document.getElementById('deliveryFee')?.value || 0);
+  const total = Math.max(0, subtotal + delivery - discount);
+  const res = await server('createQROrder', {
+    creator: State.currentUser.username,
+    salesmanName: State.currentUser.username,
+    branch: State.currentUser.branch,
+    items: State.cart,
+    subtotal,
+    discount,
+    delivery,
+    total
+  });
+  if(!res.ok) return toast(res.error || 'فشل إنشاء QR','error');
+  document.getElementById('qrOrderId').textContent = res.orderId;
+  const holder = document.getElementById('qrCodeContainer');
+  holder.innerHTML = '';
+  QRCode.toCanvas(document.createElement('canvas'), res.orderId, {width:240, margin:2}, (err, canvas) => {
+    if(!err) holder.appendChild(canvas);
+  });
+  openModal('qrModal');
+}
+
+async function loadQROrderPrompt(){
+  const code = prompt('أدخل كود QR');
+  if(!code) return;
+  const res = await server('getQROrder', code);
+  if(!res.order) return toast('الطلب غير موجود','error');
+  State.cart = (res.order.items || []).map(i => ({
+    ...i,
+    chargeQty: i.chargeQty != null ? i.chargeQty : i.qty,
+    total: Number(i.total || ((i.price || 0) * (i.chargeQty != null ? i.chargeQty : i.qty || 0)))
+  }));
+  State.currentQROrderId = code;
+  showSection('pos');
+  setTimeout(() => {
+    const fee = document.getElementById('deliveryFee');
+    const disc = document.getElementById('discountVal');
+    if(fee) fee.value = res.order.delivery || 0;
+    if(disc) disc.value = res.order.discount || 0;
+    renderCart();
+  }, 50);
+  toast('تم تحميل طلب QR', 'success');
+}
+
+// ================= Shifts =================
+function showShiftTools(){
+  if(!State.currentShift){
+    if(confirm('لا توجد وردية مفتوحة. هل تريد فتح وردية الآن؟')) openShift();
+    return;
+  }
+  showShiftCashReport();
+}
+
+async function openShift(){
+  const res = await server('openShift', State.currentUser.branch, State.currentUser.username);
+  if(!res.ok) return toast(res.error || 'فشل فتح الوردية', 'error');
+  await refreshData();
+  renderCart();
+  toast('تم فتح الوردية', 'success');
+}
+
+async function showShiftCashReport(){
+  if(!State.currentShift) return;
+  const res = await server('getShiftExpectedCash', State.currentShift.id);
+  document.getElementById('expectedCash').textContent = money(res.cash || 0) + ' ج';
+  document.getElementById('actualCash').value = '';
+  openModal('shiftCashModal');
+}
+
+async function saveShiftCash(){
+  if(!State.currentShift) return;
+  const actual = Number(document.getElementById('actualCash').value || 0);
+  await server('updateShiftActualCash', State.currentShift.id, actual);
+  await server('closeShift', State.currentShift.id);
+  closeModal('shiftCashModal');
+  await refreshData();
+  renderCart();
+  toast('تم إغلاق الوردية', 'success');
+}
+
+// ================= Parked Orders =================
+async function parkCurrentOrder(){
+  if(!State.cart.length) return toast('السلة فارغة','error');
+  const res = await server('parkOrder', {
+    branch: State.currentUser.branch,
+    cashier: State.currentUser.username,
+    cart: State.cart,
+    customerData: State.customerData
+  });
+  if(!res.ok) return toast(res.error || 'فشل التعليق', 'error');
+  clearCart();
+  toast('تم تعليق الفاتورة', 'success');
+}
+
+async function loadParkedOrders(){
+  const res = await server('getParkedOrders', State.currentUser.branch, State.currentUser.username);
+  const list = res.orders || [];
+  if(!list.length) return toast('لا توجد فواتير معلقة');
+  const msg = list.map((o,i) => `${i+1}) ${o.id}`).join('\n');
+  const chosen = prompt(`الفواتير المعلقة:\n${msg}\n\nأدخل الكود المطلوب استرجاعه`);
+  if(!chosen) return;
+  const target = list.find(o => o.id === chosen.trim());
+  if(!target) return toast('الكود غير موجود','error');
+  State.cart = target.data.cart || [];
+  State.customerData = target.data.customerData || {name:'',phone:'',address:''};
+  await server('deleteParkedOrder', target.id);
+  renderCart();
+  toast('تم استرجاع الفاتورة', 'success');
+}
+
+// ================= CRM =================
+async function renderCRM(){
+  const deliveryUsers = (await server('getDeliveryUsers', State.currentUser.branch === 'الإدارة' ? '' : State.currentUser.branch)).users || [];
+  const branches = [...new Set((State.db.users || []).filter(u => u.pointType === 'دليفري' && u.active).map(u => u.branch))];
+
+  document.getElementById('content').innerHTML = `
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="title">طلب CRM جديد</div>
+        <input id="crmCustomer" placeholder="اسم العميل">
+        <input id="crmPhone" placeholder="رقم الهاتف" style="margin-top:10px">
+        <div style="position:relative;margin-top:10px">
+          <input id="crmAddress" placeholder="العنوان" oninput="crmSearchAddress()">
+          <div id="crmAddressSuggestions" class="hidden" style="position:absolute;right:0;left:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:12px;z-index:20;max-height:180px;overflow:auto"></div>
         </div>
-    `).join('');
-}
-
-function showSection(section) {
-    const content = document.getElementById('mainContent');
-    if (section === 'crm') renderCRM(content);
-    else if (section === 'pos') renderPOS(content);
-    else if (section === 'delivery') renderDelivery(content);
-    else if (section === 'stock') renderStock(content);
-    else if (section === 'orders') renderCrmOrders(content);
-}
-
-// ================== CRM - شاشة البيع الموحدة ==================
-function renderCRM(content) {
-    content.innerHTML = `
-        <h2>📞 خدمة العملاء - نقطة بيع احترافية</h2>
-        <div class="customer-info">
-            <input id="custName" placeholder="اسم العميل" style="width:100%;padding:12px;margin:6px 0;">
-            <input id="custPhone" placeholder="رقم الهاتف" style="width:100%;padding:12px;margin:6px 0;">
-            <input id="custAddress" placeholder="العنوان (اكتب للبحث)" style="width:100%;padding:12px;margin:6px 0;" oninput="searchDeliveryPrice()">
-            <div id="deliveryPriceShow" style="color:var(--primary);font-weight:bold;margin:8px 0;"></div>
+        <select id="crmBranch" style="margin-top:10px" onchange="crmDeliveryUsersChanged()">
+          <option value="">اختر فرع التوصيل</option>
+          ${branches.map(b => `<option>${esc(b)}</option>`).join('')}
+        </select>
+        <select id="crmDeliveryUser" style="margin-top:10px">
+          <option value="">تعيين تلقائي للدليفري</option>
+        </select>
+        <textarea id="crmNotes" rows="2" placeholder="ملاحظات" style="margin-top:10px"></textarea>
+        <div id="crmCartList" style="margin-top:12px"></div>
+        <div style="margin-top:12px;font-weight:800">الإجمالي: <span id="crmTotal">${money(0)}</span> ج</div>
+        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="saveCrmOrderFromCart()">إرسال للدليفري</button>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div class="title">منتجات CRM</div>
+          <input id="crmSearch" placeholder="بحث..." style="max-width:260px" oninput="renderCrmProducts()">
         </div>
-
-        <div style="display:flex;gap:20px;">
-            <!-- المنتجات -->
-            <div style="flex:1;">
-                <input type="text" id="searchInput" placeholder="🔍 بحث في المنتجات..." style="width:100%;padding:12px;margin-bottom:12px;" onkeyup="renderProductsCRM()">
-                <div id="productsContainerCRM" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;"></div>
-            </div>
-
-            <!-- السلة المعدلة -->
-            <div class="cart">
-                <h3>🛒 السلة</h3>
-                <div id="crmCartItems" style="max-height:380px;overflow-y:auto;"></div>
-                <div style="margin:15px 0;padding-top:15px;border-top:2px solid #eee;">
-                    <div>المجموع الفرعي: <span id="subTotal">0.00</span> ج</div>
-                    <div>رسوم التوصيل: <span id="delivFee">0.00</span> ج</div>
-                    <div class="grand">الإجمالي: <span id="grandTotal">0.00</span> ج</div>
-                </div>
-                <button onclick="sendCrmOrder()" style="width:100%;padding:16px;background:var(--primary);color:white;border:none;border-radius:30px;font-size:17px;">
-                    📤 إرسال للفرع
-                </button>
-            </div>
+        <div class="row" id="crmCats" style="margin-bottom:12px"></div>
+        <div id="crmProducts" class="products"></div>
+        <div style="margin-top:18px" class="title">الطلبات الحالية</div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>الكود</th><th>العميل</th><th>الفرع</th><th>الدليفري</th><th>الحالة</th><th>الإجمالي</th></tr></thead>
+            <tbody>
+              ${(State.db.crmOrders || []).map(o => `<tr><td>${esc(o.id)}</td><td>${esc(o.customer)}</td><td>${esc(o.branch)}</td><td>${esc(o.assignedTo || '-')}</td><td>${esc(o.status)}</td><td>${money(o.total)}</td></tr>`).join('') || `<tr><td colspan="6">لا توجد طلبات</td></tr>`}
+            </tbody>
+          </table>
         </div>
-    `;
-    renderProductsCRM();
-    renderCrmCart();
+      </div>
+    </div>
+  `;
+
+  State.crmCurrentCat = 'الكل';
+  State.crmCart = State.crmCart || [];
+  renderCrmCats();
+  renderCrmProducts();
+  renderCrmCart();
+  crmDeliveryUsersChanged();
+
+  window._crmAllDeliveryUsers = deliveryUsers;
 }
 
-// بحث أسعار التوصيل
-async function searchDeliveryPrice() {
-    const addr = document.getElementById('custAddress').value.trim();
-    if (addr.length < 3) return;
-    const res = await jsonp('getDeliveryZones', { searchText: addr });
-    if (res.zones && res.zones.length) {
-        const fee = res.zones[0].price;
-        document.getElementById('delivFee').textContent = fee.toFixed(2);
-        document.getElementById('deliveryPriceShow').innerHTML = `🚚 رسوم التوصيل: <b>${fee} جنيه</b>`;
-    }
+function renderCrmCats(){
+  const cats = ['الكل', ...new Set((State.db.products || []).map(p => p.cat).filter(Boolean))];
+  document.getElementById('crmCats').innerHTML = cats.map(c => `<button class="catBtn ${State.crmCurrentCat===c?'active':''}" onclick="State.crmCurrentCat='${esc(c)}';renderCrmCats();renderCrmProducts()">${esc(c)}</button>`).join('');
 }
 
-function renderProductsCRM() {
-    // ... (نفس منطق renderProducts مع عرض المخزون حسب الفرع)
-    // تم تنفيذها بالكامل حسب طلبك
+function renderCrmProducts(){
+  const q = (document.getElementById('crmSearch')?.value || '').trim();
+  let list = State.db.products || [];
+  if(State.crmCurrentCat !== 'الكل') list = list.filter(p => p.cat === State.crmCurrentCat);
+  if(q) list = list.filter(p => p.name.includes(q));
+  document.getElementById('crmProducts').innerHTML = list.map(p => `<div class="product" onclick="crmAddItem('${esc(p.name)}')"><div style="font-weight:700">${esc(p.name)}</div><div class="muted">${esc(p.cat)}</div><div style="color:var(--primary);font-weight:800;margin-top:8px">${money(p.price)} ج</div></div>`).join('');
 }
 
-function renderCrmCart() {
-    // سلة CRM معدلة (صغيرة + فوقها بيانات العميل + أسعار التوصيل)
-    // ... كاملة
+function crmAddItem(name){
+  const p = (State.db.products || []).find(x => x.name === name);
+  if(!p) return;
+  const ex = State.crmCart.find(i => i.name === name);
+  if(ex){ ex.qty += 1; ex.total = ex.qty * ex.price; }
+  else State.crmCart.push({name:p.name, qty:1, price:Number(p.price || 0), total:Number(p.price || 0)});
+  renderCrmCart();
 }
 
-async function sendCrmOrder() {
-    // إرسال الطلب للدليفري + إشعار + حفظ في شيت CRM
-    toast('✅ تم إرسال الطلب للدليفري بنجاح', 'success');
+function renderCrmCart(){
+  const total = State.crmCart.reduce((a,b) => a + Number(b.total || 0), 0);
+  document.getElementById('crmTotal').textContent = money(total);
+  document.getElementById('crmCartList').innerHTML = State.crmCart.map((i,idx) => `
+    <div class="cartItem">
+      <div>${esc(i.name)} × ${i.qty}</div>
+      <div>${money(i.total)} ج <button class="btn btn-outline" style="padding:5px 8px" onclick="State.crmCart.splice(${idx},1);renderCrmCart()">حذف</button></div>
+    </div>`).join('') || `<div class="muted">السلة فارغة</div>`;
 }
 
-// ================== POS + Delivery + Orders ==================
-// (كل الدوال الأخرى: renderPOS, renderDelivery, renderCrmOrders, إلخ)
-
-function renderCrmOrders(content) {
-    content.innerHTML = `
-        <h2>📋 متابعة طلبات CRM للفروع</h2>
-        <div id="crmOrdersTable" class="table-wrapper"></div>
-    `;
-    // عرض كل الطلبات مع حالاتها
+function crmDeliveryUsersChanged(){
+  const branch = document.getElementById('crmBranch')?.value || '';
+  const sel = document.getElementById('crmDeliveryUser');
+  const all = window._crmAllDeliveryUsers || [];
+  const list = branch ? all.filter(u => u.branch === branch) : [];
+  sel.innerHTML = `<option value="">تعيين تلقائي للدليفري</option>` + list.map(u => `<option value="${esc(u.username)}">${esc(u.username)}</option>`).join('');
 }
 
-// ================== باقي الدوال (مختصرة) ==================
-async function jsonp(action, params = {}) {
-    // jsonp كامل
-    return new Promise((resolve) => { /* ... */ });
+async function crmSearchAddress(){
+  const branch = document.getElementById('crmBranch').value;
+  const val = document.getElementById('crmAddress').value.trim();
+  const box = document.getElementById('crmAddressSuggestions');
+  if(!branch || val.length < 2){ box.classList.add('hidden'); return; }
+  const res = await server('getDeliveryZones', branch, val);
+  if(!(res.zones || []).length){ box.classList.add('hidden'); return; }
+  box.innerHTML = res.zones.map(z => `<div style="padding:10px;cursor:pointer;border-bottom:1px solid #eee" onclick="selectCrmAddress('${esc(z.area)}')">${esc(z.area)} - <strong>${money(z.price)} ج</strong></div>`).join('');
+  box.classList.remove('hidden');
 }
 
-// window.onload
-window.onload = () => {
-    // تحميل البيانات + login screen
-};
-<!-- استمرار الكود من الجزء 2 -->
-
-<script>
-// ================== الدوال المتبقية ==================
-function renderPOS(content) {
-    content.innerHTML = `
-        <h2>🍬 نقطة البيع (موحدة)</h2>
-        <div style="display:flex;gap:20px;">
-            <div style="flex:1;">
-                <input type="text" id="posSearch" placeholder="🔍 بحث..." onkeyup="renderProductsPOS()" style="width:100%;padding:14px;font-size:16px;">
-                <div id="posProducts" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;"></div>
-            </div>
-            <div class="cart" id="posCart"></div>
-        </div>
-    `;
-    renderProductsPOS();
-    renderPosCart();
+function selectCrmAddress(addr){
+  document.getElementById('crmAddress').value = addr;
+  document.getElementById('crmAddressSuggestions').classList.add('hidden');
 }
 
-function renderProductsPOS() {
-    // نفس منطق renderProductsCRM مع تكبير الخط وإصلاح العربية
+async function saveCrmOrderFromCart(){
+  const branch = document.getElementById('crmBranch').value;
+  if(!branch) return toast('اختر فرع التوصيل', 'error');
+  if(!State.crmCart.length) return toast('أضف أصناف للطلب', 'error');
+
+  const order = {
+    branch,
+    customer: document.getElementById('crmCustomer').value.trim() || 'عميل',
+    phone: document.getElementById('crmPhone').value.trim(),
+    address: document.getElementById('crmAddress').value.trim(),
+    itemsJson: JSON.stringify(State.crmCart),
+    total: State.crmCart.reduce((a,b) => a + Number(b.total || 0), 0),
+    notes: document.getElementById('crmNotes').value.trim(),
+    createdBy: State.currentUser.username,
+    assignedTo: document.getElementById('crmDeliveryUser').value.trim()
+  };
+
+  const res = await server('saveCrmOrder', order);
+  if(!res.ok) return toast(res.error || 'فشل الحفظ', 'error');
+  State.crmCart = [];
+  await refreshData();
+  renderCRM();
+  toast('تم إرسال الطلب للدليفري', 'success');
 }
 
-function renderPosCart() {
-    // سلة POS موحدة
-}
-
-// ================== متابعة طلبات CRM ==================
-function renderCrmOrders(content) {
-    content.innerHTML = `
-        <h2>📋 متابعة طلبات CRM للفروع</h2>
-        <table style="width:100%;border-collapse:collapse;">
-            <thead><tr><th>كود الطلب</th><th>الفرع</th><th>العميل</th><th>الحالة</th><th>التاريخ</th></tr></thead>
-            <tbody id="ordersTableBody"></tbody>
-        </table>
-    `;
-    // تحميل الطلبات من State.db.crmOrders
-}
-
-// ================== Delivery Screen ==================
-function renderDelivery(content) {
-    content.innerHTML = `
-        <h2>🛵 طلبات الدليفري</h2>
-        <div id="deliveryList"></div>
-    `;
-    // عرض الطلبات + أزرار تغيير الحالة + سبب الإلغاء
-}
-
-// ================== JSONP + Post ==================
-async function jsonp(action, params={}) {
-    return new Promise((resolve, reject) => {
-        const cb = 'jsonp_' + Date.now();
-        window[cb] = (data) => {
-            delete window[cb];
-            resolve(data);
-        };
-        const url = `${SCRIPT_URL}?action=${action}&callback=${cb}&${new URLSearchParams(params)}`;
-        const script = document.createElement('script');
-        script.src = url;
-        document.head.appendChild(script);
-    });
-}
-
-// ================== تهيئة النظام ==================
-window.onload = async () => {
-    // تحميل البيانات الأولية
-    try {
-        const res = await jsonp('getInitialData', {});
-        if (res.ok) State.db = res;
-    } catch(e) {}
-
-    // عرض شاشة الدخول
-    // ... (كود الـ login)
-};
-
-console.log('%c✅ سُكّر 33 - النسخة النهائية الكاملة جاهزة', 'color:#b81b5c;font-size:18px;font-weight:bold;');
-</script>
-</body>
-</html>
+// ================= Delivery =================
+async function renderDelivery(){
+  const orders = (State.db.crmOrders || []).slice().sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  const statuses = ['جديد','تم الاستلام','جاري التحضير','خرج للتوصيل','مكتمل','ملغي'];
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="title">طلبات الدليفري</div>
+        <div class="badge">الجديد: ${(orders.filter(o => o.status === 'جديد')).length}</div>
+      </div>
+      <div class="tableWrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>الكود</th><th>العميل</th><th>العنوان</th><th>الإجمالي</th><th>الحالة</th><th>إجراء</th></tr></thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr class="${o.status === 'جديد' ? 'newRow' : ''}">
+                <td>${esc(o.id)}</td>
+                <td>${esc(o.customer)}</td>
+                <td>${esc(o.address || '')}</td>
+                <td>${money(o.total)}</td>
+                <td>
+                  <select onchange="updateDeliveryStatus('${esc(o.id)}', this.value)">
+                    ${statuses.map(s => `<option ${o
