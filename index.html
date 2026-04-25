@@ -227,7 +227,7 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2wx6uzCv1PnpUhCZKsoOMr9Yp9IDxr082ytn5pMpXpN81s0HciSz_CmSBk9pLgJBbwQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGP55EIyPoR2ghD86k6MXt2E7c6NJ2d8fJN55j0VD6BQnhG1Femn-NE52QsjUVmXOvRA/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
@@ -907,7 +907,7 @@ function renderCrmCart() {
   document.getElementById('crmTotal').textContent = money(total);
 }
 
-async function saveCrmOrderFromCart() {
+async async function saveCrmOrderFromCart() {
   const branch = document.getElementById('crmTargetBranch').value;
   if (!branch) return toast('⚠️ اختر فرع التوصيل', 'error');
   if (!State.crmCart.length) return toast('⚠️ أضف أصناف للطلب', 'error');
@@ -923,14 +923,21 @@ async function saveCrmOrderFromCart() {
     createdBy: State.currentUser.branch,
     deliveryFee: deliveryFee
   };
+  
+  // جرب jsonp بدل postForm
   try {
-    await postForm('saveCrmOrder', { order });
-    toast('📤 تم إرسال الطلب للدليفري', 'success');
-    State.crmCart = [];
-    renderCRM();
-  } catch(e) { toast('❌ ' + e.message, 'error'); }
+    const res = await jsonp('saveCrmOrder', { order: JSON.stringify(order) });
+    if (res.ok) {
+      toast('📤 تم إرسال الطلب للدليفري', 'success');
+      State.crmCart = [];
+      renderCRM();
+    } else {
+      toast('❌ ' + (res.error || 'خطأ غير معروف'), 'error');
+    }
+  } catch(e) { 
+    toast('❌ ' + e.message, 'error'); 
+  }
 }
-
 function crmSearchAddress() {
   const addrInput = document.getElementById('crmAddress'); if (!addrInput) return;
   const val = addrInput.value.trim(); const suggestionsDiv = document.getElementById('crmAddressSuggestions');
