@@ -227,7 +227,7 @@
 <div class="modal" id="productEditModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cookie"></i><h3>🍰 تحرير منتج</h3></div><div class="form-group"><label>اسم الصنف</label><input id="editProdName"></div><div class="form-group"><label>الفئة</label><input id="editProdCat"></div><div class="form-group"><label>الوحدة</label><select id="editProdUnit"><option>قطعة</option><option>جرام</option><option>كيلو</option></select></div><div class="form-group"><label>السعر</label><input id="editProdPrice" type="number" step="0.01"></div><div class="form-group"><label><input type="checkbox" id="editProdActive" checked> نشط</label></div><div class="form-group"><label>ملاحظات</label><input id="editProdNotes"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('productEditModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveProductChanges()">💾 حفظ</button></div></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylKLyQ8LewVCnqGhq_h_YptUDWVH7rLawFqYaWb1UX3kIC_L0_TRYsZjNjNAWB6KnD/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHWFTD3JttyIO2Aoi3i8hAdUOKR_Y0ybcUFXfggBRAxRHCKgtKK9YS7RTDdf9or8SWuQ/exec';
 
 const State = {
   db: { products:[], users:[], stock:[], sales:[], crmOrders:[], shifts:[], complaints:[], customers:[], loyalty:[], forecast:[], parkedOrders:[], expenses:[], returns:[] },
