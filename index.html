@@ -201,6 +201,7 @@
             <p style="margin-top:22px;font-size:12px;color:#795548;">برمجة م/ محمود سلامة — الإصدار 2.0 (محسن)</p>
         </div>
     </div>
+
     <!-- MAIN APP -->
     <div id="appContainer" class="app-container hidden" style="display:flex;height:100vh;overflow:hidden;">
         
@@ -328,26 +329,12 @@
     </div>
 
     <div id="toastContainer" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:99999;"></div>
+
     <script>
         // ==================== GLOBAL STATE ====================
         let State = {
             currentUser: null,
             cart: [],
-            // ==================== اتصال بسكربت جوجل ====================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbym3qLB8hE0kSbghi10dGAm4CF9qf7LNaDJorj4iAH-Jc0wh7EtdAJtrvRvYv2jYD3MTQ/exec';
-async function postJson(action, data = {}) {
-    try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, ...data })
-        });
-        return await res.json();
-    } catch (e) {
-        console.error(e);
-        return { ok: false, error: 'خطأ في الاتصال بسكربت جوجل' };
-    }
-}
             appliedDiscount: 0,
             deliveryFee: 0,
             currentShift: null,
@@ -358,6 +345,23 @@ async function postJson(action, data = {}) {
         let chatInterval = null;
         let currentChatTab = 0;
         let isOnline = navigator.onLine;
+
+        // ==================== اتصال بسكربت جوجل ====================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbym3qLB8hE0kSbghi10dGAm4CF9qf7LNaDJorj4iAH-Jc0wh7EtdAJtrvRvYv2jYD3MTQ/exec';
+
+        async function postJson(action, data = {}) {
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, ...data })
+                });
+                return await res.json();
+            } catch (e) {
+                console.error(e);
+                return { ok: false, error: 'خطأ في الاتصال بسكربت جوجل' };
+            }
+        }
 
         // ==================== THEME ====================
         function toggleTheme() {
@@ -656,6 +660,7 @@ async function postJson(action, data = {}) {
                 if (saved) { State.cart = JSON.parse(saved); updateCartDisplay(); }
             }
         }
+
         // ==================== CHECKOUT + PRINT ====================
         async function checkout() {
             if (State.cart.length === 0) { showToast('السلة فارغة!', 'warning'); return; }
@@ -842,6 +847,7 @@ async function postJson(action, data = {}) {
             const parked = localStorage.getItem('parkedOrders');
             if (parked) State.db.parkedOrders = JSON.parse(parked);
         }
+
         // ==================== PWA + OFFLINE + SMART RECS ====================
         function initPWA() {
             if ('serviceWorker' in navigator) {
