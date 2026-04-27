@@ -426,7 +426,7 @@
     async function saveQROrder(){if(State.cart.length===0){toast('⚠️ السلة فارغة','warning');return;}const subtotal=State.cart.reduce((s,it)=>s+it.total,0);try{const res=await postJson('createQROrder',{order:{qrCode:'QR-'+Date.now(),date:todayStr(),creator:State.currentUser.branch,delegate:State.currentUser.branch,branch:State.currentUser.branch,itemsJson:JSON.stringify(State.cart),subtotal:subtotal,discount:State.appliedDiscount,delivery:State.deliveryFee,total:subtotal-State.appliedDiscount+State.deliveryFee,status:'مفتوح'}});if(res.ok){toast('✅ تم إنشاء QR بنجاح','success');const qrCode=res.qrCode||'QR-'+Date.now();const qrDiv=document.createElement('div');qrDiv.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:10000;';const qrContainer=document.createElement('div');qrContainer.id='qrDisplay';qrDiv.appendChild(qrContainer);const closeBtn=document.createElement('button');closeBtn.textContent='إغلاق';closeBtn.style.cssText='width:100%;padding:10px;margin-top:15px;border:none;background:#b81b5c;color:white;border-radius:8px;cursor:pointer;font-weight:bold;';closeBtn.onclick=()=>qrDiv.remove();qrDiv.appendChild(closeBtn);document.body.appendChild(qrDiv);QRCode.toCanvas(qrContainer,qrCode,{width:250},(err)=>{if(err)console.error(err);});State.cart=[];State.appliedDiscount=0;State.deliveryFee=0;updateCartDisplay();}else{toast('❌ '+(res.error||'خطأ'),'error');}}catch(e){toast('❌ '+e.message,'error');}}
     function connectThermalPrinter(){toast('🔗 جاري البحث عن الطابعات...','info');navigator.bluetooth.requestDevice({filters:[{services:['0000180a-0000-1000-8000-00805f9b34fb']}]}).then(device=>{toast('✅ تم الاتصال بالطابعة','success');State.thermalPrinter=device;$('#printerStatus').textContent='✅ متصلة: '+device.name;}).catch(err=>{toast('❌ فشل الاتصال: '+err.message,'error');});}
     function printLastReceipt(){if(!State.lastReceipt){toast('⚠️ لا توجد فاتورة سابقة','warning');return;}printReceipt80mm();}
-
+ 
     /* ============================================================
      * سُكّر 33 — CRM + Delivery + Tracking + Stock
      * ============================================================ */
@@ -850,7 +850,7 @@
         link.download = `stock_${State.currentUser?.branch}_${todayStr()}.csv`;
         link.click();
     }
-      
+
     /* ============================================================
      * سُكّر 33 — Chat + Dashboard + Reports + Forms + Final
      * ============================================================ */
