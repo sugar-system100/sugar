@@ -217,9 +217,6 @@
                 <select id="loginBranch"><option value="">اختر الفرع...</option></select>
             </div>
             <div class="form-group">
-                <input type="text" id="loginUsername" placeholder="اسم المستخدم (مثل: مندوب_1)" onkeydown="if(event.key==='Enter')doLogin()">
-            </div>
-            <div class="form-group">
                 <input type="password" id="loginPass" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()">
             </div>
             <button class="btn btn-primary btn-block" onclick="doLogin()" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول النظام</button>
@@ -327,7 +324,7 @@
      * ============================================================ */
 
     /* ===== الثوابت ===== */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsYKUnBwVlIHeroDKlKQYZv7mtkLPQ5jyuF_tL-Fk8l7CO9drvAO0sRo9TzE4EFnC-9A/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznzg9H1qe9JXeknF2w4NsT1k_L9x6FvzJVQ9ybX6OhUpEZVsZ7a_kBDFG5nFHKocSzlw/exec';
     const BRANCHES = ['فرع 1','فرع 2','فرع 3','فرع 4','فرع 5','فرع 6','فرع 7','فرع 8','الإدارة'];
     const ROLES = ['مندوب_بيع','كاشير','دليفري','خدمة العملاء','مدير_فرع','إدارة'];
     const HEARTBEAT_INTERVAL = 30000;     // 30s
@@ -455,9 +452,7 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> جاري الدخول...';
         try {
-            const un = $('#loginUsername').value.trim();
-            if(!un){ toast('أدخل اسم المستخدم', 'error'); return; }
-            const res = await jsonp('authenticate', { username: un, branch: br, pass: pw });
+            const res = await jsonp('authenticate', { pointType: pt, branch: br, pass: pw });
             if (!res.ok) { toast(res.error || '❌ بيانات خاطئة', 'error'); return; }
             State.currentUser = {
                 branch: br, pointType: pt, username: br,
@@ -465,7 +460,7 @@
                 permissions: res.user?.permissions || ''
             };
             localStorage.setItem('SOKAR_TOKEN', res.token);
-            localStorage.setItem('SOKAR_USER', JSON.stringify({ branch:br, pointType:res.user.pointType, username:un }));
+            localStorage.setItem('SOKAR_USER', JSON.stringify({ branch:br, pointType:pt, username:br }));
             await enterApp();
             toast('🍬 أهلاً بك في سُكّر 33', 'success');
         } catch(e) { toast('❌ ' + e.message, 'error'); }
