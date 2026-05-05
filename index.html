@@ -97,6 +97,8 @@
         .btn-success:hover{background:#1b5e20;}
         .btn-warning{background:var(--accent);color:white;}
         .btn-warning:hover{background:#f57f17;}
+        .btn-info{background:var(--info);color:white;}
+        .btn-info:hover{background:#0d47a1;}
         .btn-sm{padding:8px 16px;font-size:0.85rem;}
         .btn-block{display:flex;width:100%;justify-content:center;}
         .modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:999;}
@@ -288,7 +290,7 @@
 
     <div class="modal" id="shiftModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-clock"></i><h3>🕐 إدارة الوردية</h3></div><div id="shiftInfo" style="margin-bottom:18px;"></div><div id="shiftActions"></div><button class="btn btn-outline btn-block" style="margin-top:14px;" onclick="closeModal('shiftModal')">إغلاق</button></div></div>
 
-    <div class="modal" id="shiftCashModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cash-register"></i><h3>💰 تقرير إغلاق الوردية</h3></div><div style="background:#e8f0fe;padding:24px;border-radius:16px;text-align:center;margin-bottom:18px;"><div style="font-size:0.95rem;color:var(--text-muted);">المتوقع في الخزنة</div><div style="font-size:36px;font-weight:800;color:var(--primary);"><span id="expectedCash">0</span> ج.م</div></div><div class="form-group"><label>الموجود فعلياً</label><input id="actualCash" type="number" step="0.01" style="font-size:1.4rem;text-align:center;"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('shiftCashModal')">إلغاء</button><button class="btn btn-danger" style="flex:1;" onclick="saveShiftCash()">🔒 تأكيد وإغلاق</button></div></div></div>
+    <div class="modal" id="shiftCashModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-cash-register"></i><h3>💰 تقرير إغلاق الوردية</h3></div><div id="shiftCloseSummary"></div><div style="background:#e8f0fe;padding:24px;border-radius:16px;text-align:center;margin-bottom:18px;"><div style="font-size:0.95rem;color:var(--text-muted);">المتوقع في الخزنة</div><div style="font-size:36px;font-weight:800;color:var(--primary);"><span id="expectedCash">0</span> ج.م</div></div><div class="form-group"><label>الموجود فعلياً</label><input id="actualCash" type="number" step="0.01" style="font-size:1.4rem;text-align:center;"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('shiftCashModal')">إلغاء</button><button class="btn btn-danger" style="flex:1;" onclick="saveShiftCash()">🔒 تأكيد وإغلاق</button></div></div></div>
 
     <div class="modal" id="parkedModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-pause-circle"></i><h3>⏸️ الفواتير المعلقة</h3></div><div id="parkedList" style="max-height:380px;overflow-y:auto;"></div><button class="btn btn-outline btn-block" style="margin-top:14px;" onclick="closeModal('parkedModal')">إغلاق</button></div></div>
 
@@ -310,7 +312,7 @@
     <div class="modal" id="addStockMovementModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-truck-loading"></i><h3>📦 حركة مخزون</h3></div><div class="form-group"><label>نوع الحركة</label><select id="stockMoveType"><option value="إضافة">➕ إضافة (دخول)</option><option value="خصم">➖ خصم (خروج)</option><option value="تعديل">✏️ تعديل (ضبط رصيد)</option></select></div><div class="form-group"><label>المنتج</label><select id="stockMoveItem"></select></div><div class="form-group"><label>الكمية</label><input id="stockMoveQty" type="number" step="0.01" min="0"></div><div class="form-group"><label>ملاحظات</label><input id="stockMoveNotes" placeholder="مثال: مرتجع من مورد"></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('addStockMovementModal')">إلغاء</button><button class="btn btn-primary" style="flex:1;" onclick="saveStockMovement()">💾 حفظ</button></div></div></div>
 
     <!-- مودال خيار QR / فاتورة -->
-    <div class="modal" id="qrChoiceTypeModal"><div class="modal-card" style="text-align:center;max-width:380px;"><div class="modal-header" style="justify-content:center;"><i class="fas fa-qrcode"></i><h3>📦 إصدار الطلب</h3></div><p style="margin-bottom:18px;color:var(--text-muted);">اختر طريقة إصدار الطلب الحالي</p><div style="display:flex;flex-direction:column;gap:12px;"><button class="btn btn-primary btn-block" onclick="closeModal('qrChoiceTypeModal');proceedToCheckout()"><i class="fas fa-credit-card"></i> 💳 إصدار فاتورة فوراً</button><button class="btn btn-outline btn-block" onclick="closeModal('qrChoiceTypeModal');createQROrder()"><i class="fas fa-qrcode"></i> 📱 إصدار QR للعميل</button><button class="btn btn-outline btn-block" onclick="closeModal('qrChoiceTypeModal')">إلغاء</button></div></div></div>
+    <div class="modal" id="qrChoiceTypeModal"><div class="modal-card" style="text-align:center;max-width:380px;"><div class="modal-header" style="justify-content:center;"><i class="fas fa-qrcode"></i><h3>📦 إصدار الطلب</h3></div><p style="margin-bottom:18px;color:var(--text-muted);">اختر طريقة إصدار الطلب الحالي</p><div style="display:flex;flex-direction:column;gap:12px;"><button class="btn btn-primary btn-block" onclick="closeModal('qrChoiceTypeModal');proceedToCheckout()"><i class="fas fa-credit-card"></i> 💳 إصدار فاتورة فوراً</button><button class="btn btn-outline btn-block" onclick="closeModal('qrChoiceTypeModal');saveQROrder()"><i class="fas fa-qrcode"></i> 📱 إصدار QR للعميل</button><button class="btn btn-outline btn-block" onclick="closeModal('qrChoiceTypeModal')">إلغاء</button></div></div></div>
 
     <!-- مودال إعادة فتح وردية مغلقة -->
     <div class="modal" id="reopenShiftModal"><div class="modal-card"><div class="modal-header"><i class="fas fa-redo"></i><h3>🔄 إعادة فتح الوردية</h3></div><div class="form-group"><label>كود الوردية</label><input id="reopenShiftId" readonly></div><div class="form-group"><label>السبب</label><textarea id="reopenReason" rows="3" placeholder="اذكر سبب إعادة الفتح"></textarea></div><div style="display:flex;gap:12px;"><button class="btn btn-outline" style="flex:1;" onclick="closeModal('reopenShiftModal')">إلغاء</button><button class="btn btn-warning" style="flex:1;" onclick="adminReopenShift()">🔄 إعادة الفتح</button></div></div></div>
@@ -324,7 +326,7 @@
      * ============================================================ */
 
     /* ===== الثوابت ===== */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznzg9H1qe9JXeknF2w4NsT1k_L9x6FvzJVQ9ybX6OhUpEZVsZ7a_kBDFG5nFHKocSzlw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxS9SKVyA7LCyXjmmoDXMzv7x6x_Th3sm6-uarXUIcRPcYKAHsQiGWs_wUIqRlpmYk_/exec';
     const BRANCHES = ['فرع 1','فرع 2','فرع 3','فرع 4','فرع 5','فرع 6','فرع 7','فرع 8','الإدارة'];
     const ROLES = ['مندوب_بيع','كاشير','دليفري','خدمة العملاء','مدير_فرع','إدارة'];
     const HEARTBEAT_INTERVAL = 30000;     // 30s
@@ -336,7 +338,7 @@
     /* ===== الحالة العامة ===== */
     const State = {
         currentUser: null,
-        db: { products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [], complaints: [], customers: [], loyalty: [], forecast: [], parkedOrders: [], expenses: [], returns: [], crmStatuses: [] },
+        db: { products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [], complaints: [], customers: [], loyalty: [], forecast: [], parkedOrders: [], expenses: [], returns: [], crmStatuses: [], stockMovements: [], auditLog: [] },
         cart: [],
         currentCategory: 'all',
         currentSearch: '',
@@ -455,12 +457,13 @@
             const res = await jsonp('authenticate', { pointType: pt, branch: br, pass: pw });
             if (!res.ok) { toast(res.error || '❌ بيانات خاطئة', 'error'); return; }
             State.currentUser = {
-                branch: br, pointType: pt, username: br,
+                branch: br, pointType: pt,
+                username: res.user?.username || br,
                 token: res.token, superPass: res.superPass,
                 permissions: res.user?.permissions || ''
             };
             localStorage.setItem('SOKAR_TOKEN', res.token);
-            localStorage.setItem('SOKAR_USER', JSON.stringify({ branch:br, pointType:pt, username:br }));
+            localStorage.setItem('SOKAR_USER', JSON.stringify({ branch:br, pointType:pt, username: res.user?.username || br }));
             await enterApp();
             toast('🍬 أهلاً بك في سُكّر 33', 'success');
         } catch(e) { toast('❌ ' + e.message, 'error'); }
@@ -475,7 +478,7 @@
         // إعلام السيرفر بالخروج
         try {
             postJson('setUserStatus', { statusData: {
-                username: State.currentUser?.branch, branch: State.currentUser?.branch,
+                username: State.currentUser?.username, branch: State.currentUser?.branch,
                 role: State.currentUser?.pointType, online: false, screen: 'logout'
             }});
         } catch(e) {}
@@ -488,7 +491,7 @@
         const u = State.currentUser;
         $('#loginScreen').classList.add('hidden');
         $('#appContainer').classList.remove('hidden');
-        $('#whoami').textContent = `${u.branch} (${u.pointType})`;
+        $('#whoami').textContent = `${u.username || u.branch} (${u.pointType})`;
         await refreshData();
         buildNav();
         // الشاشة الافتراضية حسب الدور
@@ -503,7 +506,7 @@
         startHeartbeat();
         startChatPolling();
         $('#chatWidgetBtn').classList.remove('hidden');
-        if (u.pointType === 'دليفري') startDeliveryPolling();
+        if (u.pointType === 'دليفري' || u.pointType === 'إدارة') startDeliveryPolling();
         if (u.pointType === 'إدارة') startDashboardPolling();
     }
 
@@ -514,7 +517,7 @@
             const res = await jsonp('getInitialData', {
                 userType: State.currentUser.pointType,
                 branch: State.currentUser.branch,
-                username: State.currentUser.branch
+                username: State.currentUser.username
             });
             if (res.ok) { State.db = { ...State.db, ...res }; loadCurrentShift(); }
         } catch(e) {}
@@ -524,7 +527,7 @@
     function loadCurrentShift() {
         State.currentShift = (State.db.shifts || []).find(s =>
             s.branch === State.currentUser?.branch &&
-            s.cashier === State.currentUser?.branch &&
+            s.cashier === State.currentUser?.username &&
             s.status === 'مفتوحة'
         ) || null;
         const el = $('#shiftStatus');
@@ -559,7 +562,7 @@
     function buildNav() {
         const pt = State.currentUser?.pointType;
         const menus = {
-            'مندوب_بيع':    [['pos','🍬 نقطة البيع','store']],
+            'مندوب_بيع':    [['pos','🛒 نقطة البيع','store'],['loyalty','⭐ ولاء العملاء','star']],
             'كاشير':        [['pos','🍬 نقطة البيع','store'],['stock','📦 المخزون','boxes'],['stock-movements','🔄 حركات مخزون','exchange-alt'],['reports','📊 تقارير','chart-bar'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo'],['loyalty','⭐ ولاء','star']],
             'دليفري':       [['pos','🍬 نقطة البيع','store'],['delivery','🛵 توصيل','motorcycle'],['search','🔍 بحث','search'],['stock','📦 المخزون','boxes'],['stock-movements','🔄 حركات مخزون','exchange-alt'],['reports','📊 تقارير','chart-bar'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo'],['loyalty','⭐ ولاء','star']],
             'خدمة العملاء': [['crm','📞 طلبات جديدة','headset'],['crm-tracking','📋 متابعة الأوردرات','clipboard-list'],['products','🍰 المنتجات','cookie'],['complaints','⚠️ شكاوى','exclamation'],['stock','📦 المخزون','boxes']],
@@ -567,9 +570,10 @@
             'إدارة':        [['admin-dashboard','📈 Dashboard','tachometer-alt'],['admin-monitor','🌐 مراقبة الفروع','network-wired'],['users','👥 المستخدمون','users-cog'],['products','🍰 المنتجات','cookie'],['pos','🍬 نقطة البيع','store'],['crm','📞 CRM','headset'],['delivery','🛵 توصيل','motorcycle'],['stock','📦 المخزون','boxes'],['stock-movements','🔄 حركات مخزون','exchange-alt'],['reports','📊 تقارير','chart-bar'],['complaints','⚠️ شكاوى','exclamation'],['forecast','📈 توقعات','chart-line'],['loyalty','⭐ ولاء','star'],['expenses','🧾 مصروفات','receipt'],['returns','↩️ مرتجعات','undo'],['audit','📜 سجل العمليات','history']]
         };
         const items = (menus[pt] || []);
+        const isAdmin = pt === 'إدارة';
         $('#navMenu').innerHTML = items.map(([id,label,icon]) =>
             `<div class="nav-item" data-sec="${id}" onclick="showSection('${id}')"><i class="fas fa-${icon}"></i> ${label}</div>`
-        ).join('') + (hasPermission('global_search') ?
+        ).join('') + (!isAdmin && hasPermission('global_search') ?
             `<div class="nav-item" onclick="openGlobalSearch()"><i class="fas fa-search"></i> 🔍 بحث شامل</div>` : '');
     }
 
@@ -621,7 +625,7 @@
         if (!State.currentUser) return;
         try {
             await postJson('setUserStatus', { statusData: {
-                username: State.currentUser.branch,
+                username: State.currentUser.username,
                 branch: State.currentUser.branch,
                 role: State.currentUser.pointType,
                 online: true,
@@ -635,7 +639,7 @@
         if (State.deliveryPollingInterval) clearInterval(State.deliveryPollingInterval);
         State.deliveryPollingInterval = setInterval(async () => {
             try {
-                const res = await jsonp('getDeliveryOrders', { username: State.currentUser.branch, branch: State.currentUser.branch });
+                const res = await jsonp('getDeliveryOrders', { username: State.currentUser.username, branch: State.currentUser.branch });
                 if (res.ok) {
                     const old = State.db.crmOrders || [];
                     const oldNew = old.filter(o => o.status === 'جديد').length;
@@ -672,7 +676,7 @@
                 navigator.sendBeacon(SCRIPT_URL, new URLSearchParams({
                     action: 'setUserStatus',
                     payload: JSON.stringify({ statusData: {
-                        username: State.currentUser.branch, branch: State.currentUser.branch,
+                        username: State.currentUser.username, branch: State.currentUser.branch,
                         role: State.currentUser.pointType, online: false, screen: 'closed'
                     }})
                 }));
@@ -685,16 +689,17 @@
     
     function renderPOS() {
         const u = State.currentUser;
+        const isSalesRep = u.pointType === 'مندوب_بيع';
         const canQR = ['مندوب_بيع','كاشير','دليفري'].indexOf(u.pointType) >= 0;
         const canDelivery = ['كاشير','دليفري'].indexOf(u.pointType) >= 0;
         const html = `
         <div class="breadcrumb">
-            <span>🍬 نقطة البيع</span>
+            <span>${isSalesRep ? '🛒 مندوب البيع' : '🍬 نقطة البيع'}</span>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                ${canQR ? '<button class="btn btn-outline btn-sm" onclick="openQrScanner()"><i class="fas fa-qrcode"></i> مسح QR</button>' : ''}
+                ${!isSalesRep && canQR ? '<button class="btn btn-outline btn-sm" onclick="openQrScanner()"><i class="fas fa-qrcode"></i> مسح QR</button>' : ''}
                 <button class="btn btn-outline btn-sm" onclick="openModal('parkedModal');renderParkedOrders()"><i class="fas fa-pause-circle"></i> معلقة (<span id="parkedBadge">0</span>)</button>
-                <button class="btn btn-outline btn-sm" onclick="openModal('shiftModal');renderShiftOptions()"><i class="fas fa-clock"></i> الوردية</button>
-                <button class="btn btn-outline btn-sm" onclick="openModal('thermalPrinterModal')"><i class="fas fa-print"></i> طابعة</button>
+                ${!isSalesRep ? `<button class="btn btn-outline btn-sm" onclick="openModal('shiftModal');renderShiftOptions()"><i class="fas fa-clock"></i> الوردية</button>` : ''}
+                ${!isSalesRep ? `<button class="btn btn-outline btn-sm" onclick="openModal('thermalPrinterModal')"><i class="fas fa-print"></i> طابعة</button>` : ''}
             </div>
         </div>
         <div class="pos-layout">
@@ -720,19 +725,28 @@
                     <div class="summary-row"><span>الخصم:</span><span id="discountDisplay">0.00</span></div>
                     <div class="summary-row"><span>التوصيل:</span><span id="deliveryDisplay">0.00</span></div>
                     <div class="summary-row grand"><span>الإجمالي:</span><span id="grandTotal">0.00</span></div>
+                    ${!isSalesRep ? `
                     <div class="cart-discount-row">
                         <input type="number" id="discountInput" placeholder="خصم ج.م" step="0.01" min="0" oninput="applyDiscount()">
                         <button class="btn btn-warning btn-sm" style="flex:1;" onclick="openModal('supervisorModal')">🛡️ تطبيق</button>
-                    </div>
+                    </div>` : ''}
                     ${canDelivery ? `
                     <div class="cart-discount-row" style="margin-top:10px;">
                         <input type="text" id="deliveryInput" placeholder="📍 العنوان" style="flex:1;" oninput="suggestDeliveryFee()">
                         <button class="btn btn-info btn-sm" style="flex:0.5;" onclick="applyDeliveryFee()">✓</button>
                     </div>
                     ` : ''}
+                    ${isSalesRep ? `
+                    <button class="btn btn-primary btn-block" style="margin-top:16px;font-size:1.1rem;padding:16px;background:var(--primary);" onclick="saveQROrder()">
+                        <i class="fas fa-qrcode"></i> إنشاء QR للعميل
+                    </button>
+                    <div style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px;">يذهب العميل للكاشير ويسكن الـ QR لإتمام الدفع</div>
+                    ` : `
                     <button class="btn btn-primary btn-block" style="margin-top:16px;font-size:1.1rem;padding:16px;" onclick="proceedToCheckout()">
                         <i class="fas fa-credit-card"></i> إتمام الدفع
                     </button>
+                    ${canQR ? `<button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="createQROrder()"><i class="fas fa-qrcode"></i> إنشاء QR</button>` : ''}
+                    `}
                     <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="clearCart()">
                         <i class="fas fa-trash"></i> مسح السلة
                     </button>
@@ -743,7 +757,7 @@
         $('#dynamicContent').innerHTML = html;
         renderProducts();
         updateCartDisplay();
-        $('#parkedBadge').textContent = (State.db.parkedOrders||[]).filter(p=>p.branch===u.branch && p.cashier===u.branch).length;
+        $('#parkedBadge').textContent = (State.db.parkedOrders||[]).filter(p=>p.branch===u.branch && p.cashier===u.username).length;
     }
 
     function filterByCategory(cat) {
@@ -771,14 +785,13 @@
             const qty = Number(stock.qty) || 0;
             const outOfStock = qty <= 0;
             const unitLabel = p.unit === 'جرام' ? 'g' : p.unit === 'كيلو' ? 'kg' : '';
+            const qtyLabel = qty > 0 ? `<div style="font-size:0.72rem;color:var(--success);font-weight:600;">✓ متوفر: ${qty}${unitLabel}</div>` : `<div style="font-size:0.72rem;color:var(--danger);">✗ نفد المخزون</div>`;
             return `
             <div class="product-card ${outOfStock ? 'out-of-stock' : ''}" onclick="addToCart('${escapeHtml(p.name)}', ${p.price}, '${escapeHtml(p.unit)}', ${qty})">
                 <div class="product-name">${escapeHtml(p.name)}</div>
                 <div class="product-price">${fmt(p.price)} ج.م</div>
                 <div class="product-unit">${escapeHtml(p.unit)}${unitLabel ? ' (' + unitLabel + ')' : ''}</div>
-                <div class="stock-badge" style="background:${outOfStock?'#ffcdd2':'#c8e6c9'};color:${outOfStock?'#c62828':'#2e7d32'};">
-                    ${outOfStock ? '❌ نفذ' : '✓ ' + fmt(qty) + ' ' + unitLabel}
-                </div>
+                ${qtyLabel}
             </div>
             `;
         }).join('');
@@ -815,6 +828,7 @@
             State.cart.push(item);
         }
         updateCartDisplay();
+        updateCrmCartDisplay(); // تحديث سلة CRM إن وُجدت
         closeModal('qtyModal');
         toast('✅ تمت الإضافة', 'success');
     }
@@ -958,8 +972,8 @@
                 discount: State.appliedDiscount,
                 delivery: State.deliveryFee,
                 total: grand,
-                cashier: State.currentUser.branch,
-                username: State.currentUser.branch,
+                cashier: State.currentUser.username,
+                username: State.currentUser.username,
                 notes: notes,
                 shiftId: State.currentShift?.id || '',
                 paymentMethod: method,
@@ -968,8 +982,20 @@
                 loyaltyRedeemed: State.loyaltyRedeemed
             });
             if (res.ok) {
-                State.lastReceipt = res;
+                State.lastReceipt = {
+                    ...res,
+                    _items: [...State.cart],
+                    _discount: State.appliedDiscount,
+                    _delivery: State.deliveryFee,
+                    _loyalty: State.loyaltyRedeemed,
+                    _grand: grand
+                };
                 toast('✅ تم حفظ الفاتورة بنجاح', 'success');
+                // إذا كان الطلب محمّلاً من QR → اغلق الـ QR في السيرفر
+                if (State._loadedQrCode) {
+                    try { await postJson('updateQROrderStatus', { qrCode: State._loadedQrCode, status: 'مكتمل', cashier: State.currentUser.username }); } catch(e) {}
+                    State._loadedQrCode = null;
+                }
                 State.cart = [];
                 State.appliedDiscount = 0;
                 State.deliveryFee = 0;
@@ -994,9 +1020,12 @@
     function printReceipt80mm() {
         if (!State.lastReceipt) return;
         const r = State.lastReceipt;
-        const items = State.cart;
+        const items = r._items || State.cart;
         const subtotal = items.reduce((s, it) => s + it.total, 0);
-        const grand = subtotal - State.appliedDiscount + State.deliveryFee - State.loyaltyRedeemed;
+        const appliedDiscount = r._discount !== undefined ? r._discount : State.appliedDiscount;
+        const deliveryFee = r._delivery !== undefined ? r._delivery : State.deliveryFee;
+        const loyaltyRedeemed = r._loyalty !== undefined ? r._loyalty : State.loyaltyRedeemed;
+        const grand = r._grand !== undefined ? r._grand : subtotal - appliedDiscount + deliveryFee - loyaltyRedeemed;
         const html = `
         <!DOCTYPE html>
         <html dir="rtl">
@@ -1032,8 +1061,8 @@
                     <span>${fmt(subtotal)} ج.م</span>
                     <span>الإجمالي الفرعي:</span>
                 </div>
-                ${State.appliedDiscount > 0 ? `<div class="item"><span>${fmt(State.appliedDiscount)} ج.م</span><span>الخصم</span></div>` : ''}
-                ${State.deliveryFee > 0 ? `<div class="item"><span>${fmt(State.deliveryFee)} ج.م</span><span>التوصيل</span></div>` : ''}
+                ${appliedDiscount > 0 ? `<div class="item"><span>${fmt(appliedDiscount)} ج.م</span><span>الخصم</span></div>` : ''}
+                ${deliveryFee > 0 ? `<div class="item"><span>${fmt(deliveryFee)} ج.م</span><span>التوصيل</span></div>` : ''}
                 <div class="total-row" style="display:flex;justify-content:space-between;font-size:13px;margin-top:8px;">
                     <span>${fmt(grand)} ج.م</span>
                     <span>الإجمالي:</span>
@@ -1075,20 +1104,25 @@
     }
 
     async function loadManualQR(code) {
-        code = (code || $('#manualQrInput').value || '').trim();
+        code = (code || $('#manualQrInput')?.value || '').trim();
         if (!code) { toast('⚠️ أدخل كود QR', 'warning'); return; }
         try {
             const res = await jsonp('getQROrder', { orderId: code });
             if (res.ok) {
+                if (res.status === 'مكتمل' || res.status === 'ملغي') {
+                    toast('⚠️ هذا الـ QR تم استخدامه مسبقاً', 'warning'); return;
+                }
                 State.cart = (res.items || []).map(it => ({
                     name: it.name, qty: it.qty, chargeQty: it.chargeQty || it.qty, unit: it.unit || 'قطعة',
                     price: it.price, total: it.price * (it.chargeQty || it.qty), note: it.note || ''
                 }));
                 State.deliveryFee = res.delivery || 0;
                 State.appliedDiscount = res.discount || 0;
+                State._loadedQrCode = code; // احفظ الكود لتحديث حالته بعد الدفع
                 updateCartDisplay();
                 closeModal('qrScannerModal');
-                toast('✅ تم تحميل الطلب من QR', 'success');
+                const delegate = res.delegate || res.creator || '';
+                toast(`✅ تم تحميل طلب من مندوب: ${delegate}`, 'success', 4000);
             } else {
                 toast('❌ ' + (res.error || 'الطلب غير موجود'), 'error');
             }
@@ -1105,13 +1139,14 @@
     async function saveQROrder() {
         if (State.cart.length === 0) { toast('⚠️ السلة فارغة', 'warning'); return; }
         const subtotal = State.cart.reduce((s, it) => s + it.total, 0);
+        const qrCode = 'QR-' + Date.now();
         try {
             const res = await postJson('createQROrder', {
                 order: {
-                    qrCode: 'QR-' + Date.now(),
+                    qrCode: qrCode,
                     date: todayStr(),
-                    creator: State.currentUser.branch,
-                    delegate: State.currentUser.branch,
+                    creator: State.currentUser.username,
+                    delegate: State.currentUser.username,
                     branch: State.currentUser.branch,
                     itemsJson: JSON.stringify(State.cart),
                     subtotal: subtotal,
@@ -1123,21 +1158,36 @@
             });
             if (res.ok) {
                 toast('✅ تم إنشاء QR بنجاح', 'success');
-                const qrCode = res.qrCode || 'QR-' + Date.now();
-                const qrDiv = document.createElement('div');
-                qrDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:10000;';
-                const qrContainer = document.createElement('div');
-                qrContainer.id = 'qrDisplay';
-                qrDiv.appendChild(qrContainer);
-                const closeBtn = document.createElement('button');
-                closeBtn.textContent = 'إغلاق';
-                closeBtn.style.cssText = 'width:100%;padding:10px;margin-top:15px;border:none;background:#b81b5c;color:white;border-radius:8px;cursor:pointer;font-weight:bold;';
-                closeBtn.onclick = () => qrDiv.remove();
-                qrDiv.appendChild(closeBtn);
-                document.body.appendChild(qrDiv);
-                QRCode.toCanvas(qrContainer, qrCode, { width: 250 }, (err) => {
-                    if (err) console.error(err);
-                });
+                const finalQrCode = res.qrCode || qrCode;
+                const cartSnapshot = [...State.cart];
+                const totalAmt = subtotal - State.appliedDiscount + State.deliveryFee;
+
+                // عرض QR في نافذة احترافية
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000;';
+                overlay.innerHTML = `
+                    <div style="background:white;border-radius:20px;padding:30px;text-align:center;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="font-size:2rem;margin-bottom:6px;">🍬 سُكّر 33</div>
+                        <div style="font-weight:700;font-size:1.1rem;margin-bottom:4px;">${escapeHtml(State.currentUser.branch)}</div>
+                        <div style="color:#888;font-size:0.85rem;margin-bottom:16px;">مندوب: ${escapeHtml(State.currentUser.username)} • ${todayStr()}</div>
+                        <div id="qrCanvasWrapper" style="display:inline-block;padding:12px;border:2px dashed #b81b5c;border-radius:12px;margin-bottom:14px;"></div>
+                        <div style="font-family:monospace;font-size:0.9rem;color:#555;margin-bottom:6px;">${escapeHtml(finalQrCode)}</div>
+                        <div style="font-size:0.85rem;color:#888;margin-bottom:14px;">اطبع هذا الكود وأعطه للعميل ليسكنه عند الكاشير</div>
+                        <div style="background:#f9f9f9;border-radius:10px;padding:10px;text-align:right;font-size:0.85rem;margin-bottom:14px;max-height:120px;overflow-y:auto;">
+                            ${cartSnapshot.map(it=>`<div>• ${escapeHtml(it.name)}: ${fmt(it.qty)} ${it.unit} = ${fmt(it.total)} ج.م</div>`).join('')}
+                            <div style="border-top:1px dashed #ccc;margin-top:6px;padding-top:6px;font-weight:700;">الإجمالي: ${fmt(totalAmt)} ج.م</div>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="printQRReceipt('${escapeHtml(finalQrCode)}',${JSON.stringify(cartSnapshot).replace(/'/g,"\\'")},'${State.currentUser.branch}','${State.currentUser.username}',${totalAmt})" style="flex:1;padding:12px;background:#b81b5c;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.95rem;">🖨️ طباعة</button>
+                            <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;background:#eee;color:#333;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.95rem;">✖ إغلاق</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                const canvas = document.createElement('canvas');
+                document.getElementById('qrCanvasWrapper').appendChild(canvas);
+                QRCode.toCanvas(canvas, finalQrCode, { width: 220 }, (err) => { if (err) console.error(err); });
+
                 State.cart = [];
                 State.appliedDiscount = 0;
                 State.deliveryFee = 0;
@@ -1148,6 +1198,34 @@
         } catch(e) {
             toast('❌ ' + e.message, 'error');
         }
+    }
+
+    function printQRReceipt(qrCode, cartItems, branch, delegate, total) {
+        const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+        <style>
+            body{font-family:Arial,sans-serif;width:80mm;margin:0;padding:10px;font-size:11px;}
+            .center{text-align:center;} .bold{font-weight:bold;} .divider{border-top:1px dashed #000;margin:8px 0;}
+            .row{display:flex;justify-content:space-between;} .grand{font-size:13px;font-weight:bold;}
+            .qr-area{text-align:center;margin:10px 0;} .footer{font-size:9px;color:#666;text-align:center;margin-top:8px;}
+        </style></head><body>
+        <div class="center bold" style="font-size:16px;">🍬 سُكّر 33</div>
+        <div class="center">${escapeHtml(branch)}</div>
+        <div class="center" style="color:#666;font-size:9px;">مندوب: ${escapeHtml(delegate)} • ${todayStr()}</div>
+        <div class="divider"></div>
+        ${cartItems.map(it=>`<div class="row"><span>${fmt(it.total)} ج.م</span><span>${escapeHtml(it.name)} ${fmt(it.qty)} ${it.unit}</span></div>`).join('')}
+        <div class="divider"></div>
+        <div class="row grand"><span>${fmt(total)} ج.م</span><span>الإجمالي:</span></div>
+        <div class="divider"></div>
+        <div class="center" style="margin:8px 0;font-size:10px;font-weight:bold;">امسح الـ QR عند الكاشير لإتمام الدفع</div>
+        <div class="qr-area"><canvas id="printQrCanvas"></canvas></div>
+        <div class="center" style="font-size:9px;color:#666;">${escapeHtml(qrCode)}</div>
+        <div class="footer">شكراً لزيارتكم 🍬</div>
+        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\/script>
+        <script>QRCode.toCanvas(document.getElementById('printQrCanvas'),'${escapeHtml(qrCode)}',{width:200},()=>window.print());<\/script>
+        </body></html>`;
+        const w = window.open('', '_blank', 'width=350,height=600');
+        w.document.write(html);
+        w.document.close();
     }
 
     function connectThermalPrinter() {
@@ -1184,17 +1262,24 @@
     }
 
     function renderCrmOrders() {
-        const orders = (State.db.crmOrders || []).filter(o => o.branch === State.currentUser.branch && o.status !== 'مكتمل' && o.status !== 'ملغي');
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const orders = (State.db.crmOrders || []).filter(o =>
+            (isAdmin || o.branch === State.currentUser.branch) &&
+            o.status !== 'مكتمل' && o.status !== 'ملغي'
+        );
         const html = orders.length === 0 ?
             '<div class="empty-state"><i class="fas fa-inbox"></i>لا توجد طلبات جديدة</div>' :
-            orders.map(o => `
+            orders.map(o => {
+                const deliveryUsers = (State.db.users || []).filter(u => u.branch === o.branch && u.pointType === 'دليفري' && u.active);
+                return `
             <div style="background:white;border-radius:18px;padding:18px;box-shadow:var(--shadow);border-right:5px solid var(--primary);">
                 <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
                     <div><strong>${escapeHtml(o.customer)}</strong> <span style="color:var(--text-muted);">${escapeHtml(o.phone)}</span></div>
                     <span style="background:var(--primary-soft);color:var(--primary);padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.85rem;">${escapeHtml(o.status)}</span>
                 </div>
                 <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px;">📍 ${escapeHtml(o.address)}</div>
-                <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:12px;">⏰ ${escapeHtml(o.date)}</div>
+                <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:6px;">⏰ ${escapeHtml(o.date)}</div>
+                ${o.takenBy ? `<div style="color:var(--success);font-size:0.9rem;margin-bottom:8px;font-weight:600;">🛵 مع: ${escapeHtml(o.takenBy)}</div>` : ''}
                 <div style="background:#f9f9f9;padding:10px;border-radius:10px;margin-bottom:12px;font-size:0.9rem;max-height:80px;overflow-y:auto;">
                     ${(() => {
                         try {
@@ -1206,12 +1291,24 @@
                 <div style="display:flex;gap:8px;margin-bottom:10px;">
                     <strong>الإجمالي:</strong> <span style="color:var(--primary);font-weight:700;">${fmt(o.total)} ج.م</span>
                 </div>
+                ${deliveryUsers.length > 0 ? `
+                <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+                    <label style="font-size:0.9rem;white-space:nowrap;">تعيين لـ:</label>
+                    <select id="deliveryAssign_${escapeHtml(o.id)}" style="flex:1;padding:8px 12px;border:2px solid var(--border);border-radius:20px;font-family:inherit;font-size:0.9rem;outline:none;">
+                        <option value="">— اختر مندوب —</option>
+                        ${deliveryUsers.map(u => `<option value="${escapeHtml(u.username)}">${escapeHtml(u.username)}</option>`).join('')}
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="assignDeliveryUser('${escapeHtml(o.id)}')">تعيين</button>
+                </div>
+                ` : ''}
                 <div style="display:flex;gap:10px;">
                     <button class="btn btn-primary btn-sm" style="flex:1;" onclick="updateCrmStatus('${escapeHtml(o.id)}','تم الاستلام')">✅ استلام</button>
+                    ${o.takenBy ? `<button class="btn btn-info btn-sm" style="flex:1;" onclick="chatWithDelivery('${escapeHtml(o.takenBy)}')">💬 شات</button>` : ''}
                     <button class="btn btn-outline btn-sm" style="flex:1;" onclick="updateCrmStatus('${escapeHtml(o.id)}','ملغي')">❌ إلغاء</button>
                 </div>
             </div>
-            `).join('');
+            `;
+            }).join('');
         $('#crmList').innerHTML = html;
     }
 
@@ -1271,13 +1368,14 @@
                         <strong style="color:var(--primary);" id="crmTotal">0.00</strong>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-block" onclick="saveCrmOrder('${escapeHtml(JSON.stringify(customer))}')">💾 حفظ الطلب</button>
+                <button class="btn btn-primary btn-block" onclick="saveCrmOrder()">💾 حفظ الطلب</button>
                 <button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="showSection('crm')">إلغاء</button>
             </div>
         </div>
         `;
         $('#dynamicContent').innerHTML = html;
         State.cart = [];
+        State._crmCustomer = customer;
         renderCrmProducts(customer);
     }
 
@@ -1336,9 +1434,10 @@
         `).join('');
     }
 
-    async function saveCrmOrder(customerJson) {
+    async function saveCrmOrder() {
         if (State.cart.length === 0) { toast('⚠️ السلة فارغة', 'warning'); return; }
-        const customer = JSON.parse(customerJson);
+        const customer = State._crmCustomer;
+        if (!customer) { toast('⚠️ بيانات العميل غير متاحة', 'error'); return; }
         const total = State.cart.reduce((s, it) => s + it.total, 0);
         try {
             const res = await postJson('saveCrmOrder', {
@@ -1350,11 +1449,26 @@
                     itemsJson: JSON.stringify(State.cart),
                     total: total,
                     notes: '',
-                    createdBy: State.currentUser.branch
+                    status: 'جديد',
+                    date: todayStr(),
+                    createdBy: State.currentUser.username
                 }
             });
             if (res.ok) {
                 toast('✅ تم حفظ الطلب بنجاح', 'success');
+                // إرسال إشعار للدليفري عبر رسالة فرع
+                try {
+                    await postJson('sendMessage', {
+                        messageData: {
+                            from_user: State.currentUser.username,
+                            from_branch: State.currentUser.branch,
+                            to_user: '',
+                            to_branch: State.currentUser.branch,
+                            message: `🛵 طلب جديد للتوصيل — ${customer.name} — 📍 ${customer.addr} — 💰 ${fmt(total)} ج.م`,
+                            type: 'branch'
+                        }
+                    });
+                } catch(e) {}
                 await refreshData();
                 renderCRM();
             } else {
@@ -1365,12 +1479,49 @@
         }
     }
 
-    async function updateCrmStatus(orderId, newStatus) {
+    function chatWithDelivery(username) {
+        if (!username) return;
+        const user = (State.db.users || []).find(u => u.username === username);
+        if (user) {
+            State.currentChatPeer = user;
+        } else {
+            State.currentChatPeer = { username: username, branch: State.currentUser.branch };
+        }
+        openChatWidget();
+        setTimeout(() => renderChatMessages(), 300);
+    }
+
+    function assignDeliveryUser(orderId) {
+        const sel = document.getElementById(`deliveryAssign_${orderId}`);
+        if (!sel || !sel.value) { toast('⚠️ اختر مندوب دليفري', 'warning'); return; }
+        const username = sel.value;
+        postJson('assignDeliveryUser', { orderId, username })
+            .then(res => {
+                if (res.ok) {
+                    toast(`✅ تم تعيين ${username} للطلب`, 'success');
+                    // أرسل إشعار للمندوب
+                    const order = (State.db.crmOrders || []).find(o => o.id === orderId);
+                    if (order) {
+                        postJson('sendMessage', { messageData: {
+                            from_user: State.currentUser.username,
+                            from_branch: State.currentUser.branch,
+                            to_user: username,
+                            to_branch: State.currentUser.branch,
+                            message: `🛵 تم تعيينك لطلب جديد — ${order.customer} — 📍 ${order.address} — 💰 ${fmt(order.total)} ج.م`,
+                            type: 'direct'
+                        }}).catch(()=>{});
+                    }
+                    refreshData().then(() => renderCrmOrders());
+                } else {
+                    toast('❌ ' + (res.error || 'خطأ'), 'error');
+                }
+            }).catch(e => toast('❌ ' + e.message, 'error'));
+    }
         try {
             const res = await postJson('updateCrmOrderStatus', {
                 id: orderId,
                 status: newStatus,
-                username: State.currentUser.branch
+                username: State.currentUser.username
             });
             if (res.ok) {
                 toast('✅ تم التحديث', 'success');
@@ -1386,7 +1537,11 @@
 
     /* ===== Delivery ===== */
     function renderDelivery() {
-        const orders = (State.db.crmOrders || []).filter(o => o.branch === State.currentUser.branch && o.status !== 'مكتمل' && o.status !== 'ملغي');
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const orders = (State.db.crmOrders || []).filter(o =>
+            (isAdmin || o.branch === State.currentUser.branch) &&
+            o.status !== 'مكتمل' && o.status !== 'ملغي'
+        );
         const html = `
         <div class="breadcrumb">
             <span>🛵 توصيل الطلبات</span>
@@ -1401,7 +1556,7 @@
             return;
         }
         list.innerHTML = orders.map(o => {
-            const taken = o.takenBy === State.currentUser.branch;
+            const taken = o.takenBy === State.currentUser.username;
             return `
             <div style="background:white;border-radius:18px;padding:18px;box-shadow:var(--shadow);border-right:5px solid ${taken?'var(--success)':'var(--accent)'};">
                 <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
@@ -1427,7 +1582,7 @@
 
     async function takeDeliveryOrder(orderId) {
         try {
-            const res = await postJson('takeOrderByDelivery', { orderId: orderId, username: State.currentUser.branch });
+            const res = await postJson('takeOrderByDelivery', { orderId: orderId, username: State.currentUser.username });
             if (res.ok) {
                 toast('✅ تم استلام الطلب', 'success');
                 await refreshData();
@@ -1442,7 +1597,7 @@
 
     async function completeDelivery(orderId) {
         try {
-            const res = await postJson('updateCrmOrderStatus', { id: orderId, status: 'مكتمل', username: State.currentUser.branch });
+            const res = await postJson('updateCrmOrderStatus', { id: orderId, status: 'مكتمل', username: State.currentUser.username });
             if (res.ok) {
                 toast('✅ تم إكمال التوصيل', 'success');
                 await refreshData();
@@ -1456,7 +1611,7 @@
     }
 
     function renderCrmOrdersTracking() {
-        const orders = (State.db.crmOrders || []).filter(o => o.createdBy === State.currentUser.branch);
+        const orders = (State.db.crmOrders || []).filter(o => o.createdBy === State.currentUser.username);
         const html = `
         <div class="breadcrumb">
             <span>📋 متابعة الأوردرات</span>
@@ -1502,7 +1657,7 @@
         </div>
         <div class="search-box" style="margin-bottom:16px;">
             <i class="fas fa-search"></i>
-            <input type="text" id="prodSearch" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
+            <input type="text" id="prodSearch" placeholder="🔍 ابحث عن منتج..." oninput="renderProductsTable()">
         </div>
         <div class="table-wrapper">
             <table>
@@ -1625,7 +1780,11 @@
 
     function renderStockTable() {
         const search = ($('#stockSearch')?.value || '').toLowerCase();
-        const stock = (State.db.stock || []).filter(s => s.branch === State.currentUser.branch && s.item.toLowerCase().includes(search));
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const stock = (State.db.stock || []).filter(s =>
+            (isAdmin || s.branch === State.currentUser.branch) &&
+            s.item.toLowerCase().includes(search)
+        );
         const tbody = $('#stockTable');
         if (!tbody) return;
         tbody.innerHTML = stock.map(s => {
@@ -1740,7 +1899,7 @@
                 item: item,
                 qty: qty,
                 type: type,
-                username: State.currentUser.branch,
+                username: State.currentUser.username,
                 notes: notes
             });
             if (res.ok) {
@@ -1762,40 +1921,71 @@
     /* ===== Chat System ===== */
     function startChatPolling() {
         if (State.chatPollingInterval) clearInterval(State.chatPollingInterval);
-        State.chatPollingInterval = setInterval(pollChatMessages, CHAT_POLL_INTERVAL);
+        State.chatPollingInterval = setInterval(async () => {
+            await pollChatMessages();
+            // تحديث الشات المفتوح تلقائياً بدون إعادة رسم كامل
+            const panel = $('#chatPanel');
+            if (panel && panel.classList.contains('active')) {
+                if (State.chatTab === 'users' && State.currentChatPeer) {
+                    renderChatMessages();
+                    // تحديث الشارات في قائمة المستخدمين
+                    _updateChatUserBadges();
+                } else if (State.chatTab === 'branch') {
+                    renderChatBranchMessages();
+                }
+            }
+        }, CHAT_POLL_INTERVAL);
         pollChatMessages();
     }
 
     async function pollChatMessages() {
         if (!State.currentUser) return;
         try {
-            const res = await jsonp('getMessages', { branch: State.currentUser.branch, username: State.currentUser.branch });
+            const res = await jsonp('getMessages', { branch: State.currentUser.branch, username: State.currentUser.username });
             if (res.ok) {
                 State.messages = res.messages || [];
-                const unread = State.messages.filter(m => !m.read && m.to_user === State.currentUser.branch).length;
+                const unread = State.messages.filter(m => !m.read && m.to_user === State.currentUser.username).length;
+                const prev = State.unreadCount || 0;
                 State.unreadCount = unread;
-                if (unread > 0) {
-                    $('#chatBadge').textContent = unread;
-                    $('#chatBadge').classList.remove('hidden');
-                } else {
-                    $('#chatBadge').classList.add('hidden');
+                const badge = $('#chatBadge');
+                if (badge) {
+                    if (unread > 0) {
+                        badge.textContent = unread;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+                // صوت إشعار عند وصول رسالة جديدة
+                if (unread > prev) {
+                    try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=').play(); } catch(e) {}
                 }
             }
         } catch(e) {}
     }
 
+    function openChatWidget() {
+        const panel = $('#chatPanel');
+        if (panel) {
+            panel.classList.add('active');
+            renderChatPanel();
+        }
+    }
+
     function toggleChatPanel() {
         const panel = $('#chatPanel');
-        if (panel) panel.classList.toggle('active');
-        if (panel && panel.classList.contains('active')) {
+        if (!panel) return;
+        const isOpen = panel.classList.contains('active');
+        if (isOpen) {
+            panel.classList.remove('active');
+        } else {
+            panel.classList.add('active');
             renderChatPanel();
         }
     }
 
     function renderChatPanel() {
         const tab = State.chatTab || 'users';
-        const body = $('#chatBody');
-        if (!body) return;
         if (tab === 'users') {
             renderChatUsersList();
         } else {
@@ -1805,6 +1995,7 @@
 
     function switchChatTab(tab) {
         State.chatTab = tab;
+        if (tab === 'users') State.currentChatPeer = null;
         $$('.chat-tab').forEach(t => t.classList.toggle('active', t.dataset.chatTab === tab));
         renderChatPanel();
     }
@@ -1812,64 +2003,159 @@
     function renderChatUsersList() {
         const body = $('#chatBody');
         if (!body) return;
-        const users = (State.db.users || []).filter(u => u.branch === State.currentUser.branch && u.username !== State.currentUser.branch && u.active);
-        body.innerHTML = `
-        <div class="chat-list">
-            ${users.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--text-muted);">لا توجد مستخدمون</div>' :
-            users.map(u => {
-                const unread = State.messages.filter(m => m.from_user === u.username && !m.read && m.to_user === State.currentUser.branch).length;
-                return `
-                <div class="chat-user-item ${State.currentChatPeer?.username === u.username ? 'active' : ''}" onclick="selectChatPeer('${escapeHtml(u.username)}','${escapeHtml(u.branch)}')">
-                    <div style="flex:1;">
-                        <div style="font-weight:600;">${escapeHtml(u.username)}</div>
-                        <div style="font-size:0.8rem;color:var(--text-muted);">${escapeHtml(u.pointType)}</div>
-                    </div>
-                    ${unread > 0 ? `<span style="background:var(--danger);color:white;padding:2px 8px;border-radius:12px;font-size:0.8rem;font-weight:700;">${unread}</span>` : ''}
+        const users = (State.db.users || []).filter(u =>
+            u.branch === State.currentUser.branch &&
+            u.username !== State.currentUser.username &&
+            u.active
+        );
+
+        // إذا فيه peer مختار — اعرض المحادثة مع زرار رجوع
+        if (State.currentChatPeer) {
+            const peer = State.currentChatPeer;
+            const msgs = State.messages.filter(m =>
+                (m.from_user === peer.username && m.to_user === State.currentUser.username) ||
+                (m.from_user === State.currentUser.username && m.to_user === peer.username)
+            ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+            body.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--border);background:var(--primary-soft);">
+                <button onclick="State.currentChatPeer=null;renderChatUsersList();" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--primary);">←</button>
+                <div>
+                    <div style="font-weight:700;">${escapeHtml(peer.username)}</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">${escapeHtml(peer.pointType||'')}</div>
                 </div>
-                `;
-            }).join('')}
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-row">
-            <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendChatMessage()">
-            <button style="background:var(--primary);color:white;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                ${msgs.length === 0 ? '<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:0.9rem;">لا توجد رسائل بعد</div>' :
+                msgs.map(m => {
+                    const isOut = m.from_user === State.currentUser.username;
+                    return `
+                    <div style="display:flex;margin-bottom:8px;${isOut?'justify-content:flex-end':'justify-content:flex-start'};">
+                        <div class="chat-msg ${isOut?'out':'in'}">
+                            ${escapeHtml(m.message)}
+                            <div class="chat-msg-time">${(m.timestamp||'').slice(11,16)}</div>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+                <button style="background:var(--primary);color:white;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            `;
+            // scroll للأسفل + mark as read
+            setTimeout(() => {
+                const c = $('#chatMessages');
+                if (c) c.scrollTop = c.scrollHeight;
+            }, 50);
+            if (msgs.some(m => !m.read && m.to_user === State.currentUser.username)) {
+                postJson('markMessagesRead', { branch: State.currentUser.branch, username: State.currentUser.username })
+                    .then(() => { State.unreadCount = 0; $('#chatBadge')?.classList.add('hidden'); })
+                    .catch(()=>{});
+            }
+            return;
+        }
+
+        // عرض قائمة المستخدمين
+        body.innerHTML = `
+        <div class="chat-list" id="chatUserList">
+            ${users.length === 0
+                ? '<div style="padding:20px;text-align:center;color:var(--text-muted);">لا يوجد مستخدمون في الفرع</div>'
+                : users.map(u => {
+                    const unread = State.messages.filter(m => m.from_user === u.username && !m.read && m.to_user === State.currentUser.username).length;
+                    const lastMsg = State.messages.filter(m =>
+                        (m.from_user === u.username && m.to_user === State.currentUser.username) ||
+                        (m.from_user === State.currentUser.username && m.to_user === u.username)
+                    ).sort((a,b) => new Date(b.timestamp)-new Date(a.timestamp))[0];
+                    return `
+                    <div class="chat-user-item" id="chatUser_${escapeHtml(u.username)}" onclick="selectChatPeer('${escapeHtml(u.username)}','${escapeHtml(u.branch)}','${escapeHtml(u.pointType||'')}')">
+                        <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--primary);flex-shrink:0;">
+                            ${escapeHtml((u.username||'?').charAt(0))}
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;display:flex;justify-content:space-between;align-items:center;">
+                                <span>${escapeHtml(u.username)}</span>
+                                ${lastMsg ? `<span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">${(lastMsg.timestamp||'').slice(11,16)}</span>` : ''}
+                            </div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                ${lastMsg ? escapeHtml(lastMsg.message.slice(0,30)+(lastMsg.message.length>30?'...':'')) : escapeHtml(u.pointType||'')}
+                            </div>
+                        </div>
+                        ${unread > 0 ? `<span style="background:var(--danger);color:white;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:700;flex-shrink:0;">${unread}</span>` : ''}
+                    </div>`;
+                }).join('')
+            }
         </div>
         `;
-        if (State.currentChatPeer) {
-            renderChatMessages();
-        }
     }
 
-    function selectChatPeer(username, branch) {
-        State.currentChatPeer = { username, branch };
+    function _updateChatUserBadges() {
+        const users = (State.db.users || []).filter(u =>
+            u.branch === State.currentUser.branch &&
+            u.username !== State.currentUser.username &&
+            u.active
+        );
+        users.forEach(u => {
+            const el = $(`#chatUser_${u.username.replace(/[^a-zA-Z0-9_]/g,'')}`);
+            if (!el) return;
+            const unread = State.messages.filter(m => m.from_user === u.username && !m.read && m.to_user === State.currentUser.username).length;
+            let badge = el.querySelector('.unread-badge');
+            if (unread > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'unread-badge';
+                    badge.style.cssText = 'background:var(--danger);color:white;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:700;flex-shrink:0;';
+                    el.appendChild(badge);
+                }
+                badge.textContent = unread;
+            } else if (badge) {
+                badge.remove();
+            }
+        });
+    }
+
+    function selectChatPeer(username, branch, pointType) {
+        State.currentChatPeer = { username, branch, pointType };
         renderChatUsersList();
     }
 
+    // legacy: used by chatWithDelivery
     function renderChatMessages() {
-        if (!State.currentChatPeer) return;
-        const peer = State.currentChatPeer;
-        const msgs = State.messages.filter(m =>
-            (m.from_user === peer.username && m.to_user === State.currentUser.branch) ||
-            (m.from_user === State.currentUser.branch && m.to_user === peer.username)
-        ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        const container = $('#chatMessages');
-        if (!container) return;
-        container.innerHTML = msgs.map(m => {
-            const isOut = m.from_user === State.currentUser.branch;
-            return `
-            <div style="display:flex;margin-bottom:8px;${isOut?'justify-content:flex-end':''};">
-                <div class="chat-msg ${isOut?'out':'in'}">
-                    ${escapeHtml(m.message)}
-                    <div class="chat-msg-time">${m.timestamp.slice(11,16)}</div>
-                </div>
-            </div>
-            `;
-        }).join('');
-        container.scrollTop = container.scrollHeight;
-        // Mark as read
-        if (msgs.length > 0) {
-            postJson('markMessagesRead', { branch: State.currentUser.branch, username: State.currentUser.branch });
-        }
+        if (State.currentChatPeer) renderChatUsersList();
+    }
+
+    function renderChatBranchMessages() {
+        const body = $('#chatBody');
+        if (!body) return;
+        // ترتيب تصاعدي (الأقدم فوق، الأحدث تحت) — عكس ما كان
+        const branchMsgs = State.messages
+            .filter(m => m.type === 'branch' && m.to_branch === State.currentUser.branch)
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        body.innerHTML = `
+        <div class="chat-messages" id="chatMessages">
+            ${branchMsgs.length === 0
+                ? '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.9rem;">لا توجد رسائل للفرع بعد</div>'
+                : branchMsgs.slice(-50).map(m => {
+                    const isMe = m.from_user === State.currentUser.username;
+                    return `
+                    <div style="display:flex;margin-bottom:8px;${isMe?'justify-content:flex-end':'justify-content:flex-start'};">
+                        <div class="chat-msg ${isMe?'out':'in'}">
+                            ${!isMe ? `<div style="font-size:0.78rem;font-weight:700;margin-bottom:3px;opacity:0.8;">${escapeHtml(m.from_user)}</div>` : ''}
+                            ${escapeHtml(m.message)}
+                            <div class="chat-msg-time">${(m.timestamp||'').slice(11,16)}</div>
+                        </div>
+                    </div>`;
+                }).join('')}
+        </div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="رسالة للفرع..." onkeydown="if(event.key==='Enter')sendBranchMessage()">
+            <button style="background:var(--primary);color:white;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;" onclick="sendBranchMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        `;
+        setTimeout(() => {
+            const c = $('#chatMessages');
+            if (c) c.scrollTop = c.scrollHeight;
+        }, 50);
     }
 
     async function sendChatMessage() {
@@ -1881,7 +2167,7 @@
         try {
             const res = await postJson('sendMessage', {
                 messageData: {
-                    from_user: State.currentUser.branch,
+                    from_user: State.currentUser.username,
                     from_branch: State.currentUser.branch,
                     to_user: State.currentChatPeer.username,
                     to_branch: State.currentChatPeer.branch,
@@ -1891,32 +2177,9 @@
             });
             if (res.ok) {
                 await pollChatMessages();
-                renderChatMessages();
+                renderChatUsersList();
             }
         } catch(e) {}
-    }
-
-    function renderChatBranchMessages() {
-        const body = $('#chatBody');
-        if (!body) return;
-        const branchMsgs = State.messages.filter(m => m.type === 'branch' && m.to_branch === State.currentUser.branch)
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        body.innerHTML = `
-        <div class="chat-messages" id="chatMessages" style="flex:1;">
-            ${branchMsgs.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--text-muted);">لا توجد رسائل</div>' :
-            branchMsgs.slice(0, 50).map(m => `
-            <div style="margin-bottom:12px;padding:10px;background:white;border-radius:10px;border-right:3px solid var(--primary);">
-                <div style="font-weight:600;font-size:0.9rem;">${escapeHtml(m.from_user)}</div>
-                <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:4px;">${m.timestamp.slice(0,16)}</div>
-                <div>${escapeHtml(m.message)}</div>
-            </div>
-            `).join('')}
-        </div>
-        <div class="chat-input-row">
-            <input type="text" id="chatInput" placeholder="رسالة للفرع..." onkeydown="if(event.key==='Enter')sendBranchMessage()">
-            <button style="background:var(--primary);color:white;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="sendBranchMessage()"><i class="fas fa-paper-plane"></i></button>
-        </div>
-        `;
     }
 
     async function sendBranchMessage() {
@@ -1927,7 +2190,7 @@
         try {
             await postJson('sendMessage', {
                 messageData: {
-                    from_user: State.currentUser.branch,
+                    from_user: State.currentUser.username,
                     from_branch: State.currentUser.branch,
                     to_user: '',
                     to_branch: State.currentUser.branch,
@@ -2142,7 +2405,8 @@
     }
 
     function renderComplaints() {
-        const complaints = (State.db.complaints || []).filter(c => c.branch === State.currentUser.branch);
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const complaints = (State.db.complaints || []).filter(c => isAdmin || c.branch === State.currentUser.branch);
         const html = `
         <div class="breadcrumb">
             <span>⚠️ الشكاوى</span>
@@ -2174,7 +2438,7 @@
         try {
             const res = await postJson('saveComplaint', {
                 complaint: {
-                    phone, name, type, description: desc,
+                    phone, customer: name, name, type, description: desc,
                     branch: State.currentUser.branch,
                     status: 'جديدة'
                 }
@@ -2301,7 +2565,8 @@
     }
 
     function renderExpensesTable() {
-        const expenses = (State.db.expenses || []).filter(e => e.branch === State.currentUser.branch).reverse();
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const expenses = (State.db.expenses || []).filter(e => isAdmin || e.branch === State.currentUser.branch).reverse();
         const tbody = $('#expensesTable');
         if (!tbody) return;
         tbody.innerHTML = expenses.map(e => `
@@ -2325,7 +2590,7 @@
                 expense: {
                     type, amount, notes,
                     branch: State.currentUser.branch,
-                    username: State.currentUser.branch,
+                    username: State.currentUser.username,
                     shiftId: State.currentShift?.id || ''
                 }
             });
@@ -2368,7 +2633,8 @@
     }
 
     function renderReturnsTable() {
-        const returns = (State.db.returns || []).filter(r => r.branch === State.currentUser.branch).reverse();
+        const isAdmin = State.currentUser.pointType === 'إدارة';
+        const returns = (State.db.returns || []).filter(r => isAdmin || r.branch === State.currentUser.branch).reverse();
         const tbody = $('#returnsTable');
         if (!tbody) return;
         tbody.innerHTML = returns.map(r => `
@@ -2393,7 +2659,7 @@
                     originalSaleId: saleId,
                     amount, reason,
                     branch: State.currentUser.branch,
-                    username: State.currentUser.branch,
+                    username: State.currentUser.username,
                     shiftId: State.currentShift?.id || ''
                 }
             });
@@ -2777,7 +3043,7 @@
         const reason = $('#reopenReason').value.trim();
         if (!reason) { toast('⚠️ اذكر السبب', 'warning'); return; }
         try {
-            const res = await postJson('adminReopenShift', { shiftId, reason, adminUser: State.currentUser.branch });
+            const res = await postJson('adminReopenShift', { shiftId, reason, adminUser: State.currentUser.username });
             if (res.ok) {
                 toast('✅ تم إعادة فتح الوردية', 'success');
                 await refreshData();
@@ -2868,18 +3134,40 @@
         const el = $('#shiftInfo');
         if (!el) return;
         if (State.currentShift) {
+            const s = State.currentShift;
+            const diff = s.openTime ? Math.floor((Date.now() - new Date(s.openTime)) / 60000) : 0;
+            const hours = Math.floor(diff / 60);
+            const mins = diff % 60;
             el.innerHTML = `
             <div style="background:var(--primary-soft);padding:16px;border-radius:14px;margin-bottom:14px;">
-                <div style="color:var(--text-muted);font-size:0.9rem;">الوردية الحالية</div>
-                <div style="font-size:1.2rem;font-weight:700;color:var(--primary);">${escapeHtml(State.currentShift.id)}</div>
-                <div style="color:var(--text-muted);font-size:0.9rem;margin-top:6px;">🕐 ${escapeHtml(State.currentShift.openTime)}</div>
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+                    <div style="color:var(--text-muted);font-size:0.85rem;">الوردية الحالية</div>
+                    <span style="background:var(--success);color:white;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">🟢 مفتوحة</span>
+                </div>
+                <div style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:6px;">${escapeHtml(s.id||'')}</div>
+                <div style="color:var(--text-muted);font-size:0.85rem;">🕐 فتحت: ${escapeHtml(s.openTime||'')}</div>
+                <div style="color:var(--text-muted);font-size:0.85rem;">⏱ المدة: ${hours > 0 ? hours+'س ' : ''}${mins} دقيقة</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+                    <div style="background:white;border-radius:10px;padding:10px;text-align:center;">
+                        <div style="font-size:0.78rem;color:var(--text-muted);">المبيعات</div>
+                        <div style="font-weight:700;color:var(--primary);">${fmt(s.totalSales||0)} ج.م</div>
+                    </div>
+                    <div style="background:white;border-radius:10px;padding:10px;text-align:center;">
+                        <div style="font-size:0.78rem;color:var(--text-muted);">الفواتير</div>
+                        <div style="font-weight:700;color:var(--primary);">${s.invoiceCount||0}</div>
+                    </div>
+                </div>
             </div>
             `;
             $('#shiftActions').innerHTML = `
             <button class="btn btn-danger btn-block" onclick="closeCurrentShift()">🔒 إغلاق الوردية</button>
             `;
         } else {
-            el.innerHTML = '<div style="color:var(--text-muted);padding:16px;text-align:center;">لا توجد وردية مفتوحة</div>';
+            el.innerHTML = `
+            <div style="text-align:center;padding:24px;color:var(--text-muted);">
+                <i class="fas fa-clock" style="font-size:40px;color:var(--border);display:block;margin-bottom:12px;"></i>
+                لا توجد وردية مفتوحة
+            </div>`;
             $('#shiftActions').innerHTML = `
             <button class="btn btn-primary btn-block" onclick="openNewShift()">🟢 فتح وردية جديدة</button>
             `;
@@ -2888,13 +3176,16 @@
 
     async function openNewShift() {
         try {
-            const res = await postJson('openShift', { branch: State.currentUser.branch, cashier: State.currentUser.branch });
+            const res = await postJson('openShift', { branch: State.currentUser.branch, cashier: State.currentUser.username });
             if (res.ok) {
                 toast('✅ تم فتح وردية جديدة', 'success');
                 await refreshData();
                 renderShiftOptions();
+                // تحديث حالة الوردية في الشريط الجانبي
+                const el = $('#shiftStatus');
+                if (el) el.textContent = '🟢 وردية مفتوحة';
             } else {
-                toast('❌ ' + (res.error || 'خطأ'), 'error');
+                toast('❌ ' + (res.error || 'لا يمكن فتح وردية جديدة، يوجد وردية مفتوحة بالفعل'), 'error');
             }
         } catch(e) {
             toast('❌ ' + e.message, 'error');
@@ -2903,8 +3194,19 @@
 
     async function closeCurrentShift() {
         if (!State.currentShift) return;
-        const expectedCash = State.currentShift.totalSales || 0;
+        const s = State.currentShift;
+        const expectedCash = s.totalSales || 0;
         $('#expectedCash').textContent = fmt(expectedCash);
+        $('#shiftCloseSummary').innerHTML = `
+            <div style="background:var(--primary-soft);padding:12px;border-radius:10px;margin-bottom:14px;font-size:0.9rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                    <span>إجمالي المبيعات:</span><strong>${fmt(s.totalSales||0)} ج.م</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span>عدد الفواتير:</span><strong>${s.invoiceCount||0}</strong>
+                </div>
+            </div>
+        `;
         $('#actualCash').value = '';
         closeModal('shiftModal');
         openModal('shiftCashModal');
@@ -2913,14 +3215,21 @@
     async function saveShiftCash() {
         const actual = Number($('#actualCash').value) || 0;
         if (!State.currentShift) return;
+        const expected = State.currentShift.totalSales || 0;
+        const diff = actual - expected;
         try {
             const res = await postJson('updateShiftActualCash', { shiftId: State.currentShift.id, actualCash: actual });
             if (res.ok) {
                 const res2 = await postJson('closeShift', { shiftId: State.currentShift.id, branch: State.currentUser.branch });
                 if (res2.ok) {
-                    toast('✅ تم إغلاق الوردية', 'success');
+                    const diffMsg = diff === 0 ? '✅ مطابق' : diff > 0 ? `⬆️ زيادة ${fmt(Math.abs(diff))} ج.م` : `⬇️ عجز ${fmt(Math.abs(diff))} ج.م`;
+                    toast(`✅ تم إغلاق الوردية — ${diffMsg}`, diff === 0 ? 'success' : 'warning', 5000);
+                    State.currentShift = null;
                     await refreshData();
                     closeModal('shiftCashModal');
+                    // تحديث حالة الوردية في الشريط الجانبي
+                    const el = $('#shiftStatus');
+                    if (el) el.textContent = '⚪ لا توجد وردية';
                     renderPOS();
                 } else {
                     toast('❌ ' + (res2.error || 'خطأ'), 'error');
@@ -2934,7 +3243,7 @@
     }
 
     function renderParkedOrders() {
-        const orders = (State.db.parkedOrders || []).filter(o => o.branch === State.currentUser.branch && o.cashier === State.currentUser.branch);
+        const orders = (State.db.parkedOrders || []).filter(o => o.branch === State.currentUser.branch && o.cashier === State.currentUser.username);
         const list = $('#parkedList');
         if (!list) return;
         if (orders.length === 0) {
