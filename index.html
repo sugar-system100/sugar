@@ -31,8 +31,14 @@
     .hidden{display:none!important}
     .app-shell{display:grid;grid-template-columns:1fr var(--sidebar-w);min-height:100vh}
     .sidebar{
-      background:linear-gradient(180deg,#fff,#fff8f6); border-left:1px solid var(--line);
-      padding:20px 14px; position:sticky; top:0; height:100vh; overflow:auto; box-shadow:var(--shadow-sm)
+      background:linear-gradient(180deg,#fff,#fff8f6);
+      border-left:1px solid var(--line);
+      padding:20px 14px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      box-shadow:var(--shadow-sm)
     }
     .brand{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:linear-gradient(135deg,#fff,#ffe8e0)}
     .brand-logo{
@@ -52,20 +58,18 @@
     .nav-item:hover,.nav-item.active{background:#fff;border-color:var(--line);box-shadow:var(--shadow-sm)}
     .nav-item .left{display:flex;align-items:center;gap:10px}
     .nav-item i{width:18px;text-align:center;color:var(--primary-dark)}
-    .main{
-      min-width:0; display:flex; flex-direction:column; height:100vh; overflow:hidden;
-    }
+    .main{min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
     .topbar{
-      height:var(--topbar-h); display:flex; align-items:center; justify-content:space-between;
-      gap:12px; padding:14px 20px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.8); backdrop-filter:blur(10px)
+      height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.8);backdrop-filter:blur(10px)
     }
     .breadcrumbs{font-size:13px;color:var(--muted)}
     .topbar-actions{display:flex;gap:10px;align-items:center}
     .search-mini,.btn,.input,.select,.textarea{
-      border:1px solid var(--line); background:#fff; border-radius:14px; padding:10px 12px; color:var(--text)
+      border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;color:var(--text)
     }
     .search-mini{min-width:240px}
-    .btn{cursor:pointer; transition:.2s}
+    .btn{cursor:pointer;transition:.2s}
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none}
     .btn-secondary{background:linear-gradient(135deg,var(--secondary),#6a473a);color:#fff;border:none}
@@ -78,22 +82,16 @@
     .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
     .page-head h2{margin:0;font-size:28px}
     .page-head p{margin:6px 0 0;color:var(--muted)}
-    .kpi-grid,.grid-2,.grid-3,.grid-4{
-      display:grid; gap:16px;
-    }
+    .kpi-grid,.grid-2,.grid-3,.grid-4{display:grid;gap:16px}
     .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
     .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
     .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
     .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .card{
-      background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-sm); padding:16px; min-width:0
-    }
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-sm);padding:16px;min-width:0}
     .kpi{display:flex;justify-content:space-between;align-items:flex-start}
     .kpi .value{font-size:26px;font-weight:800}
     .kpi .label{color:var(--muted);font-size:13px}
-    .kpi .icon{
-      width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#fff3ef;color:var(--primary-dark)
-    }
+    .kpi .icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#fff3ef;color:var(--primary-dark)}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
     table{width:100%;border-collapse:collapse;font-size:14px}
     th,td{padding:12px 10px;border-bottom:1px solid #f3e7e2;text-align:right;vertical-align:top}
@@ -108,9 +106,7 @@
     .toolbar .grow{flex:1}
     .pos-layout{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:16px}
     .cat-list,.product-grid,.cart-list{max-height:calc(100vh - 260px);overflow:auto}
-    .cat-btn,.product-card,.cart-item,.branch-card,.mini-card{
-      border:1px solid var(--line); border-radius:16px; background:#fff; padding:12px
-    }
+    .cat-btn,.product-card,.cart-item,.branch-card,.mini-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px}
     .cat-btn{width:100%;margin-bottom:8px;cursor:pointer;text-align:right}
     .cat-btn.active{background:#fff3ef;border-color:#efc4b7}
     .product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -143,16 +139,12 @@
     .section{margin-bottom:18px}
     .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
     .section-title h3{margin:0;font-size:18px}
-    .modal-backdrop,.loading-overlay,.chat-panel,.toast-stack,.scanner-box{
-      position:fixed;z-index:1000
-    }
+    .modal-backdrop,.loading-overlay,.chat-panel,.toast-stack,.scanner-box{position:fixed;z-index:1000}
     .loading-overlay{
       inset:0;background:rgba(55,40,34,.25);backdrop-filter:blur(4px);
       display:none;align-items:center;justify-content:center
     }
-    .spinner{
-      width:72px;height:72px;border-radius:50%;border:6px solid #f1d9d1;border-top-color:var(--primary);animation:spin 1s linear infinite
-    }
+    .spinner{width:72px;height:72px;border-radius:50%;border:6px solid #f1d9d1;border-top-color:var(--primary);animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .toast-stack{left:16px;bottom:16px;display:flex;flex-direction:column;gap:10px}
     .toast{
@@ -220,7 +212,6 @@
   </style>
 </head>
 <body>
-  <!-- شاشة الدخول -->
   <section id="authScreen" class="auth-screen">
     <div class="login-card">
       <div class="login-brand">
@@ -235,17 +226,17 @@
             <label>نوع المستخدم</label>
             <select id="loginPointType" class="select" required>
               <option value="">اختر النوع</option>
-              <option>مندوب_بيع</option>
-              <option>كاشير</option>
-              <option>دليفري</option>
-              <option>خدمة_العملاء</option>
-              <option>مدير_فرع</option>
-              <option>إدارة</option>
+              <option value="seller">بائع / POS</option>
+              <option value="cashier">كاشير</option>
+              <option value="delivery">دليفري</option>
+              <option value="manager">مدير فرع</option>
+              <option value="crm">CRM</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
           <div class="field">
             <label>الفرع</label>
-            <input id="loginBranch" class="input" placeholder="مثال: مدينة نصر" required />
+            <input id="loginBranch" class="input" placeholder="مثال: 1" required />
           </div>
         </div>
         <div class="field">
@@ -259,7 +250,6 @@
     </div>
   </section>
 
-  <!-- التطبيق -->
   <div id="appShell" class="app-shell hidden">
     <aside id="sidebar" class="sidebar"></aside>
 
@@ -273,7 +263,6 @@
         <div class="topbar-actions">
           <button id="menuBtn" class="btn btn-icon btn-soft" title="القائمة"><i class="fa-solid fa-bars"></i></button>
           <input id="quickSearchInput" class="search-mini" placeholder="بحث سريع..." />
-          <button id="globalSearchBtn" class="btn btn-icon btn-soft" title="بحث شامل"><i class="fa-solid fa-magnifying-glass"></i></button>
           <button id="refreshBtn" class="btn btn-icon btn-soft" title="تحديث"><i class="fa-solid fa-rotate"></i></button>
           <button id="logoutBtn" class="btn btn-icon btn-danger" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -283,13 +272,9 @@
     </main>
   </div>
 
-  <!-- Toast -->
   <div id="toastStack" class="toast-stack"></div>
-
-  <!-- Loading -->
   <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
 
-  <!-- Chat -->
   <button id="chatWidget" class="chat-widget hidden"><i class="fa-solid fa-comments"></i></button>
   <div id="chatPanel" class="chat-panel">
     <div class="chat-head">
@@ -312,7 +297,6 @@
     </div>
   </div>
 
-  <!-- QR Scanner -->
   <div id="scannerBox" class="scanner-box">
     <div class="scanner-frame">
       <div class="modal-head">
@@ -326,13 +310,12 @@
     </div>
   </div>
 
-  <!-- Generic Modal -->
   <div id="modalBackdrop" class="modal-backdrop">
     <div id="modalBox" class="modal"></div>
   </div>
 
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbydxi0S8kN_lhOdu1akkg1gSm4LL8FyAFtTTELi8CCq5fgoGIyldDLbYiqLAlsfXgb9/exec';
+    const GASURL = 'https://script.google.com/macros/s/AKfycbwwgdrwN43EBpmf78H5CFNIa7ihED09iitXA4MMTcQSwnY-AnnjIOYLJwkSNJWA7hJ8/exec';
 
     const App = {
       state: {
@@ -340,9 +323,23 @@
         user: null,
         superPass: '',
         data: {
-          products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [],
-          complaints: [], loyalty: [], forecast: [], expenses: [], returns: [],
-          parkedOrders: [], auditLog: [], messages: [], deliveryZones: [], branchReports: []
+          products: [],
+          users: [],
+          stock: [],
+          sales: [],
+          crmOrders: [],
+          shifts: [],
+          complaints: [],
+          loyalty: [],
+          forecast: [],
+          expenses: [],
+          returns: [],
+          parkedOrders: [],
+          auditLog: [],
+          messages: [],
+          deliveryZones: [],
+          branchReports: [],
+          movements: []
         },
         route: 'dashboard',
         activeCategory: 'الكل',
@@ -353,35 +350,70 @@
         heartbeatTimer: null,
         pollTimer: null,
         chatTimer: null,
-        scanner: null
-      },
+        scanner: null,
 
-      menuByRole: {
-        'مندوب_بيع': ['pos','qr'],
-        'كاشير': ['pos','stock','movements','reports','expenses','returns','loyalty','shifts','search'],
-        'دليفري': ['pos','delivery','search','stock','reports','expenses','returns','loyalty'],
-        'خدمة_العملاء': ['crm','crmTracking','products','complaints','stock'],
-        'مدير_فرع': ['pos','reports','stock','forecast','loyalty','dashboard'],
-        'إدارة': ['dashboard','monitor','branchDetail','branchShifts','branchStock','branchReports','pos','crm','delivery','products','stock','movements','reports','complaints','loyalty','forecast','expenses','returns','search','users','audit','shifts']
-      },
+        menuByRole: {
+          pos: ['pos','qr'],
+          cashier: ['pos','stock','movements','reports','expenses','returns','loyalty','shifts','search'],
+          delivery: ['pos','delivery','search','stock','reports','expenses','returns','loyalty'],
+          crm: ['crm','crmTracking','products','complaints','stock'],
+          manager: ['pos','reports','stock','forecast','loyalty','dashboard'],
+          admin: ['dashboard','monitor','branchDetail','branchShifts','branchStock','branchReports','pos','crm','delivery','products','stock','movements','reports','complaints','loyalty','forecast','expenses','returns','search','users','audit','shifts']
+        },
 
-      labels: {
-        dashboard:'Dashboard الإدارة', monitor:'مراقبة الفروع', branchDetail:'تفاصيل الفرع',
-        branchShifts:'ورديات الفرع', branchStock:'مخزون الفرع', branchReports:'تقارير الفرع',
-        pos:'نقطة البيع', qr:'QR', crm:'CRM', crmTracking:'متابعة الطلبات', delivery:'التوصيل',
-        products:'المنتجات', stock:'المخزون', movements:'حركات المخزون', reports:'التقارير',
-        complaints:'الشكاوى', loyalty:'الولاء', forecast:'التوقعات', expenses:'المصروفات',
-        returns:'المرتجعات', search:'بحث سريع', users:'المستخدمون', audit:'سجل العمليات',
-        shifts:'الورديات'
-      },
+        labels: {
+          dashboard:'Dashboard',
+          monitor:'مراقبة الفروع',
+          branchDetail:'تفاصيل الفرع',
+          branchShifts:'ورديات الفرع',
+          branchStock:'مخزون الفرع',
+          branchReports:'تقارير الفرع',
+          pos:'نقطة البيع',
+          qr:'QR',
+          crm:'CRM',
+          crmTracking:'متابعة الطلبات',
+          delivery:'التوصيل',
+          products:'المنتجات',
+          stock:'المخزون',
+          movements:'حركات المخزون',
+          reports:'التقارير',
+          complaints:'الشكاوى',
+          loyalty:'الولاء',
+          forecast:'التوقعات',
+          expenses:'المصروفات',
+          returns:'المرتجعات',
+          search:'بحث سريع',
+          users:'المستخدمون',
+          audit:'سجل العمليات',
+          shifts:'الورديات'
+        },
 
-      icons: {
-        dashboard:'fa-chart-line', monitor:'fa-building', branchDetail:'fa-store', branchShifts:'fa-clock',
-        branchStock:'fa-boxes-stacked', branchReports:'fa-chart-pie', pos:'fa-cash-register', qr:'fa-qrcode',
-        crm:'fa-headset', crmTracking:'fa-list-check', delivery:'fa-motorcycle', products:'fa-cookie-bite',
-        stock:'fa-warehouse', movements:'fa-arrow-right-arrow-left', reports:'fa-chart-column', complaints:'fa-triangle-exclamation',
-        loyalty:'fa-gift', forecast:'fa-wand-magic-sparkles', expenses:'fa-money-bill-wave', returns:'fa-rotate-left',
-        search:'fa-magnifying-glass', users:'fa-users-gear', audit:'fa-clipboard-list', shifts:'fa-stopwatch'
+        icons: {
+          dashboard:'fa-chart-line',
+          monitor:'fa-building',
+          branchDetail:'fa-store',
+          branchShifts:'fa-clock',
+          branchStock:'fa-boxes-stacked',
+          branchReports:'fa-chart-pie',
+          pos:'fa-cash-register',
+          qr:'fa-qrcode',
+          crm:'fa-headset',
+          crmTracking:'fa-list-check',
+          delivery:'fa-motorcycle',
+          products:'fa-cookie-bite',
+          stock:'fa-warehouse',
+          movements:'fa-arrow-right-arrow-left',
+          reports:'fa-chart-column',
+          complaints:'fa-triangle-exclamation',
+          loyalty:'fa-gift',
+          forecast:'fa-wand-magic-sparkles',
+          expenses:'fa-money-bill-wave',
+          returns:'fa-rotate-left',
+          search:'fa-magnifying-glass',
+          users:'fa-users-gear',
+          audit:'fa-clipboard-list',
+          shifts:'fa-stopwatch'
+        }
       },
 
       init() {
@@ -412,42 +444,76 @@
       },
 
       bindGlobalEvents() {
-        document.getElementById('loginForm').addEventListener('submit', (e) => this.login(e));
+        document.getElementById('loginForm').addEventListener('submit', e => this.login(e));
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('refreshBtn').addEventListener('click', () => this.loadInitialData(true));
-        document.getElementById('globalSearchBtn').addEventListener('click', () => this.openGlobalSearch());
-        document.getElementById('quickSearchInput').addEventListener('keydown', (e) => {
+        document.getElementById('quickSearchInput').addEventListener('keydown', e => {
           if (e.key === 'Enter') this.quickSearch(e.target.value.trim());
         });
         document.getElementById('chatWidget').addEventListener('click', () => this.toggleChat(true));
         document.getElementById('chatSendBtn').addEventListener('click', () => this.sendChatMessage());
         document.getElementById('menuBtn').addEventListener('click', () => this.el.sidebar.classList.toggle('open'));
-        this.el.modalBackdrop.addEventListener('click', (e) => { if (e.target === this.el.modalBackdrop) this.closeModal(); });
-        document.querySelectorAll('.chat-tab').forEach(btn => btn.addEventListener('click', () => {
-          document.querySelectorAll('.chat-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          this.state.selectedChatTab = btn.dataset.chatTab;
-          this.renderChat();
-        }));
+        this.el.modalBackdrop.addEventListener('click', e => {
+          if (e.target === this.el.modalBackdrop) this.closeModal();
+        });
+
+        document.querySelectorAll('.chat-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.chat-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.state.selectedChatTab = btn.dataset.chatTab;
+            this.state.selectedChatTarget = null;
+            this.renderChat();
+          });
+        });
+      },
+
+      normalizeRole(rawRole = '', username = '') {
+        const role = String(rawRole || '').trim().toLowerCase();
+        const user = String(username || '').trim().toLowerCase();
+
+        if (user === 'admin' || role === 'admin' || role === 'super' || role === 'إدارة') return 'admin';
+        if (user === 'crmuser' || role === 'crm' || role === 'customer service' || role === 'خدمة عملاء') return 'crm';
+        if (user.startsWith('seller') || role === 'seller' || role === 'pos' || role === 'مندوب_بيع' || role === 'بائع') return 'pos';
+        if (user.startsWith('cash') || role === 'cashier' || role === 'كاشير') return 'cashier';
+        if (user.startsWith('del') || role === 'delivery' || role === 'دليفري' || role === 'مندوب') return 'delivery';
+        if (user.startsWith('mgr') || role === 'manager' || role === 'مدير_فرع' || role === 'مدير فرع' || role === 'مشرف') return 'manager';
+
+        return role || 'pos';
+      },
+
+      mapLoginPointType(selected='') {
+        const role = String(selected).trim().toLowerCase();
+        const map = {
+          seller: 'seller',
+          pos: 'seller',
+          cashier: 'cashier',
+          delivery: 'delivery',
+          manager: 'manager',
+          crm: 'crm',
+          admin: 'admin'
+        };
+        return map[role] || role;
       },
 
       saveSession() {
         try {
-          localStorage.setItem('s33_token', this.state.token);
-          localStorage.setItem('s33_user', JSON.stringify(this.state.user || null));
-          localStorage.setItem('s33_super', this.state.superPass || '');
+          localStorage.setItem('s33token', this.state.token);
+          localStorage.setItem('s33user', JSON.stringify(this.state.user || null));
+          localStorage.setItem('s33super', this.state.superPass || '');
         } catch (e) {}
       },
 
       restoreSession() {
         try {
-          const token = localStorage.getItem('s33_token');
-          const user = JSON.parse(localStorage.getItem('s33_user') || 'null');
-          const superPass = localStorage.getItem('s33_super') || '';
+          const token = localStorage.getItem('s33token');
+          const user = JSON.parse(localStorage.getItem('s33user') || 'null');
+          const superPass = localStorage.getItem('s33super');
           if (token && user) {
+            user.pointType = this.normalizeRole(user.pointType, user.username);
             this.state.token = token;
             this.state.user = user;
-            this.state.superPass = superPass;
+            this.state.superPass = superPass || '';
             this.startApp();
           }
         } catch (e) {}
@@ -455,31 +521,35 @@
 
       clearSession() {
         try {
-          localStorage.removeItem('s33_token');
-          localStorage.removeItem('s33_user');
-          localStorage.removeItem('s33_super');
+          localStorage.removeItem('s33token');
+          localStorage.removeItem('s33user');
+          localStorage.removeItem('s33super');
         } catch (e) {}
       },
 
       async login(e) {
         e.preventDefault();
-        const pointType = document.getElementById('loginPointType').value;
+        const pointType = this.mapLoginPointType(document.getElementById('loginPointType').value);
         const branch = document.getElementById('loginBranch').value.trim();
-        const pass = document.getElementById('loginPass').value;
+        const pass = document.getElementById('loginPass').value.trim();
+
         if (!pointType || !branch || !pass) return this.toast('اكمل بيانات الدخول', 'error');
 
         this.showLoading(true);
         try {
           const res = await this.apiGet('authenticate', { pointType, branch, pass });
           if (!res.ok) return this.toast(res.error || 'فشل تسجيل الدخول', 'error');
+
+          res.user.pointType = this.normalizeRole(res.user.pointType, res.user.username);
           this.state.token = res.token;
           this.state.user = res.user;
           this.state.superPass = res.superPass || '';
+
           this.saveSession();
-          this.startApp();
-          this.toast('تم تسجيل الدخول بنجاح', 'success');
+          await this.startApp();
+          this.toast(`مرحبًا ${this.state.user.username}`, 'success');
         } catch (err) {
-          this.toast('تعذر الاتصال بالخادم', 'error');
+          this.toast(err.message || 'تعذر الاتصال بالخادم', 'error');
         } finally {
           this.showLoading(false);
         }
@@ -497,24 +567,23 @@
       },
 
       async logout() {
-        this.stopScanner();
+        await this.stopScanner();
         clearInterval(this.state.heartbeatTimer);
         clearInterval(this.state.pollTimer);
         clearInterval(this.state.chatTimer);
-        await this.safePost('setUserStatus', {
-          token: this.state.token, status: 'offline', screen: 'logout'
-        });
+        await this.safePost('setUserStatus', { status:'offline', screen:'logout' });
         this.clearSession();
         location.reload();
       },
 
-      role() { return this.state.user?.pointType || ''; },
-      branch() { return this.state.user?.branch || ''; },
-      username() { return this.state.user?.username || ''; },
+      role() { return this.normalizeRole(this.state.user?.pointType, this.state.user?.username); },
+      branch() { return String(this.state.user?.branch || '').trim(); },
+      username() { return String(this.state.user?.username || '').trim(); },
 
       buildSidebar() {
         const role = this.role();
-        const items = this.menuByRole[role] || ['pos'];
+        const items = this.state.menuByRole[role] || ['pos'];
+
         this.el.sidebar.innerHTML = `
           <div class="brand">
             <div class="brand-logo"><i class="fa-solid fa-cake-candles"></i></div>
@@ -533,12 +602,13 @@
             <div class="nav-title">القائمة الرئيسية</div>
             ${items.map(key => `
               <button class="nav-item ${this.state.route===key?'active':''}" data-route="${key}">
-                <span class="left"><i class="fa-solid ${this.icons[key]||'fa-circle'}"></i><span>${this.labels[key]||key}</span></span>
+                <span class="left"><i class="fa-solid ${this.state.icons[key]||'fa-circle'}"></i><span>${this.state.labels[key]||key}</span></span>
                 <i class="fa-solid fa-angle-left"></i>
               </button>
             `).join('')}
           </div>
         `;
+
         this.el.sidebar.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => {
           this.state.route = btn.dataset.route;
           this.el.sidebar.classList.remove('open');
@@ -595,7 +665,6 @@
       },
 
       bindDynamicEvents() {
-        // POS
         document.querySelectorAll('[data-cat]').forEach(btn => btn.addEventListener('click', () => {
           this.state.activeCategory = btn.dataset.cat;
           this.render();
@@ -632,14 +701,13 @@
         const openShiftBtn = document.getElementById('openShiftBtn');
         if (openShiftBtn) openShiftBtn.addEventListener('click', () => this.openShiftModal());
 
-        // Tables actions
         document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', async () => {
           await this.handleActionButton(btn);
         }));
 
-        const quickTableSearch = document.querySelectorAll('[data-table-search]');
-        quickTableSearch.forEach(inp => inp.addEventListener('input', () => {
+        document.querySelectorAll('[data-table-search]').forEach(inp => inp.addEventListener('input', () => {
           const target = document.getElementById(inp.dataset.tableSearch);
+          if (!target) return;
           const q = inp.value.trim().toLowerCase();
           [...target.querySelectorAll('tbody tr')].forEach(tr => {
             tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
@@ -657,7 +725,7 @@
       },
 
       productStock(name) {
-        const row = (this.state.data.stock || []).find(s => s.branch === this.branch() && s.item === name);
+        const row = (this.state.data.stock || []).find(s => String(s.branch) === String(this.branch()) && s.item === name);
         return Number(row?.qty || 0);
       },
 
@@ -676,7 +744,7 @@
         const openOrders = (this.state.data.crmOrders || []).filter(x => !['مكتمل','ملغي'].includes(x.status)).length;
 
         return `
-          ${this.setPage('Dashboard الإدارة','ملخص لحظي للمبيعات والفروع والمستخدمين')}
+          ${this.setPage('Dashboard','ملخص لحظي للمبيعات والفروع')}
           <div class="kpi-grid">
             ${this.kpiCard('مبيعات اليوم', this.money(total), 'fa-sack-dollar')}
             ${this.kpiCard('عدد الفواتير', invoices, 'fa-receipt')}
@@ -687,26 +755,11 @@
           <div class="grid-2 mt-16">
             <div class="card">
               <div class="section-title"><h3>ملخص الفروع</h3></div>
-              <div class="table-wrap">${this.branchSummaryTable()}</div>
+              ${this.branchSummaryTable()}
             </div>
             <div class="card">
               <div class="section-title"><h3>اتجاه المبيعات</h3></div>
               <canvas id="dashBranchChart" height="180"></canvas>
-            </div>
-          </div>
-
-          <div class="grid-3 mt-16">
-            <div class="card">
-              <div class="section-title"><h3>أحدث الفواتير</h3></div>
-              ${this.simpleList((salesToday || []).slice(0,6).map(s => `${s.saleId} — ${s.customer || 'عميل نقدي'} — ${this.money(s.total)}`))}
-            </div>
-            <div class="card">
-              <div class="section-title"><h3>الشكاوى</h3></div>
-              ${this.simpleList((this.state.data.complaints || []).slice(0,6).map(c => `${c.name || '-'} — ${c.type || '-'} — ${c.status || 'جديد'}`))}
-            </div>
-            <div class="card">
-              <div class="section-title"><h3>المحادثات الأخيرة</h3></div>
-              ${this.simpleList((this.state.data.messages || []).slice(-6).reverse().map(m => `${m.from_user || m.from_branch} : ${m.message}`))}
             </div>
           </div>
         `;
@@ -744,16 +797,16 @@
       },
 
       renderBranchDetail(branch = this.branch()) {
-        const sales = (this.state.data.sales || []).filter(x => x.branch === branch).slice(-10).reverse();
-        const users = (this.state.data.users || []).filter(x => x.branch === branch);
-        const total = this.sum((this.state.data.sales || []).filter(x => x.branch===branch), 'total');
+        const sales = (this.state.data.sales || []).filter(x => String(x.branch) === String(branch)).slice(-10).reverse();
+        const users = (this.state.data.users || []).filter(x => String(x.branch) === String(branch));
+        const total = this.sum((this.state.data.sales || []).filter(x => String(x.branch)===String(branch)), 'total');
         return `
           ${this.setPage('تفاصيل الفرع', branch)}
           <div class="kpi-grid">
             ${this.kpiCard('إجمالي المبيعات', this.money(total), 'fa-sack-dollar')}
             ${this.kpiCard('الموظفون', users.length, 'fa-users')}
-            ${this.kpiCard('المخزون', (this.state.data.stock||[]).filter(x=>x.branch===branch).length, 'fa-boxes-stacked')}
-            ${this.kpiCard('الورديات', (this.state.data.shifts||[]).filter(x=>x.branch===branch).length, 'fa-clock')}
+            ${this.kpiCard('المخزون', (this.state.data.stock||[]).filter(x=>String(x.branch)===String(branch)).length, 'fa-boxes-stacked')}
+            ${this.kpiCard('الورديات', (this.state.data.shifts||[]).filter(x=>String(x.branch)===String(branch)).length, 'fa-clock')}
           </div>
           <div class="grid-2 mt-16">
             <div class="card"><div class="section-title"><h3>الموظفون</h3></div>${this.table([
@@ -767,7 +820,7 @@
       },
 
       renderBranchShifts(branch = this.branch()) {
-        const rows = (this.state.data.shifts || []).filter(x => x.branch === branch).slice().reverse();
+        const rows = (this.state.data.shifts || []).filter(x => String(x.branch) === String(branch)).slice().reverse();
         return `
           ${this.setPage('ورديات الفرع', branch)}
           <div class="toolbar">
@@ -781,14 +834,13 @@
             {key:'status',label:'الحالة'},
             {key:'totalSales',label:'المبيعات',fmt:v=>this.money(v)},
             {key:'invoiceCount',label:'الفواتير'},
-            {key:'actualCash',label:'النقد الفعلي'},
-            {key:'actions',label:'إجراء',fmt:(v,r)=> this.role()==='إدارة' ? `<button class="btn btn-warning" data-action="reopen-shift" data-id="${r.id}">إعادة فتح</button>` : '-'}
+            {key:'actualCash',label:'النقد الفعلي'}
           ], rows, 'branchShiftsTable')}</div>
         `;
       },
 
       renderBranchStock(branch = this.branch()) {
-        const rows = (this.state.data.stock || []).filter(x => x.branch === branch);
+        const rows = (this.state.data.stock || []).filter(x => String(x.branch) === String(branch));
         return `
           ${this.setPage('مخزون الفرع', branch)}
           <div class="card">${this.table([
@@ -798,15 +850,15 @@
       },
 
       renderBranchReports(branch = this.branch()) {
-        const sales = (this.state.data.sales || []).filter(x => x.branch === branch);
+        const sales = (this.state.data.sales || []).filter(x => String(x.branch) === String(branch));
         const total = this.sum(sales, 'total');
         return `
           ${this.setPage('تقارير الفرع', branch)}
           <div class="kpi-grid">
             ${this.kpiCard('إجمالي المبيعات', this.money(total), 'fa-sack-dollar')}
             ${this.kpiCard('عدد الفواتير', sales.length, 'fa-receipt')}
-            ${this.kpiCard('المصروفات', this.money(this.sum((this.state.data.expenses||[]).filter(x=>x.branch===branch), 'amount')), 'fa-money-bill-wave')}
-            ${this.kpiCard('المرتجعات', this.money(this.sum((this.state.data.returns||[]).filter(x=>x.branch===branch), 'amount')), 'fa-rotate-left')}
+            ${this.kpiCard('المصروفات', this.money(this.sum((this.state.data.expenses||[]).filter(x=>String(x.branch)===String(branch)), 'amount')), 'fa-money-bill-wave')}
+            ${this.kpiCard('المرتجعات', this.money(this.sum((this.state.data.returns||[]).filter(x=>String(x.branch)===String(branch)), 'amount')), 'fa-rotate-left')}
           </div>
           <div class="grid-2 mt-16">
             <div class="card"><canvas id="salesChart" height="180"></canvas></div>
@@ -823,14 +875,14 @@
         const subtotal = this.state.cart.reduce((a,b)=>a+(Number(b.qty)*Number(b.price)),0);
 
         return `
-          ${this.setPage('نقطة البيع','بيع مباشر + QR + طباعة حرارية + فواتير معلقة')}
+          ${this.setPage('نقطة البيع','بيع مباشر + QR + طباعة')}
           <div class="toolbar">
             <button id="openShiftBtn" class="btn btn-soft"><i class="fa-solid fa-clock"></i> الوردية</button>
             <button id="parkBtn" class="btn btn-soft"><i class="fa-solid fa-pause"></i> تعليق الفاتورة</button>
             <button id="parkedBtn" class="btn btn-soft"><i class="fa-solid fa-layer-group"></i> الفواتير المعلقة</button>
             <button id="qrBtn" class="btn btn-soft"><i class="fa-solid fa-qrcode"></i> إنشاء QR</button>
             <button id="scanQrBtn" class="btn btn-soft"><i class="fa-solid fa-camera"></i> مسح QR</button>
-            <span class="print-note">الطباعة 80mm مدعومة، وBluetooth اختياري من المتصفح</span>
+            <span class="print-note">الطباعة 80mm مدعومة</span>
           </div>
 
           <div class="pos-layout">
@@ -885,7 +937,7 @@
 
       renderQR() {
         return `
-          ${this.setPage('QR','إنشاء طلبات QR واسترجاعها ومسحها')}
+          ${this.setPage('QR','إنشاء طلبات QR واسترجاعها')}
           <div class="grid-2">
             <div class="card">
               <div class="section-title"><h3>إنشاء QR لطلب جديد</h3></div>
@@ -909,7 +961,7 @@
       },
 
       renderCRM() {
-        const rows = (this.state.data.crmOrders || []).filter(x => x.branch === this.branch() && !['مكتمل','ملغي'].includes(x.status));
+        const rows = (this.state.data.crmOrders || []).filter(x => String(x.branch) === String(this.branch()) && !['مكتمل','ملغي'].includes(x.status));
         return `
           ${this.setPage('CRM','طلبات جديدة + تحديث حالة + إنشاء طلب')}
           <div class="toolbar">
@@ -923,7 +975,7 @@
             {key:'takenBy',label:'المسؤول'},
             {key:'actions',label:'إجراء',fmt:(v,r)=>`
               <div class="actions">
-                <button class="btn btn-success" data-action="crm-status" data-id="${r.id}" data-status="مكتمل">استلام/مكتمل</button>
+                <button class="btn btn-success" data-action="crm-status" data-id="${r.id}" data-status="مكتمل">مكتمل</button>
                 <button class="btn btn-danger" data-action="crm-status" data-id="${r.id}" data-status="ملغي">إلغاء</button>
               </div>
             `}
@@ -944,20 +996,14 @@
       },
 
       renderDelivery() {
-        const rows = (this.state.data.crmOrders || []).filter(x => x.branch === this.branch() && !['مكتمل','ملغي'].includes(x.status));
+        const rows = (this.state.data.crmOrders || []).filter(x => String(x.branch) === String(this.branch()) && !['مكتمل','ملغي'].includes(x.status));
         return `
           ${this.setPage('التوصيل','استلام طلبات التوصيل وإكمالها أو إلغاؤها')}
           <div class="card">${this.table([
             {key:'id',label:'الرقم'},{key:'customer',label:'العميل'},{key:'phone',label:'الهاتف'},
             {key:'address',label:'العنوان'},{key:'total',label:'المبلغ',fmt:v=>this.money(v)},
             {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
-            {key:'takenBy',label:'أخذه'},
-            {key:'actions',label:'إجراء',fmt:(v,r)=>`
-              <div class="actions">
-                <button class="btn btn-soft" data-action="delivery-take" data-id="${r.id}">استلام</button>
-                <button class="btn btn-success" data-action="crm-status" data-id="${r.id}" data-status="مكتمل">إكمال</button>
-                <button class="btn btn-danger" data-action="crm-status" data-id="${r.id}" data-status="ملغي">إلغاء</button>
-              </div>`}
+            {key:'takenBy',label:'أخذه'}
           ], rows, 'deliveryTable')}</div>
         `;
       },
@@ -975,17 +1021,15 @@
             {key:'unit',label:'الوحدة'},
             {key:'price',label:'السعر',fmt:v=>this.money(v)},
             {key:'active',label:'نشط'},
-            {key:'notes',label:'ملاحظات'},
-            {key:'actions',label:'إجراء',fmt:(v,r)=>`
-              <button class="btn btn-soft" data-action="edit-product" data-row="${r._row}">تعديل</button>`}
+            {key:'notes',label:'ملاحظات'}
           ], this.state.data.products || [], 'productsTable')}</div>
         `;
       },
 
       renderStock() {
-        const rows = (this.state.data.stock || []).filter(x => x.branch === this.branch());
+        const rows = (this.state.data.stock || []).filter(x => String(x.branch) === String(this.branch()));
         return `
-          ${this.setPage('المخزون','عرض مخزون الفرع وتصدير CSV وإجراء حركة')}
+          ${this.setPage('المخزون','عرض مخزون الفرع')}
           <div class="toolbar">
             <button class="btn btn-primary" onclick="App.openStockModal()">حركة مخزون</button>
             <button class="btn btn-soft" onclick="App.exportCSV('stock.csv', App.state.data.stock)">تصدير CSV</button>
@@ -998,9 +1042,9 @@
       },
 
       renderMovements() {
-        const rows = (this.state.data.stockMovements || this.state.data.movements || []);
+        const rows = (this.state.data.movements || []);
         return `
-          ${this.setPage('حركات المخزون','سجل الحركات مع إضافة حركة جديدة')}
+          ${this.setPage('حركات المخزون','سجل الحركات')}
           <div class="toolbar">
             <button class="btn btn-primary" onclick="App.openStockModal()">إضافة حركة</button>
           </div>
@@ -1016,7 +1060,7 @@
         return `
           ${this.setPage('التقارير','رسومات بيانية للمبيعات والمدفوعات')}
           <div class="grid-2">
-            <div class="card"><div class="section-title"><h3>المبيعات حسب طريقة الدفع</h3></div><canvas id="salesChart" height="180"></canvas></div>
+            <div class="card"><div class="section-title"><h3>المبيعات</h3></div><canvas id="salesChart" height="180"></canvas></div>
             <div class="card"><div class="section-title"><h3>مؤشرات اليوم</h3></div>
               <div class="mini-stats">
                 <div class="mini-card"><span class="muted">مبيعات</span><strong>${this.money(this.sum(this.todaySales(), 'total'))}</strong></div>
@@ -1100,23 +1144,18 @@
 
       renderUsers() {
         return `
-          ${this.setPage('المستخدمون','إضافة وتعديل وحذف المستخدمين')}
+          ${this.setPage('المستخدمون','إضافة وتعديل المستخدمين')}
           <div class="toolbar"><button class="btn btn-primary" onclick="App.openUserModal()">إضافة مستخدم</button></div>
           <div class="card">${this.table([
             {key:'username',label:'المستخدم'},{key:'branch',label:'الفرع'},{key:'pointType',label:'الدور'},
-            {key:'phone',label:'الهاتف'},{key:'active',label:'نشط'},
-            {key:'actions',label:'إجراء',fmt:(v,r)=>`
-              <div class="actions">
-                <button class="btn btn-soft" data-action="edit-user" data-row="${r._row}">تعديل</button>
-                <button class="btn btn-danger" data-action="delete-user" data-row="${r._row}">حذف</button>
-              </div>`}
+            {key:'phone',label:'الهاتف'},{key:'active',label:'نشط'}
           ], this.state.data.users || [], 'usersTable')}</div>
         `;
       },
 
       renderAudit() {
         return `
-          ${this.setPage('سجل العمليات','جميع العمليات الحساسة مع تصدير CSV')}
+          ${this.setPage('سجل العمليات','جميع العمليات الحساسة')}
           <div class="toolbar">
             <button class="btn btn-soft" onclick="App.exportCSV('audit_log.csv', App.state.data.auditLog || [])">تصدير CSV</button>
           </div>
@@ -1138,23 +1177,13 @@
             {key:'openTime',label:'وقت الفتح'},{key:'closeTime',label:'وقت الإغلاق'},
             {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
             {key:'totalSales',label:'المبيعات',fmt:v=>this.money(v)},{key:'invoiceCount',label:'الفواتير'},
-            {key:'actualCash',label:'النقد الفعلي'},
-            {key:'actions',label:'إجراء',fmt:(v,r)=> r.status==='مفتوح'
-              ? `<div class="actions">
-                   <button class="btn btn-success" data-action="close-shift" data-id="${r.id}">إغلاق</button>
-                   <button class="btn btn-soft" data-action="actual-cash" data-id="${r.id}">نقد فعلي</button>
-                 </div>`
-              : (this.role()==='إدارة' ? `<button class="btn btn-warning" data-action="reopen-shift" data-id="${r.id}">إعادة فتح</button>` : '-')
-            }
+            {key:'actualCash',label:'النقد الفعلي'}
           ], this.state.data.shifts || [], 'shiftsTable')}</div>
         `;
       },
 
       kpiCard(label, value, icon) {
-        return `<div class="card kpi">
-          <div><div class="label">${label}</div><div class="value">${value}</div></div>
-          <div class="icon"><i class="fa-solid ${icon}"></i></div>
-        </div>`;
+        return `<div class="card kpi"><div><div class="label">${label}</div><div class="value">${value}</div></div><div class="icon"><i class="fa-solid ${icon}"></i></div></div>`;
       },
 
       simpleList(items=[]) {
@@ -1213,7 +1242,7 @@
       },
 
       openModal(title, body, modalClass='') {
-        this.el.modalBox.className = `modal ${modalClass}`;
+        this.el.modalBox.className = `modal ${modalClass}`.trim();
         this.el.modalBox.innerHTML = `
           <div class="modal-head">
             <h3>${title}</h3>
@@ -1239,15 +1268,20 @@
           };
           const query = new URLSearchParams({ action, callback: cb, token: this.state.token || '', ...params }).toString();
           const script = document.createElement('script');
-          script.src = `${GAS_URL}?${query}`;
+          script.src = `${GASURL}?${query}`;
           script.onerror = () => { reject(new Error('JSONP error')); delete window[cb]; };
           document.body.appendChild(script);
         });
       },
 
       async apiPost(action, payload={}) {
-        const body = new URLSearchParams({ action, payload: JSON.stringify({ token: this.state.token || '', ...payload }) });
-        const res = await fetch(GAS_URL, { method:'POST', body });
+        const body = new URLSearchParams({
+          action,
+          payload: JSON.stringify(payload),
+          token: this.state.token || '',
+          ...payload
+        });
+        const res = await fetch(GASURL, { method:'POST', body });
         return res.json();
       },
 
@@ -1306,7 +1340,7 @@
 
         let list = [];
         if (tab === 'private') {
-          const names = [...new Set(all.flatMap(m => [m.from_user, m.to_user]).filter(x => x && x !== user))];
+          const names = [...new Set(all.flatMap(m => [m.fromuser || m.from_user, m.touser || m.to_user]).filter(x => x && x !== user))];
           list = names.map(n => ({id:n, label:n}));
         } else {
           list = [{id:branch, label:`غرفة ${branch}`}];
@@ -1322,17 +1356,25 @@
         `).join('') || '<div class="empty">لا توجد محادثات</div>';
 
         const msgs = all.filter(m => {
-          if (tab === 'branch') return m.type === 'branch' && (m.to_branch === branch || m.from_branch === branch);
-          return m.type === 'private' && [m.from_user, m.to_user].includes(user) && [m.from_user, m.to_user].includes(this.state.selectedChatTarget);
+          const fromUser = m.fromuser || m.from_user;
+          const toUser = m.touser || m.to_user;
+          const fromBranch = m.frombranch || m.from_branch;
+          const toBranch = m.tobranch || m.to_branch;
+          if (tab === 'branch') return m.type === 'branch' && (String(toBranch) === String(branch) || String(fromBranch) === String(branch));
+          return m.type === 'private' && [fromUser, toUser].includes(user) && [fromUser, toUser].includes(this.state.selectedChatTarget);
         });
 
-        this.el.chatConv.innerHTML = msgs.length ? msgs.map(m => `
-          <div class="msg ${m.from_user===user ? 'self':''}">
-            <strong>${m.from_user || m.from_branch}</strong>
-            <div>${m.message}</div>
-            <small class="muted">${m.timestamp || ''}</small>
-          </div>
-        `).join('') : '<div class="empty">ابدأ المحادثة</div>';
+        this.el.chatConv.innerHTML = msgs.length ? msgs.map(m => {
+          const fromUser = m.fromuser || m.from_user || m.frombranch || m.from_branch;
+          return `
+            <div class="msg ${fromUser===user ? 'self':''}">
+              <strong>${fromUser}</strong>
+              <div>${m.message}</div>
+              <small class="muted">${m.timestamp || ''}</small>
+            </div>
+          `;
+        }).join('') : '<div class="empty">ابدأ المحادثة</div>';
+
         this.el.chatConv.scrollTop = this.el.chatConv.scrollHeight;
       },
 
@@ -1345,8 +1387,8 @@
         const message = this.el.chatMessageInput.value.trim();
         if (!message) return;
         const payload = this.state.selectedChatTab === 'branch'
-          ? { type:'branch', to_branch:this.branch(), message }
-          : { type:'private', to_user:this.state.selectedChatTarget, message };
+          ? { type:'branch', tobranch:this.branch(), message }
+          : { type:'private', touser:this.state.selectedChatTarget, message };
 
         const res = await this.apiPost('sendMessage', payload);
         if (res.ok) {
@@ -1365,13 +1407,16 @@
           </div>
           <div class="field"><label>ملاحظة</label><textarea id="qtyNote" class="textarea" placeholder="اختياري"></textarea></div>
           <div class="actions">
-            <button class="btn btn-primary" onclick='App.addToCart(${JSON.stringify(item).replace(/'/g,"&#39;")})'>إضافة</button>
+            <button class="btn btn-primary" onclick="App.addToCartByCurrent()">إضافة</button>
             <button class="btn btn-soft" onclick="App.closeModal()">إلغاء</button>
           </div>
         `);
+        this._selectedItem = item;
       },
 
-      addToCart(item) {
+      addToCartByCurrent() {
+        const item = this._selectedItem;
+        if (!item) return;
         const qty = Number(document.getElementById('qtyVal').value || 0);
         const price = Number(document.getElementById('qtyPrice').value || item.price || 0);
         const note = document.getElementById('qtyNote').value.trim();
@@ -1439,41 +1484,10 @@
         if (!res.ok) return this.toast(res.error || 'فشل حفظ الطلب', 'error');
 
         this.toast('تم حفظ الفاتورة', 'success');
-        this.printInvoice(res.data);
         this.state.cart = [];
         this.closeModal();
         await this.loadInitialData(true);
         this.render();
-      },
-
-      printInvoice(order) {
-        const win = window.open('', '_blank', 'width=420,height=780');
-        if (!win) return;
-        const items = JSON.parse(order.itemsJson || '[]');
-        win.document.write(`
-          <html dir="rtl"><head><title>فاتورة</title>
-          <style>
-            body{font-family:Cairo,sans-serif;margin:0;padding:8px;width:80mm}
-            h3,p{margin:4px 0} table{width:100%;border-collapse:collapse;font-size:12px}
-            td,th{border-bottom:1px dashed #999;padding:4px;text-align:right}
-          </style></head><body>
-            <h3 style="text-align:center">سُكّر 33</h3>
-            <p style="text-align:center">فاتورة رقم ${order.saleId}</p>
-            <p>الفرع: ${order.branch}</p>
-            <p>العميل: ${order.customer || 'عميل نقدي'}</p>
-            <p>التاريخ: ${order.date}</p>
-            <table>
-              <thead><tr><th>الصنف</th><th>ك</th><th>سعر</th><th>إجمالي</th></tr></thead>
-              <tbody>
-                ${items.map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${Number(x.price).toFixed(2)}</td><td>${(Number(x.qty)*Number(x.price)).toFixed(2)}</td></tr>`).join('')}
-              </tbody>
-            </table>
-            <p><strong>الإجمالي: ${this.money(order.total)}</strong></p>
-            <p>الدفع: ${order.paymentMethod}</p>
-            <script>window.onload=()=>window.print()</script>
-          </body></html>
-        `);
-        win.document.close();
       },
 
       async saveParkedOrder() {
@@ -1589,7 +1603,7 @@
           <div class="field">
             <label>المنتجات</label>
             <div class="grid-3">
-              ${products.map((p,i)=>`
+              ${products.map((p)=>`
                 <label class="product-card" style="cursor:pointer">
                   <input type="checkbox" class="crm-prod" data-name="${p.name}" data-price="${p.price}" data-unit="${p.unit||'قطعة'}"> ${p.name} - ${this.money(p.price)}
                 </label>
@@ -1624,26 +1638,22 @@
         } else this.toast(res.error || 'فشل حفظ الطلب', 'error');
       },
 
-      openProductModal(row=null) {
-        const p = row || {};
-        this.openModal(row ? 'تعديل منتج' : 'إضافة منتج', `
+      openProductModal() {
+        this.openModal('إضافة منتج', `
           <div class="grid-2">
-            <div class="field"><label>الاسم</label><input id="prodName" class="input" value="${p.name || ''}"></div>
-            <div class="field"><label>الفئة</label><input id="prodCat" class="input" value="${p.cat || ''}"></div>
-            <div class="field"><label>الوحدة</label><input id="prodUnit" class="input" value="${p.unit || 'قطعة'}"></div>
-            <div class="field"><label>السعر</label><input id="prodPrice" class="input" type="number" step="0.01" value="${p.price || 0}"></div>
+            <div class="field"><label>الاسم</label><input id="prodName" class="input"></div>
+            <div class="field"><label>الفئة</label><input id="prodCat" class="input"></div>
+            <div class="field"><label>الوحدة</label><input id="prodUnit" class="input" value="قطعة"></div>
+            <div class="field"><label>السعر</label><input id="prodPrice" class="input" type="number" step="0.01" value="0"></div>
           </div>
-          <div class="field"><label>ملاحظات</label><textarea id="prodNotes" class="textarea">${p.notes || ''}</textarea></div>
-          <div class="field"><label><input id="prodActive" type="checkbox" ${String(p.active)==='false'?'':'checked'}> نشط</label></div>
-          <div class="actions">
-            <button class="btn btn-primary" onclick="App.saveProduct(${p._row || 0})">حفظ</button>
-          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="prodNotes" class="textarea"></textarea></div>
+          <div class="field"><label><input id="prodActive" type="checkbox" checked> نشط</label></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveProduct()">حفظ</button></div>
         `);
       },
 
-      async saveProduct(row=0) {
+      async saveProduct() {
         const payload = {
-          _row: row || '',
           name: document.getElementById('prodName').value.trim(),
           cat: document.getElementById('prodCat').value.trim(),
           unit: document.getElementById('prodUnit').value.trim(),
@@ -1680,4 +1690,315 @@
           branch: document.getElementById('stockBranch').value.trim(),
           item: document.getElementById('stockItem').value.trim(),
           type: document.getElementById('stockType').value,
-          qty: Number(document.getElementById('stockQty').value ||e ||
+          qty: Number(document.getElementById('stockQty').value || 0),
+          notes: document.getElementById('stockNotes').value.trim()
+        };
+        const res = await this.apiPost('saveStockMovement', payload);
+        if (res.ok) {
+          this.toast('تم حفظ الحركة', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openExpenseModal() {
+        this.openModal('إضافة مصروف', `
+          <div class="grid-2">
+            <div class="field"><label>النوع</label><input id="expType" class="input"></div>
+            <div class="field"><label>المبلغ</label><input id="expAmount" class="input" type="number" step="0.01"></div>
+          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="expNotes" class="textarea"></textarea></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveExpense()">حفظ</button></div>
+        `);
+      },
+
+      async saveExpense() {
+        const payload = {
+          branch: this.branch(),
+          type: document.getElementById('expType').value.trim(),
+          amount: Number(document.getElementById('expAmount').value || 0),
+          notes: document.getElementById('expNotes').value.trim()
+        };
+        const res = await this.apiPost('saveExpense', payload);
+        if (res.ok) {
+          this.toast('تم حفظ المصروف', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openReturnModal() {
+        this.openModal('إضافة مرتجع', `
+          <div class="grid-2">
+            <div class="field"><label>رقم الفاتورة الأصلية</label><input id="retSaleId" class="input"></div>
+            <div class="field"><label>المبلغ</label><input id="retAmount" class="input" type="number" step="0.01"></div>
+          </div>
+          <div class="field"><label>السبب</label><textarea id="retReason" class="textarea"></textarea></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveReturn()">حفظ</button></div>
+        `);
+      },
+
+      async saveReturn() {
+        const payload = {
+          branch: this.branch(),
+          originalSaleId: document.getElementById('retSaleId').value.trim(),
+          amount: Number(document.getElementById('retAmount').value || 0),
+          reason: document.getElementById('retReason').value.trim()
+        };
+        const res = await this.apiPost('saveReturn', payload);
+        if (res.ok) {
+          this.toast('تم حفظ المرتجع', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openComplaintModal() {
+        this.openModal('إضافة شكوى', `
+          <div class="grid-2">
+            <div class="field"><label>الاسم</label><input id="cmpName" class="input"></div>
+            <div class="field"><label>الهاتف</label><input id="cmpPhone" class="input"></div>
+            <div class="field"><label>النوع</label><input id="cmpType" class="input"></div>
+            <div class="field"><label>الفرع</label><input id="cmpBranch" class="input" value="${this.branch()}"></div>
+          </div>
+          <div class="field"><label>الوصف</label><textarea id="cmpDesc" class="textarea"></textarea></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveComplaint()">حفظ</button></div>
+        `);
+      },
+
+      async saveComplaint() {
+        const payload = {
+          name: document.getElementById('cmpName').value.trim(),
+          phone: document.getElementById('cmpPhone').value.trim(),
+          type: document.getElementById('cmpType').value.trim(),
+          branch: document.getElementById('cmpBranch').value.trim(),
+          description: document.getElementById('cmpDesc').value.trim()
+        };
+        const res = await this.apiPost('saveComplaint', payload);
+        if (res.ok) {
+          this.toast('تم حفظ الشكوى', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openShiftModal() {
+        this.openModal('فتح وردية', `
+          <div class="grid-2">
+            <div class="field"><label>الفرع</label><input id="shiftBranch" class="input" value="${this.branch()}"></div>
+            <div class="field"><label>الكاشير</label><input id="shiftCashier" class="input" value="${this.username()}"></div>
+          </div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveShift()">فتح</button></div>
+        `);
+      },
+
+      async saveShift() {
+        const payload = {
+          branch: document.getElementById('shiftBranch').value.trim(),
+          cashier: document.getElementById('shiftCashier').value.trim()
+        };
+        const res = await this.apiPost('saveShift', payload);
+        if (res.ok) {
+          this.toast('تم فتح الوردية', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openUserModal() {
+        this.openModal('إضافة مستخدم', `
+          <div class="grid-2">
+            <div class="field"><label>اسم المستخدم</label><input id="usrName" class="input"></div>
+            <div class="field"><label>الفرع</label><input id="usrBranch" class="input"></div>
+            <div class="field"><label>الدور</label><input id="usrRole" class="input" placeholder="seller / cashier / delivery / manager / crm / admin"></div>
+            <div class="field"><label>الهاتف</label><input id="usrPhone" class="input"></div>
+            <div class="field"><label>كلمة المرور</label><input id="usrPass" class="input"></div>
+          </div>
+          <div class="field"><label><input id="usrActive" type="checkbox" checked> نشط</label></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveUser()">حفظ</button></div>
+        `);
+      },
+
+      async saveUser() {
+        const payload = {
+          username: document.getElementById('usrName').value.trim(),
+          branch: document.getElementById('usrBranch').value.trim(),
+          pointType: document.getElementById('usrRole').value.trim(),
+          phone: document.getElementById('usrPhone').value.trim(),
+          pass: document.getElementById('usrPass').value.trim(),
+          active: document.getElementById('usrActive').checked
+        };
+        const res = await this.apiPost('saveUser', payload);
+        if (res.ok) {
+          this.toast('تم حفظ المستخدم', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      async searchCustomer() {
+        const phone = document.getElementById('loyaltyPhone').value.trim();
+        if (!phone) return;
+        const res = await this.apiPost('searchCustomer', { phone });
+        const box = document.getElementById('loyaltyResult');
+        if (!res.ok) return box.innerHTML = `<div class="empty">${res.error || 'غير موجود'}</div>`;
+        box.innerHTML = `
+          <div><strong>${res.data.customer || 'بدون اسم'}</strong></div>
+          <div class="muted">${res.data.phone || ''}</div>
+          <div class="mt-10"><strong>النقاط: ${res.data.points || 0}</strong></div>
+          <div class="muted">الانتهاء: ${res.data.expiry || '-'}</div>
+        `;
+      },
+
+      quickSearch(q) {
+        q = String(q || '').trim().toLowerCase();
+        const box = document.getElementById('searchResults');
+        if (!box) return;
+        if (!q) return box.innerHTML = `<div class="empty">أدخل عبارة بحث</div>`;
+
+        const sales = (this.state.data.sales || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
+        const crm = (this.state.data.crmOrders || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
+        const users = (this.state.data.users || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
+
+        box.innerHTML = `
+          <div class="grid-3">
+            <div class="card"><div class="section-title"><h3>فواتير</h3></div>${this.simpleList(sales.slice(0,10).map(x => `${x.saleId || '-'} — ${x.customer || '-'} — ${this.money(x.total)}`))}</div>
+            <div class="card"><div class="section-title"><h3>CRM</h3></div>${this.simpleList(crm.slice(0,10).map(x => `${x.id || '-'} — ${x.customer || '-'} — ${x.status || '-'}`))}</div>
+            <div class="card"><div class="section-title"><h3>مستخدمون</h3></div>${this.simpleList(users.slice(0,10).map(x => `${x.username || '-'} — ${x.branch || '-'} — ${x.pointType || '-'}`))}</div>
+          </div>
+        `;
+      },
+
+      async handleActionButton(btn) {
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        const branch = btn.dataset.branch;
+
+        if (action === 'switch-branch-detail') {
+          this.state.route = 'branchDetail';
+          this.el.content.innerHTML = this.renderBranchDetail(branch);
+          this.bindDynamicEvents();
+          return;
+        }
+
+        if (action === 'switch-branch-stock') {
+          this.state.route = 'branchStock';
+          this.el.content.innerHTML = this.renderBranchStock(branch);
+          this.bindDynamicEvents();
+          return;
+        }
+
+        if (action === 'switch-branch-shifts') {
+          this.state.route = 'branchShifts';
+          this.el.content.innerHTML = this.renderBranchShifts(branch);
+          this.bindDynamicEvents();
+          return;
+        }
+
+        if (action === 'crm-status') {
+          const res = await this.apiPost('updateCrmStatus', { id, status: btn.dataset.status });
+          if (res.ok) {
+            this.toast('تم تحديث الحالة', 'success');
+            await this.loadInitialData(true);
+            this.render();
+          } else this.toast(res.error || 'فشل التحديث', 'error');
+          return;
+        }
+
+        if (action === 'close-shift') {
+          const res = await this.apiPost('closeShift', { id });
+          if (res.ok) {
+            this.toast('تم إغلاق الوردية', 'success');
+            await this.loadInitialData(true);
+            this.render();
+          } else this.toast(res.error || 'فشل العملية', 'error');
+          return;
+        }
+
+        if (action === 'reopen-shift') {
+          const res = await this.apiPost('reopenShift', { id });
+          if (res.ok) {
+            this.toast('تمت إعادة فتح الوردية', 'success');
+            await this.loadInitialData(true);
+            this.render();
+          } else this.toast(res.error || 'فشل العملية', 'error');
+          return;
+        }
+      },
+
+      drawReportsCharts() {
+        const canvas = document.getElementById('salesChart');
+        if (!canvas || !window.Chart) return;
+
+        const sales = this.todaySales();
+        const byMethod = {};
+        sales.forEach(s => {
+          const key = s.paymentMethod || 'غير محدد';
+          byMethod[key] = (byMethod[key] || 0) + Number(s.total || 0);
+        });
+
+        if (this.state.charts.sales) this.state.charts.sales.destroy();
+        this.state.charts.sales = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(byMethod),
+            datasets: [{
+              label: 'المبيعات',
+              data: Object.values(byMethod),
+              backgroundColor: '#c96b8e'
+            }]
+          },
+          options: { responsive:true, maintainAspectRatio:false }
+        });
+      },
+
+      drawDashboardCharts() {
+        const canvas = document.getElementById('dashBranchChart');
+        if (!canvas || !window.Chart) return;
+
+        const rows = {};
+        (this.state.data.sales || []).forEach(s => {
+          rows[s.branch] = (rows[s.branch] || 0) + Number(s.total || 0);
+        });
+
+        if (this.state.charts.dash) this.state.charts.dash.destroy();
+        this.state.charts.dash = new Chart(canvas, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(rows),
+            datasets: [{
+              data: Object.values(rows),
+              backgroundColor: ['#c96b8e','#8b5e4d','#4c7dbd','#2e8b57','#c57b24','#a55eea','#ff7675','#00b894']
+            }]
+          },
+          options: { responsive:true, maintainAspectRatio:false }
+        });
+      },
+
+      exportCSV(filename, rows) {
+        rows = rows || [];
+        if (!rows.length) return this.toast('لا توجد بيانات للتصدير', 'error');
+        const headers = Object.keys(rows[0]);
+        const csv = [
+          headers.join(','),
+          ...rows.map(r => headers.map(h => `"${String(r[h] ?? '').replace(/"/g,'""')}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>
