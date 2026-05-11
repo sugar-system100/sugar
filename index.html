@@ -1,89 +1,1683 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>نظام الكاشير</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سُكّر 33 | نظام الإدارة</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script defer src="https://unpkg.com/html5-qrcode"></script>
+
   <style>
-    * { box-sizing: border-box; font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif; }
-    body { background: #f0f2f5; margin: 0; padding: 20px; }
-    .app-container { max-width: 1400px; margin: 0 auto; }
-    .header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    .header h1 { margin: 0; font-size: 1.6rem; }
-    .branch-info select { background: transparent; color: white; border: 1px solid white; padding: 5px; border-radius: 20px; }
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-btn { background: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .tab-btn.active { background: #2a5298; color: white; }
-    .tab-content { display: none; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .tab-content.active { display: block; }
-    .pos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 800px) { .pos-grid { grid-template-columns: 1fr; } }
-    .products-panel, .cart-panel { background: #f8f9fa; border-radius: 12px; padding: 15px; }
-    .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; max-height: 500px; overflow-y: auto; }
-    .product-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
-    .product-card:hover { background: #e9ecef; }
-    .cart-items { max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
-    .cart-item { display: flex; justify-content: space-between; background: white; padding: 8px; margin-bottom: 5px; border-radius: 8px; }
-    button { background: #2a5298; color: white; cursor: pointer; border: none; padding: 8px 12px; border-radius: 8px; margin: 5px; }
-    button.delete-btn { background: #dc3545; padding: 2px 8px; }
-    .message { position: fixed; bottom: 20px; left: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 30px; z-index: 1000; display: none; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-    th { background: #f2f2f2; }
-    input, select { padding: 8px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    :root{
+      --bg:#fff8f6; --bg2:#fff1ee; --surface:#ffffff; --surface2:#fff8f3;
+      --primary:#c96b8e; --primary-dark:#9c4e6c; --secondary:#8b5e4d;
+      --accent:#f1c9bd; --text:#372822; --muted:#7f6a63; --line:#eddad2;
+      --success:#2e8b57; --warning:#c57b24; --danger:#c24848; --info:#4c7dbd;
+      --radius:18px; --radius-sm:12px; --shadow:0 8px 24px rgba(86,47,34,.08);
+      --shadow-sm:0 4px 12px rgba(86,47,34,.06);
+      --sidebar-w:290px; --topbar-h:72px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:"Cairo",sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);height:100%}
+    a{text-decoration:none;color:inherit}
+    button,input,select,textarea{font-family:inherit}
+    img{max-width:100%}
+    .hidden{display:none!important}
+    .app-shell{display:grid;grid-template-columns:1fr var(--sidebar-w);min-height:100vh}
+    .sidebar{
+      background:linear-gradient(180deg,#fff,#fff8f6); border-left:1px solid var(--line);
+      padding:20px 14px; position:sticky; top:0; height:100vh; overflow:auto; box-shadow:var(--shadow-sm)
+    }
+    .brand{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:linear-gradient(135deg,#fff,#ffe8e0)}
+    .brand-logo{
+      width:54px;height:54px;border-radius:16px;display:grid;place-items:center;color:#fff;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:22px;box-shadow:var(--shadow-sm)
+    }
+    .brand h1{font-size:20px;margin:0}
+    .brand p{margin:0;color:var(--muted);font-size:13px}
+    .user-box{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface2)}
+    .status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--success);margin-inline-start:8px}
+    .nav-group{margin-top:16px}
+    .nav-title{font-size:12px;color:var(--muted);padding:8px 10px}
+    .nav-item{
+      width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;padding:12px 14px;
+      border:1px solid transparent;border-radius:14px;background:transparent;color:var(--text);cursor:pointer
+    }
+    .nav-item:hover,.nav-item.active{background:#fff;border-color:var(--line);box-shadow:var(--shadow-sm)}
+    .nav-item .left{display:flex;align-items:center;gap:10px}
+    .nav-item i{width:18px;text-align:center;color:var(--primary-dark)}
+    .main{
+      min-width:0; display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    }
+    .topbar{
+      height:var(--topbar-h); display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:14px 20px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.8); backdrop-filter:blur(10px)
+    }
+    .breadcrumbs{font-size:13px;color:var(--muted)}
+    .topbar-actions{display:flex;gap:10px;align-items:center}
+    .search-mini,.btn,.input,.select,.textarea{
+      border:1px solid var(--line); background:#fff; border-radius:14px; padding:10px 12px; color:var(--text)
+    }
+    .search-mini{min-width:240px}
+    .btn{cursor:pointer; transition:.2s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none}
+    .btn-secondary{background:linear-gradient(135deg,var(--secondary),#6a473a);color:#fff;border:none}
+    .btn-soft{background:#fff3ef}
+    .btn-success{background:var(--success);color:#fff;border:none}
+    .btn-danger{background:var(--danger);color:#fff;border:none}
+    .btn-warning{background:var(--warning);color:#fff;border:none}
+    .btn-icon{width:44px;height:44px;padding:0;display:grid;place-items:center}
+    .content{flex:1;overflow:auto;padding:20px}
+    .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+    .page-head h2{margin:0;font-size:28px}
+    .page-head p{margin:6px 0 0;color:var(--muted)}
+    .kpi-grid,.grid-2,.grid-3,.grid-4{
+      display:grid; gap:16px;
+    }
+    .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{
+      background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-sm); padding:16px; min-width:0
+    }
+    .kpi{display:flex;justify-content:space-between;align-items:flex-start}
+    .kpi .value{font-size:26px;font-weight:800}
+    .kpi .label{color:var(--muted);font-size:13px}
+    .kpi .icon{
+      width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#fff3ef;color:var(--primary-dark)
+    }
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:12px 10px;border-bottom:1px solid #f3e7e2;text-align:right;vertical-align:top}
+    th{background:#fff8f3;color:#6d5952;position:sticky;top:0;z-index:1}
+    tr:hover td{background:#fffdfa}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .b-success{background:#e9f8ef;color:#1f7a46}
+    .b-warning{background:#fff4e4;color:#a56613}
+    .b-danger{background:#ffe9e9;color:#b33e3e}
+    .b-info{background:#e9f1ff;color:#406ea7}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+    .toolbar .grow{flex:1}
+    .pos-layout{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:16px}
+    .cat-list,.product-grid,.cart-list{max-height:calc(100vh - 260px);overflow:auto}
+    .cat-btn,.product-card,.cart-item,.branch-card,.mini-card{
+      border:1px solid var(--line); border-radius:16px; background:#fff; padding:12px
+    }
+    .cat-btn{width:100%;margin-bottom:8px;cursor:pointer;text-align:right}
+    .cat-btn.active{background:#fff3ef;border-color:#efc4b7}
+    .product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .product-card{cursor:pointer;box-shadow:var(--shadow-sm)}
+    .product-card small,.muted{color:var(--muted)}
+    .cart-item{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .split{display:flex;gap:10px;flex-wrap:wrap}
+    .split > *{flex:1}
+    .auth-screen{
+      min-height:100vh;display:grid;place-items:center;padding:20px;
+      background:
+        radial-gradient(circle at top right,#ffdeda 0%,transparent 30%),
+        radial-gradient(circle at bottom left,#f4d8c9 0%,transparent 30%),
+        linear-gradient(180deg,#fff8f6,#fff0eb)
+    }
+    .login-card{
+      width:min(560px,100%);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+      border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow)
+    }
+    .login-brand{text-align:center;margin-bottom:20px}
+    .login-brand .icon{
+      width:84px;height:84px;margin:0 auto 10px;border-radius:24px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;font-size:34px
+    }
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .field label{font-size:14px;font-weight:700}
+    .input,.select,.textarea{width:100%}
+    .textarea{min-height:90px;resize:vertical}
+    .login-actions{display:flex;gap:10px;margin-top:8px}
+    .section{margin-bottom:18px}
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .section-title h3{margin:0;font-size:18px}
+    .modal-backdrop,.loading-overlay,.chat-panel,.toast-stack,.scanner-box{
+      position:fixed;z-index:1000
+    }
+    .loading-overlay{
+      inset:0;background:rgba(55,40,34,.25);backdrop-filter:blur(4px);
+      display:none;align-items:center;justify-content:center
+    }
+    .spinner{
+      width:72px;height:72px;border-radius:50%;border:6px solid #f1d9d1;border-top-color:var(--primary);animation:spin 1s linear infinite
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast-stack{left:16px;bottom:16px;display:flex;flex-direction:column;gap:10px}
+    .toast{
+      min-width:260px;max-width:360px;background:#fff;border:1px solid var(--line);border-right:5px solid var(--primary);
+      border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)
+    }
+    .toast.success{border-right-color:var(--success)}
+    .toast.error{border-right-color:var(--danger)}
+    .modal-backdrop{
+      inset:0;background:rgba(55,40,34,.28);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px
+    }
+    .modal{
+      width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:18px
+    }
+    .modal-lg{width:min(1100px,100%)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .modal-head h3{margin:0}
+    .chat-widget{
+      position:fixed;left:18px;bottom:18px;z-index:999;
+      width:60px;height:60px;border-radius:50%;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;box-shadow:var(--shadow);cursor:pointer
+    }
+    .chat-panel{
+      left:18px;bottom:88px;width:min(420px,calc(100vw - 36px));height:560px;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:none;overflow:hidden
+    }
+    .chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:#fff8f3}
+    .chat-tabs{display:flex;border-bottom:1px solid var(--line)}
+    .chat-tab{flex:1;padding:12px;border:none;background:#fff;cursor:pointer}
+    .chat-tab.active{background:#fff3ef;font-weight:800}
+    .chat-body{display:grid;grid-template-columns:160px 1fr;height:calc(100% - 118px)}
+    .chat-list{border-left:1px solid var(--line);overflow:auto}
+    .chat-conv{overflow:auto;padding:12px;background:#fffdfa}
+    .chat-item,.msg{padding:10px;border-bottom:1px solid #f7ece7;cursor:pointer}
+    .msg{margin-bottom:8px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .msg.self{background:#fff0eb;border-color:#efcec2}
+    .chat-send{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line)}
+    .chat-send input{flex:1}
+    .scanner-box{inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}
+    .scanner-frame{width:min(520px,100%);background:#fff;border-radius:24px;padding:16px}
+    .print-note{font-size:12px;color:var(--muted)}
+    .empty{padding:26px;text-align:center;color:var(--muted)}
+    .mini-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .mini-card strong{display:block;font-size:20px}
+    .w-100{width:100%}
+    .text-center{text-align:center}
+    .text-left{text-align:left}
+    .mt-10{margin-top:10px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}
+    .mb-10{margin-bottom:10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    @media (max-width:1200px){
+      .kpi-grid,.grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .pos-layout{grid-template-columns:1fr}
+      .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (max-width:900px){
+      .app-shell{grid-template-columns:1fr}
+      .sidebar{position:fixed;right:-100%;top:0;z-index:999;height:100vh;width:min(320px,92vw);transition:.25s}
+      .sidebar.open{right:0}
+      .main{height:auto;min-height:100vh}
+      .kpi-grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+      .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .chat-body{grid-template-columns:1fr}
+      .chat-list{border-left:none;border-bottom:1px solid var(--line);max-height:160px}
+    }
   </style>
 </head>
 <body>
-<div class="app-container">
-  <div class="header">
-    <h1>🧾 نظام الكاشير المتكامل</h1>
-    <div class="branch-info"><select id="branchSelect"><option>فرع 1</option><option>فرع 2</option><option>فرع 3</option></select></div>
+  <!-- شاشة الدخول -->
+  <section id="authScreen" class="auth-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="icon"><i class="fa-solid fa-cake-candles"></i></div>
+        <h1 style="margin:0">سُكّر 33</h1>
+        <p class="muted">نظام إدارة الفروع والمبيعات والطلبات والمخزون</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="grid-2">
+          <div class="field">
+            <label>نوع المستخدم</label>
+            <select id="loginPointType" class="select" required>
+              <option value="">اختر النوع</option>
+              <option>مندوب_بيع</option>
+              <option>كاشير</option>
+              <option>دليفري</option>
+              <option>خدمة_العملاء</option>
+              <option>مدير_فرع</option>
+              <option>إدارة</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>الفرع</label>
+            <input id="loginBranch" class="input" placeholder="مثال: مدينة نصر" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>كلمة المرور</label>
+          <input id="loginPass" class="input" type="password" required />
+        </div>
+        <div class="login-actions">
+          <button class="btn btn-primary w-100" type="submit"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- التطبيق -->
+  <div id="appShell" class="app-shell hidden">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="breadcrumbs" id="breadcrumbs">الرئيسية</div>
+          <strong id="topTitle">لوحة النظام</strong>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="menuBtn" class="btn btn-icon btn-soft" title="القائمة"><i class="fa-solid fa-bars"></i></button>
+          <input id="quickSearchInput" class="search-mini" placeholder="بحث سريع..." />
+          <button id="globalSearchBtn" class="btn btn-icon btn-soft" title="بحث شامل"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button id="refreshBtn" class="btn btn-icon btn-soft" title="تحديث"><i class="fa-solid fa-rotate"></i></button>
+          <button id="logoutBtn" class="btn btn-icon btn-danger" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
+
+      <section id="content" class="content"></section>
+    </main>
   </div>
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="pos">🛒 نقطة البيع</button>
-    <button class="tab-btn" data-tab="inventory">📦 المخزون</button>
-    <button class="tab-btn" data-tab="customers">👥 العملاء</button>
-    <button class="tab-btn" data-tab="reports">📊 التقارير</button>
-  </div>
-  <div id="pos" class="tab-content active">
-    <div class="pos-grid">
-      <div class="products-panel"><h3>المنتجات</h3><input type="text" id="searchProduct" placeholder="🔍 بحث" style="width:100%"><div id="productListContainer" class="product-list">جاري التحميل...</div></div>
-      <div class="cart-panel"><h3>سلة الشراء</h3><div id="cartItems" class="cart-items"></div><div class="cart-summary"><div>الإجمالي قبل الخصم: <span id="subtotal">0</span> ج.م</div><div>الخصم: <input type="number" id="discount" value="0" style="width:80px"> ج.م</div><div>رسوم توصيل: <input type="number" id="deliveryFee" value="0" style="width:80px"> ج.م</div><div><strong>الإجمالي النهائي: <span id="total">0</span> ج.م</strong></div></div>
-        <div><label>رقم هاتف العميل: <input type="text" id="customerPhone"></label><button id="checkPointsBtn">🔍 النقاط</button><span id="pointsDisplay"></span></div>
-        <div><label>طريقة الدفع:</label><select id="paymentMethod"><option>نقدي</option><option>كارت</option><option>تحويل</option></select><label>المدفوع:</label><input type="number" id="paidAmount" value="0"><button id="completeSaleBtn">💾 إتمام البيع</button><button id="clearCartBtn">🗑️ تفريغ</button></div>
+
+  <!-- Toast -->
+  <div id="toastStack" class="toast-stack"></div>
+
+  <!-- Loading -->
+  <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
+
+  <!-- Chat -->
+  <button id="chatWidget" class="chat-widget hidden"><i class="fa-solid fa-comments"></i></button>
+  <div id="chatPanel" class="chat-panel">
+    <div class="chat-head">
+      <strong>الدردشة</strong>
+      <button class="btn btn-soft btn-icon" onclick="App.toggleChat(false)"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="chat-tabs">
+      <button class="chat-tab active" data-chat-tab="private">خاص</button>
+      <button class="chat-tab" data-chat-tab="branch">الفرع</button>
+    </div>
+    <div class="chat-body">
+      <div id="chatList" class="chat-list"></div>
+      <div style="display:flex;flex-direction:column;min-width:0">
+        <div id="chatConv" class="chat-conv"></div>
+        <div class="chat-send">
+          <input id="chatMessageInput" class="input" placeholder="اكتب رسالتك..." />
+          <button id="chatSendBtn" class="btn btn-primary">إرسال</button>
+        </div>
       </div>
     </div>
   </div>
-  <div id="inventory" class="tab-content"><h3>المخزون</h3><button id="refreshStockBtn">تحديث</button><div id="stockTableContainer"></div></div>
-  <div id="customers" class="tab-content"><h3>تسجيل عميل</h3><input type="text" id="newCustPhone" placeholder="الهاتف"><input type="text" id="newCustName" placeholder="الاسم"><input type="text" id="newCustAddr" placeholder="العنوان"><button id="registerCustBtn">تسجيل</button><div id="customerInfo"></div></div>
-  <div id="reports" class="tab-content"><h3>تقرير المبيعات</h3><label>من: <input type="date" id="reportStart"></label><label>إلى: <input type="date" id="reportEnd"></label><button id="generateReportBtn">عرض</button><div id="reportResult"></div></div>
-</div>
-<div id="messageBox" class="message"></div>
-<script>
-  let cart = [], currentBranch = 'فرع 1', allProducts = [];
-  function showMessage(msg, isError=false) { let d=document.getElementById('messageBox'); d.textContent=msg; d.style.background=isError?'#dc3545':'#28a745'; d.style.display='block'; setTimeout(()=>d.style.display='none',3000); }
-  function updateCartUI(){ let div=document.getElementById('cartItems'); if(cart.length===0) div.innerHTML='<p>السلة فارغة</p>'; else{ let html=''; cart.forEach((item,idx)=>{ html+=`<div class="cart-item"><span>${item.name} (${item.quantity})</span><span>${item.price*item.quantity} ج.م</span><button class="delete-btn" data-index="${idx}">حذف</button></div>`; }); div.innerHTML=html; document.querySelectorAll('.delete-btn').forEach(btn=>{ btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.getAttribute('data-index')); cart.splice(idx,1); updateCartUI(); updateTotals(); }); }); } updateTotals(); }
-  function updateTotals(){ let sub=cart.reduce((s,i)=>s+i.price*i.quantity,0); let dis=parseFloat(document.getElementById('discount')?.value||0); let deli=parseFloat(document.getElementById('deliveryFee')?.value||0); let tot=sub-dis+deli; document.getElementById('subtotal').innerText=sub.toFixed(2); document.getElementById('total').innerText=tot.toFixed(2); }
-  function addToCart(p){ let ex=cart.find(i=>i.code===p.code); if(ex) ex.quantity+=1; else cart.push({code:p.code,name:p.name,price:p.price,quantity:1}); updateCartUI(); }
-  function loadProducts(){ google.script.run.withSuccessHandler(prods=>{ allProducts=prods; let container=document.getElementById('productListContainer'); if(!prods.length) container.innerHTML='<p>لا توجد منتجات</p>'; else{ let html=''; prods.forEach(p=>{ html+=`<div class="product-card" data-code="${p.code}"><div class="product-name">${p.name}</div><div class="product-price">${p.price} ج.م</div></div>`; }); container.innerHTML=html; document.querySelectorAll('.product-card').forEach(card=>{ card.addEventListener('click',()=>{ let code=card.getAttribute('data-code'); let prod=allProducts.find(p=>p.code===code); if(prod) addToCart(prod); }); }); } }).withFailureHandler(e=>showMessage('خطأ تحميل المنتجات',true)).getActiveProducts(); }
-  function completeSale(){ if(cart.length===0){ showMessage('السلة فارغة',true); return; } let sub=cart.reduce((s,i)=>s+i.price*i.quantity,0); let dis=parseFloat(document.getElementById('discount').value)||0; let deli=parseFloat(document.getElementById('deliveryFee').value)||0; let tot=sub-dis+deli; let paid=parseFloat(document.getElementById('paidAmount').value)||0; if(paid<tot){ showMessage(`المدفوع أقل من ${tot}`,true); return; } let saleData={ date:new Date().toISOString(), branch:currentBranch, customerName:'', phone:document.getElementById('customerPhone').value||'', address:'', channel:'كاشير', status:'مكتمل', subtotal:sub, discount:dis, deliveryFee:deli, total:tot, cashier:'كاشير', username:'كاشير', notes:'', shiftId:'', paymentMethod:document.getElementById('paymentMethod').value, paidAmount:paid, qrReference:'', items:cart.map(i=>({code:i.code,name:i.name,quantity:i.quantity,price:i.price})), usedPoints:0 }; google.script.run.withSuccessHandler(res=>{ if(res.success){ showMessage(`تم البيع - كود: ${res.receiptCode}`); cart=[]; updateCartUI(); document.getElementById('customerPhone').value=''; document.getElementById('paidAmount').value='0'; } else showMessage(res.message,true); }).withFailureHandler(e=>showMessage('فشل البيع',true)).recordSale(saleData); }
-  function loadStock(){ google.script.run.withSuccessHandler(data=>{ let html='<table><thead><tr><th>المنتج</th><th>الكمية</th><th>آخر تحديث</th></tr></thead><tbody>'; data.forEach(i=>{ html+=`<tr><td>${i.productName}</td><td>${i.quantity}</td><td>${i.lastUpdate||''}</td></tr>`; }); html+='</tbody></table>'; document.getElementById('stockTableContainer').innerHTML=html; }).withFailureHandler(e=>showMessage('فشل تحميل المخزون',true)).getBranchStock(currentBranch); }
-  function checkPoints(){ let p=document.getElementById('customerPhone').value; if(!p){ showMessage('أدخل رقم الهاتف',true); return; } google.script.run.withSuccessHandler(pts=>{ document.getElementById('pointsDisplay').innerHTML=`النقاط: ${pts}`; }).withFailureHandler(e=>showMessage('خطأ',true)).getCustomerPoints(p); }
-  function registerCustomer(){ let phone=document.getElementById('newCustPhone').value, name=document.getElementById('newCustName').value, addr=document.getElementById('newCustAddr').value; if(!phone||!name){ showMessage('الهاتف والاسم مطلوبان',true); return; } google.script.run.withSuccessHandler(res=>{ showMessage(res.message, !res.success); }).withFailureHandler(e=>showMessage('خطأ',true)).registerCustomer(phone,name,addr); }
-  function generateReport(){ let start=document.getElementById('reportStart').value, end=document.getElementById('reportEnd').value; if(!start||!end){ showMessage('اختر التاريخ',true); return; } google.script.run.withSuccessHandler(report=>{ let html='<table><thead><tr><th>كود</th><th>التاريخ</th><th>العميل</th><th>الإجمالي</th><th>الكاشير</th></tr></thead><tbody>'; report.forEach(r=>{ html+=`<tr><td>${r.receiptCode}</td><td>${r.date}</td><td>${r.customer}</td><td>${r.total}</td><td>${r.cashier}</td></tr>`; }); html+='</tbody></table>'; document.getElementById('reportResult').innerHTML=html; }).withFailureHandler(e=>showMessage('فشل التقرير',true)).getSalesReport(currentBranch, new Date(start), new Date(end)); }
-  window.onload=()=>{
-    document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(btn.getAttribute('data-tab')).classList.add('active'); if(btn.getAttribute('data-tab')==='inventory') loadStock(); if(btn.getAttribute('data-tab')==='reports'){ let t=new Date().toISOString().slice(0,10); document.getElementById('reportStart').value=t; document.getElementById('reportEnd').value=t; } }); });
-    document.getElementById('completeSaleBtn').onclick=completeSale;
-    document.getElementById('clearCartBtn').onclick=()=>{ cart=[]; updateCartUI(); };
-    document.getElementById('checkPointsBtn').onclick=checkPoints;
-    document.getElementById('registerCustBtn').onclick=registerCustomer;
-    document.getElementById('generateReportBtn').onclick=generateReport;
-    document.getElementById('refreshStockBtn').onclick=loadStock;
-    document.getElementById('branchSelect').onchange=e=>{ currentBranch=e.target.value; loadStock(); };
-    document.getElementById('discount').oninput=updateTotals;
-    document.getElementById('deliveryFee').oninput=updateTotals;
-    loadProducts(); loadStock();
-  };
-</script>
-</body>
-</html>
+
+  <!-- QR Scanner -->
+  <div id="scannerBox" class="scanner-box">
+    <div class="scanner-frame">
+      <div class="modal-head">
+        <h3>ماسح QR</h3>
+        <button class="btn btn-soft btn-icon" onclick="App.stopScanner()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="reader" style="width:100%"></div>
+      <div class="actions mt-10">
+        <button class="btn btn-soft" onclick="App.stopScanner()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Modal -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div id="modalBox" class="modal"></div>
+  </div>
+
+  <script>
+    const GAS_URL = 'PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE';
+
+    const App = {
+      state: {
+        token: '',
+        user: null,
+        superPass: '',
+        data: {
+          products: [], users: [], stock: [], sales: [], crmOrders: [], shifts: [],
+          complaints: [], loyalty: [], forecast: [], expenses: [], returns: [],
+          parkedOrders: [], auditLog: [], messages: [], deliveryZones: [], branchReports: []
+        },
+        route: 'dashboard',
+        activeCategory: 'الكل',
+        cart: [],
+        selectedChatTab: 'private',
+        selectedChatTarget: null,
+        charts: {},
+        heartbeatTimer: null,
+        pollTimer: null,
+        chatTimer: null,
+        scanner: null
+      },
+
+      menuByRole: {
+        'مندوب_بيع': ['pos','qr'],
+        'كاشير': ['pos','stock','movements','reports','expenses','returns','loyalty','shifts','search'],
+        'دليفري': ['pos','delivery','search','stock','reports','expenses','returns','loyalty'],
+        'خدمة_العملاء': ['crm','crmTracking','products','complaints','stock'],
+        'مدير_فرع': ['pos','reports','stock','forecast','loyalty','dashboard'],
+        'إدارة': ['dashboard','monitor','branchDetail','branchShifts','branchStock','branchReports','pos','crm','delivery','products','stock','movements','reports','complaints','loyalty','forecast','expenses','returns','search','users','audit','shifts']
+      },
+
+      labels: {
+        dashboard:'Dashboard الإدارة', monitor:'مراقبة الفروع', branchDetail:'تفاصيل الفرع',
+        branchShifts:'ورديات الفرع', branchStock:'مخزون الفرع', branchReports:'تقارير الفرع',
+        pos:'نقطة البيع', qr:'QR', crm:'CRM', crmTracking:'متابعة الطلبات', delivery:'التوصيل',
+        products:'المنتجات', stock:'المخزون', movements:'حركات المخزون', reports:'التقارير',
+        complaints:'الشكاوى', loyalty:'الولاء', forecast:'التوقعات', expenses:'المصروفات',
+        returns:'المرتجعات', search:'بحث سريع', users:'المستخدمون', audit:'سجل العمليات',
+        shifts:'الورديات'
+      },
+
+      icons: {
+        dashboard:'fa-chart-line', monitor:'fa-building', branchDetail:'fa-store', branchShifts:'fa-clock',
+        branchStock:'fa-boxes-stacked', branchReports:'fa-chart-pie', pos:'fa-cash-register', qr:'fa-qrcode',
+        crm:'fa-headset', crmTracking:'fa-list-check', delivery:'fa-motorcycle', products:'fa-cookie-bite',
+        stock:'fa-warehouse', movements:'fa-arrow-right-arrow-left', reports:'fa-chart-column', complaints:'fa-triangle-exclamation',
+        loyalty:'fa-gift', forecast:'fa-wand-magic-sparkles', expenses:'fa-money-bill-wave', returns:'fa-rotate-left',
+        search:'fa-magnifying-glass', users:'fa-users-gear', audit:'fa-clipboard-list', shifts:'fa-stopwatch'
+      },
+
+      init() {
+        this.cacheEls();
+        this.bindGlobalEvents();
+        this.restoreSession();
+      },
+
+      cacheEls() {
+        this.el = {
+          authScreen: document.getElementById('authScreen'),
+          appShell: document.getElementById('appShell'),
+          sidebar: document.getElementById('sidebar'),
+          content: document.getElementById('content'),
+          topTitle: document.getElementById('topTitle'),
+          breadcrumbs: document.getElementById('breadcrumbs'),
+          loading: document.getElementById('loadingOverlay'),
+          toastStack: document.getElementById('toastStack'),
+          modalBackdrop: document.getElementById('modalBackdrop'),
+          modalBox: document.getElementById('modalBox'),
+          chatWidget: document.getElementById('chatWidget'),
+          chatPanel: document.getElementById('chatPanel'),
+          chatList: document.getElementById('chatList'),
+          chatConv: document.getElementById('chatConv'),
+          chatMessageInput: document.getElementById('chatMessageInput'),
+          scannerBox: document.getElementById('scannerBox')
+        };
+      },
+
+      bindGlobalEvents() {
+        document.getElementById('loginForm').addEventListener('submit', (e) => this.login(e));
+        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+        document.getElementById('refreshBtn').addEventListener('click', () => this.loadInitialData(true));
+        document.getElementById('globalSearchBtn').addEventListener('click', () => this.openGlobalSearch());
+        document.getElementById('quickSearchInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') this.quickSearch(e.target.value.trim());
+        });
+        document.getElementById('chatWidget').addEventListener('click', () => this.toggleChat(true));
+        document.getElementById('chatSendBtn').addEventListener('click', () => this.sendChatMessage());
+        document.getElementById('menuBtn').addEventListener('click', () => this.el.sidebar.classList.toggle('open'));
+        this.el.modalBackdrop.addEventListener('click', (e) => { if (e.target === this.el.modalBackdrop) this.closeModal(); });
+        document.querySelectorAll('.chat-tab').forEach(btn => btn.addEventListener('click', () => {
+          document.querySelectorAll('.chat-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.state.selectedChatTab = btn.dataset.chatTab;
+          this.renderChat();
+        }));
+      },
+
+      saveSession() {
+        try {
+          localStorage.setItem('s33_token', this.state.token);
+          localStorage.setItem('s33_user', JSON.stringify(this.state.user || null));
+          localStorage.setItem('s33_super', this.state.superPass || '');
+        } catch (e) {}
+      },
+
+      restoreSession() {
+        try {
+          const token = localStorage.getItem('s33_token');
+          const user = JSON.parse(localStorage.getItem('s33_user') || 'null');
+          const superPass = localStorage.getItem('s33_super') || '';
+          if (token && user) {
+            this.state.token = token;
+            this.state.user = user;
+            this.state.superPass = superPass;
+            this.startApp();
+          }
+        } catch (e) {}
+      },
+
+      clearSession() {
+        try {
+          localStorage.removeItem('s33_token');
+          localStorage.removeItem('s33_user');
+          localStorage.removeItem('s33_super');
+        } catch (e) {}
+      },
+
+      async login(e) {
+        e.preventDefault();
+        const pointType = document.getElementById('loginPointType').value;
+        const branch = document.getElementById('loginBranch').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        if (!pointType || !branch || !pass) return this.toast('اكمل بيانات الدخول', 'error');
+
+        this.showLoading(true);
+        try {
+          const res = await this.apiGet('authenticate', { pointType, branch, pass });
+          if (!res.ok) return this.toast(res.error || 'فشل تسجيل الدخول', 'error');
+          this.state.token = res.token;
+          this.state.user = res.user;
+          this.state.superPass = res.superPass || '';
+          this.saveSession();
+          this.startApp();
+          this.toast('تم تسجيل الدخول بنجاح', 'success');
+        } catch (err) {
+          this.toast('تعذر الاتصال بالخادم', 'error');
+        } finally {
+          this.showLoading(false);
+        }
+      },
+
+      async startApp() {
+        this.el.authScreen.classList.add('hidden');
+        this.el.appShell.classList.remove('hidden');
+        this.el.chatWidget.classList.remove('hidden');
+        this.buildSidebar();
+        await this.loadInitialData();
+        this.startHeartbeat();
+        this.startPolling();
+        this.render();
+      },
+
+      async logout() {
+        this.stopScanner();
+        clearInterval(this.state.heartbeatTimer);
+        clearInterval(this.state.pollTimer);
+        clearInterval(this.state.chatTimer);
+        await this.safePost('setUserStatus', {
+          token: this.state.token, status: 'offline', screen: 'logout'
+        });
+        this.clearSession();
+        location.reload();
+      },
+
+      role() { return this.state.user?.pointType || ''; },
+      branch() { return this.state.user?.branch || ''; },
+      username() { return this.state.user?.username || ''; },
+
+      buildSidebar() {
+        const role = this.role();
+        const items = this.menuByRole[role] || ['pos'];
+        this.el.sidebar.innerHTML = `
+          <div class="brand">
+            <div class="brand-logo"><i class="fa-solid fa-cake-candles"></i></div>
+            <div>
+              <h1>سُكّر 33</h1>
+              <p>${this.branch()} — ${role}</p>
+            </div>
+          </div>
+
+          <div class="user-box">
+            <div><strong>${this.state.user?.username || '-'}</strong></div>
+            <div class="muted"><span class="status-dot"></span>متصل الآن</div>
+          </div>
+
+          <div class="nav-group">
+            <div class="nav-title">القائمة الرئيسية</div>
+            ${items.map(key => `
+              <button class="nav-item ${this.state.route===key?'active':''}" data-route="${key}">
+                <span class="left"><i class="fa-solid ${this.icons[key]||'fa-circle'}"></i><span>${this.labels[key]||key}</span></span>
+                <i class="fa-solid fa-angle-left"></i>
+              </button>
+            `).join('')}
+          </div>
+        `;
+        this.el.sidebar.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => {
+          this.state.route = btn.dataset.route;
+          this.el.sidebar.classList.remove('open');
+          this.render();
+        }));
+      },
+
+      setPage(title, subtitle='') {
+        this.el.topTitle.textContent = title;
+        this.el.breadcrumbs.textContent = `الرئيسية / ${title}`;
+        return `
+          <div class="page-head">
+            <div>
+              <h2>${title}</h2>
+              <p>${subtitle}</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-soft" onclick="App.loadInitialData(true)"><i class="fa-solid fa-rotate"></i> تحديث</button>
+            </div>
+          </div>
+        `;
+      },
+
+      render() {
+        this.buildSidebar();
+        const map = {
+          dashboard: () => this.renderDashboard(),
+          monitor: () => this.renderAdminMonitor(),
+          branchDetail: () => this.renderBranchDetail(),
+          branchShifts: () => this.renderBranchShifts(),
+          branchStock: () => this.renderBranchStock(),
+          branchReports: () => this.renderBranchReports(),
+          pos: () => this.renderPOS(),
+          qr: () => this.renderQR(),
+          crm: () => this.renderCRM(),
+          crmTracking: () => this.renderCRMTracking(),
+          delivery: () => this.renderDelivery(),
+          products: () => this.renderProducts(),
+          stock: () => this.renderStock(),
+          movements: () => this.renderMovements(),
+          reports: () => this.renderReports(),
+          complaints: () => this.renderComplaints(),
+          loyalty: () => this.renderLoyalty(),
+          forecast: () => this.renderForecast(),
+          expenses: () => this.renderExpenses(),
+          returns: () => this.renderReturns(),
+          search: () => this.renderSearch(),
+          users: () => this.renderUsers(),
+          audit: () => this.renderAudit(),
+          shifts: () => this.renderShifts()
+        };
+        this.el.content.innerHTML = (map[this.state.route] || map.dashboard)();
+        this.bindDynamicEvents();
+      },
+
+      bindDynamicEvents() {
+        // POS
+        document.querySelectorAll('[data-cat]').forEach(btn => btn.addEventListener('click', () => {
+          this.state.activeCategory = btn.dataset.cat;
+          this.render();
+        }));
+
+        document.querySelectorAll('.product-card[data-item]').forEach(card => {
+          card.addEventListener('click', () => {
+            const idx = Number(card.dataset.item);
+            const item = this.filteredProducts()[idx];
+            this.openQtyModal(item);
+          });
+        });
+
+        document.querySelectorAll('[data-cart-remove]').forEach(btn => btn.addEventListener('click', () => {
+          this.state.cart.splice(Number(btn.dataset.cartRemove), 1);
+          this.render();
+        }));
+
+        const payBtn = document.getElementById('payBtn');
+        if (payBtn) payBtn.addEventListener('click', () => this.openPaymentModal());
+
+        const parkBtn = document.getElementById('parkBtn');
+        if (parkBtn) parkBtn.addEventListener('click', () => this.saveParkedOrder());
+
+        const parkedBtn = document.getElementById('parkedBtn');
+        if (parkedBtn) parkedBtn.addEventListener('click', () => this.openParkedModal());
+
+        const qrBtn = document.getElementById('qrBtn');
+        if (qrBtn) qrBtn.addEventListener('click', () => this.createQROrder());
+
+        const scanBtn = document.getElementById('scanQrBtn');
+        if (scanBtn) scanBtn.addEventListener('click', () => this.startScanner());
+
+        const openShiftBtn = document.getElementById('openShiftBtn');
+        if (openShiftBtn) openShiftBtn.addEventListener('click', () => this.openShiftModal());
+
+        // Tables actions
+        document.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', async () => {
+          await this.handleActionButton(btn);
+        }));
+
+        const quickTableSearch = document.querySelectorAll('[data-table-search]');
+        quickTableSearch.forEach(inp => inp.addEventListener('input', () => {
+          const target = document.getElementById(inp.dataset.tableSearch);
+          const q = inp.value.trim().toLowerCase();
+          [...target.querySelectorAll('tbody tr')].forEach(tr => {
+            tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+          });
+        }));
+
+        if (document.getElementById('salesChart')) this.drawReportsCharts();
+        if (document.getElementById('dashBranchChart')) this.drawDashboardCharts();
+      },
+
+      filteredProducts() {
+        const products = (this.state.data.products || []).filter(p => String(p.active).toLowerCase() !== 'false' && String(p.active) !== '0');
+        if (this.state.activeCategory === 'الكل') return products;
+        return products.filter(p => p.cat === this.state.activeCategory);
+      },
+
+      productStock(name) {
+        const row = (this.state.data.stock || []).find(s => s.branch === this.branch() && s.item === name);
+        return Number(row?.qty || 0);
+      },
+
+      sum(arr, field) { return (arr || []).reduce((a, b) => a + Number(b[field] || 0), 0); },
+
+      todaySales() {
+        const today = new Date().toISOString().slice(0,10);
+        return (this.state.data.sales || []).filter(x => String(x.date || '').startsWith(today));
+      },
+
+      renderDashboard() {
+        const salesToday = this.todaySales();
+        const total = this.sum(salesToday, 'total');
+        const invoices = salesToday.length;
+        const branches = [...new Set((salesToday || []).map(x => x.branch).filter(Boolean))];
+        const openOrders = (this.state.data.crmOrders || []).filter(x => !['مكتمل','ملغي'].includes(x.status)).length;
+
+        return `
+          ${this.setPage('Dashboard الإدارة','ملخص لحظي للمبيعات والفروع والمستخدمين')}
+          <div class="kpi-grid">
+            ${this.kpiCard('مبيعات اليوم', this.money(total), 'fa-sack-dollar')}
+            ${this.kpiCard('عدد الفواتير', invoices, 'fa-receipt')}
+            ${this.kpiCard('طلبات CRM المفتوحة', openOrders, 'fa-headset')}
+            ${this.kpiCard('الفروع النشطة', branches.length || 1, 'fa-store')}
+          </div>
+
+          <div class="grid-2 mt-16">
+            <div class="card">
+              <div class="section-title"><h3>ملخص الفروع</h3></div>
+              <div class="table-wrap">${this.branchSummaryTable()}</div>
+            </div>
+            <div class="card">
+              <div class="section-title"><h3>اتجاه المبيعات</h3></div>
+              <canvas id="dashBranchChart" height="180"></canvas>
+            </div>
+          </div>
+
+          <div class="grid-3 mt-16">
+            <div class="card">
+              <div class="section-title"><h3>أحدث الفواتير</h3></div>
+              ${this.simpleList((salesToday || []).slice(0,6).map(s => `${s.saleId} — ${s.customer || 'عميل نقدي'} — ${this.money(s.total)}`))}
+            </div>
+            <div class="card">
+              <div class="section-title"><h3>الشكاوى</h3></div>
+              ${this.simpleList((this.state.data.complaints || []).slice(0,6).map(c => `${c.name || '-'} — ${c.type || '-'} — ${c.status || 'جديد'}`))}
+            </div>
+            <div class="card">
+              <div class="section-title"><h3>المحادثات الأخيرة</h3></div>
+              ${this.simpleList((this.state.data.messages || []).slice(-6).reverse().map(m => `${m.from_user || m.from_branch} : ${m.message}`))}
+            </div>
+          </div>
+        `;
+      },
+
+      renderAdminMonitor() {
+        const sales = this.todaySales();
+        const grouped = {};
+        sales.forEach(s => {
+          grouped[s.branch] ||= { total:0, count:0 };
+          grouped[s.branch].total += Number(s.total || 0);
+          grouped[s.branch].count += 1;
+        });
+        const branches = [...new Set([this.branch(), ...Object.keys(grouped), ...(this.state.data.users||[]).map(u => u.branch)])].filter(Boolean);
+
+        return `
+          ${this.setPage('مراقبة الفروع','عرض سريع لأداء كل فرع')}
+          <div class="grid-3">
+            ${branches.map(b => `
+              <div class="branch-card">
+                <div class="section-title"><h3>${b}</h3><span class="badge b-info">نشط</span></div>
+                <div class="mini-stats">
+                  <div class="mini-card"><span class="muted">مبيعات اليوم</span><strong>${this.money(grouped[b]?.total || 0)}</strong></div>
+                  <div class="mini-card"><span class="muted">فواتير</span><strong>${grouped[b]?.count || 0}</strong></div>
+                </div>
+                <div class="actions mt-10">
+                  <button class="btn btn-soft" data-action="switch-branch-detail" data-branch="${b}">تفاصيل</button>
+                  <button class="btn btn-soft" data-action="switch-branch-stock" data-branch="${b}">مخزون</button>
+                  <button class="btn btn-soft" data-action="switch-branch-shifts" data-branch="${b}">ورديات</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      },
+
+      renderBranchDetail(branch = this.branch()) {
+        const sales = (this.state.data.sales || []).filter(x => x.branch === branch).slice(-10).reverse();
+        const users = (this.state.data.users || []).filter(x => x.branch === branch);
+        const total = this.sum((this.state.data.sales || []).filter(x => x.branch===branch), 'total');
+        return `
+          ${this.setPage('تفاصيل الفرع', branch)}
+          <div class="kpi-grid">
+            ${this.kpiCard('إجمالي المبيعات', this.money(total), 'fa-sack-dollar')}
+            ${this.kpiCard('الموظفون', users.length, 'fa-users')}
+            ${this.kpiCard('المخزون', (this.state.data.stock||[]).filter(x=>x.branch===branch).length, 'fa-boxes-stacked')}
+            ${this.kpiCard('الورديات', (this.state.data.shifts||[]).filter(x=>x.branch===branch).length, 'fa-clock')}
+          </div>
+          <div class="grid-2 mt-16">
+            <div class="card"><div class="section-title"><h3>الموظفون</h3></div>${this.table([
+              {key:'username',label:'المستخدم'},{key:'pointType',label:'الدور'},{key:'phone',label:'الهاتف'},{key:'active',label:'نشط'}
+            ], users, 'branchUsers')}</div>
+            <div class="card"><div class="section-title"><h3>أحدث الفواتير</h3></div>${this.table([
+              {key:'saleId',label:'رقم'},{key:'customer',label:'العميل'},{key:'total',label:'الإجمالي',fmt:v=>this.money(v)},{key:'status',label:'الحالة'}
+            ], sales, 'branchSales')}</div>
+          </div>
+        `;
+      },
+
+      renderBranchShifts(branch = this.branch()) {
+        const rows = (this.state.data.shifts || []).filter(x => x.branch === branch).slice().reverse();
+        return `
+          ${this.setPage('ورديات الفرع', branch)}
+          <div class="toolbar">
+            <input class="input grow" data-table-search="branchShiftsTable" placeholder="بحث في الورديات..." />
+          </div>
+          <div class="card">${this.table([
+            {key:'id',label:'الرقم'},
+            {key:'cashier',label:'الكاشير'},
+            {key:'openTime',label:'فتح'},
+            {key:'closeTime',label:'إغلاق'},
+            {key:'status',label:'الحالة'},
+            {key:'totalSales',label:'المبيعات',fmt:v=>this.money(v)},
+            {key:'invoiceCount',label:'الفواتير'},
+            {key:'actualCash',label:'النقد الفعلي'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=> this.role()==='إدارة' ? `<button class="btn btn-warning" data-action="reopen-shift" data-id="${r.id}">إعادة فتح</button>` : '-'}
+          ], rows, 'branchShiftsTable')}</div>
+        `;
+      },
+
+      renderBranchStock(branch = this.branch()) {
+        const rows = (this.state.data.stock || []).filter(x => x.branch === branch);
+        return `
+          ${this.setPage('مخزون الفرع', branch)}
+          <div class="card">${this.table([
+            {key:'item',label:'الصنف'},{key:'qty',label:'الكمية'},{key:'lastUpdate',label:'آخر تحديث'}
+          ], rows, 'branchStockTable')}</div>
+        `;
+      },
+
+      renderBranchReports(branch = this.branch()) {
+        const sales = (this.state.data.sales || []).filter(x => x.branch === branch);
+        const total = this.sum(sales, 'total');
+        return `
+          ${this.setPage('تقارير الفرع', branch)}
+          <div class="kpi-grid">
+            ${this.kpiCard('إجمالي المبيعات', this.money(total), 'fa-sack-dollar')}
+            ${this.kpiCard('عدد الفواتير', sales.length, 'fa-receipt')}
+            ${this.kpiCard('المصروفات', this.money(this.sum((this.state.data.expenses||[]).filter(x=>x.branch===branch), 'amount')), 'fa-money-bill-wave')}
+            ${this.kpiCard('المرتجعات', this.money(this.sum((this.state.data.returns||[]).filter(x=>x.branch===branch), 'amount')), 'fa-rotate-left')}
+          </div>
+          <div class="grid-2 mt-16">
+            <div class="card"><canvas id="salesChart" height="180"></canvas></div>
+            <div class="card">${this.table([
+              {key:'saleId',label:'الرقم'},{key:'customer',label:'العميل'},{key:'total',label:'القيمة',fmt:v=>this.money(v)},{key:'paymentMethod',label:'الدفع'}
+            ], sales.slice(-10).reverse(), 'branchReportSales')}</div>
+          </div>
+        `;
+      },
+
+      renderPOS() {
+        const categories = ['الكل', ...new Set((this.state.data.products || []).map(p => p.cat).filter(Boolean))];
+        const items = this.filteredProducts();
+        const subtotal = this.state.cart.reduce((a,b)=>a+(Number(b.qty)*Number(b.price)),0);
+
+        return `
+          ${this.setPage('نقطة البيع','بيع مباشر + QR + طباعة حرارية + فواتير معلقة')}
+          <div class="toolbar">
+            <button id="openShiftBtn" class="btn btn-soft"><i class="fa-solid fa-clock"></i> الوردية</button>
+            <button id="parkBtn" class="btn btn-soft"><i class="fa-solid fa-pause"></i> تعليق الفاتورة</button>
+            <button id="parkedBtn" class="btn btn-soft"><i class="fa-solid fa-layer-group"></i> الفواتير المعلقة</button>
+            <button id="qrBtn" class="btn btn-soft"><i class="fa-solid fa-qrcode"></i> إنشاء QR</button>
+            <button id="scanQrBtn" class="btn btn-soft"><i class="fa-solid fa-camera"></i> مسح QR</button>
+            <span class="print-note">الطباعة 80mm مدعومة، وBluetooth اختياري من المتصفح</span>
+          </div>
+
+          <div class="pos-layout">
+            <div class="card">
+              <div class="section-title"><h3>الفئات</h3></div>
+              <div class="cat-list">
+                ${categories.map(c => `<button class="cat-btn ${this.state.activeCategory===c?'active':''}" data-cat="${c}">${c}</button>`).join('')}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title"><h3>المنتجات</h3></div>
+              <div class="product-grid">
+                ${items.map((p,i)=>`
+                  <div class="product-card" data-item="${i}">
+                    <strong>${p.name}</strong>
+                    <div class="muted">${p.cat || '-'} • ${p.unit || 'قطعة'}</div>
+                    <div class="split mt-10">
+                      <small>السعر: ${this.money(p.price)}</small>
+                      <small>المتوفر: ${this.productStock(p.name)}</small>
+                    </div>
+                  </div>
+                `).join('') || '<div class="empty">لا توجد منتجات</div>'}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title"><h3>السلة</h3><span class="badge b-info">${this.state.cart.length} عنصر</span></div>
+              <div class="cart-list">
+                ${(this.state.cart || []).map((c,i)=>`
+                  <div class="cart-item">
+                    <div>
+                      <strong>${c.name}</strong>
+                      <div class="muted">${c.qty} ${c.unit || ''} × ${this.money(c.price)}</div>
+                      ${c.note ? `<small class="muted">ملاحظة: ${c.note}</small>`:''}
+                    </div>
+                    <div class="actions">
+                      <button class="btn btn-danger btn-icon" data-cart-remove="${i}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                  </div>
+                `).join('') || '<div class="empty">السلة فارغة</div>'}
+              </div>
+              <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+              <div class="split"><div><strong>الإجمالي</strong></div><div class="text-left"><strong>${this.money(subtotal)}</strong></div></div>
+              <div class="actions mt-16">
+                <button id="payBtn" class="btn btn-primary w-100"><i class="fa-solid fa-credit-card"></i> دفع</button>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderQR() {
+        return `
+          ${this.setPage('QR','إنشاء طلبات QR واسترجاعها ومسحها')}
+          <div class="grid-2">
+            <div class="card">
+              <div class="section-title"><h3>إنشاء QR لطلب جديد</h3></div>
+              <div class="field"><label>اسم العميل</label><input id="qrCustomer" class="input"></div>
+              <div class="field"><label>الهاتف</label><input id="qrPhone" class="input"></div>
+              <div class="field"><label>العنوان</label><input id="qrAddress" class="input"></div>
+              <div class="field"><label>ملاحظات</label><textarea id="qrNotes" class="textarea"></textarea></div>
+              <button class="btn btn-primary" onclick="App.createQROrder()">إنشاء QR</button>
+            </div>
+            <div class="card">
+              <div class="section-title"><h3>استرجاع طلب QR</h3></div>
+              <div class="actions">
+                <input id="manualQrId" class="input grow" placeholder="أدخل رقم الطلب" />
+                <button class="btn btn-soft" onclick="App.fetchQROrder(document.getElementById('manualQrId').value)">جلب</button>
+                <button class="btn btn-soft" onclick="App.startScanner()">مسح بالكاميرا</button>
+              </div>
+              <div id="qrPreview" class="mt-16 empty">سيظهر هنا الطلب أو رمز QR</div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderCRM() {
+        const rows = (this.state.data.crmOrders || []).filter(x => x.branch === this.branch() && !['مكتمل','ملغي'].includes(x.status));
+        return `
+          ${this.setPage('CRM','طلبات جديدة + تحديث حالة + إنشاء طلب')}
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="App.openCrmOrderModal()">طلب CRM جديد</button>
+            <input class="input grow" data-table-search="crmTable" placeholder="بحث..." />
+          </div>
+          <div class="card">${this.table([
+            {key:'id',label:'الرقم'},{key:'date',label:'التاريخ'},{key:'customer',label:'العميل'},
+            {key:'phone',label:'الهاتف'},{key:'total',label:'الإجمالي',fmt:v=>this.money(v)},
+            {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
+            {key:'takenBy',label:'المسؤول'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=>`
+              <div class="actions">
+                <button class="btn btn-success" data-action="crm-status" data-id="${r.id}" data-status="مكتمل">استلام/مكتمل</button>
+                <button class="btn btn-danger" data-action="crm-status" data-id="${r.id}" data-status="ملغي">إلغاء</button>
+              </div>
+            `}
+          ], rows, 'crmTable')}</div>
+        `;
+      },
+
+      renderCRMTracking() {
+        const rows = (this.state.data.crmOrders || []).filter(x => x.createdBy === this.username()).slice().reverse();
+        return `
+          ${this.setPage('متابعة الطلبات','الطلبات التي أنشأها المستخدم الحالي')}
+          <div class="card">${this.table([
+            {key:'id',label:'الرقم'},{key:'date',label:'التاريخ'},{key:'customer',label:'العميل'},
+            {key:'phone',label:'الهاتف'},{key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
+            {key:'notes',label:'ملاحظات'}
+          ], rows, 'crmTrackTable')}</div>
+        `;
+      },
+
+      renderDelivery() {
+        const rows = (this.state.data.crmOrders || []).filter(x => x.branch === this.branch() && !['مكتمل','ملغي'].includes(x.status));
+        return `
+          ${this.setPage('التوصيل','استلام طلبات التوصيل وإكمالها أو إلغاؤها')}
+          <div class="card">${this.table([
+            {key:'id',label:'الرقم'},{key:'customer',label:'العميل'},{key:'phone',label:'الهاتف'},
+            {key:'address',label:'العنوان'},{key:'total',label:'المبلغ',fmt:v=>this.money(v)},
+            {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
+            {key:'takenBy',label:'أخذه'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=>`
+              <div class="actions">
+                <button class="btn btn-soft" data-action="delivery-take" data-id="${r.id}">استلام</button>
+                <button class="btn btn-success" data-action="crm-status" data-id="${r.id}" data-status="مكتمل">إكمال</button>
+                <button class="btn btn-danger" data-action="crm-status" data-id="${r.id}" data-status="ملغي">إلغاء</button>
+              </div>`}
+          ], rows, 'deliveryTable')}</div>
+        `;
+      },
+
+      renderProducts() {
+        return `
+          ${this.setPage('المنتجات','إضافة وتعديل وإدارة حالة المنتجات')}
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="App.openProductModal()">إضافة منتج</button>
+            <input class="input grow" data-table-search="productsTable" placeholder="بحث بالاسم أو الفئة..." />
+          </div>
+          <div class="card">${this.table([
+            {key:'name',label:'الاسم'},
+            {key:'cat',label:'الفئة'},
+            {key:'unit',label:'الوحدة'},
+            {key:'price',label:'السعر',fmt:v=>this.money(v)},
+            {key:'active',label:'نشط'},
+            {key:'notes',label:'ملاحظات'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=>`
+              <button class="btn btn-soft" data-action="edit-product" data-row="${r._row}">تعديل</button>`}
+          ], this.state.data.products || [], 'productsTable')}</div>
+        `;
+      },
+
+      renderStock() {
+        const rows = (this.state.data.stock || []).filter(x => x.branch === this.branch());
+        return `
+          ${this.setPage('المخزون','عرض مخزون الفرع وتصدير CSV وإجراء حركة')}
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="App.openStockModal()">حركة مخزون</button>
+            <button class="btn btn-soft" onclick="App.exportCSV('stock.csv', App.state.data.stock)">تصدير CSV</button>
+            <input class="input grow" data-table-search="stockTable" placeholder="بحث..." />
+          </div>
+          <div class="card">${this.table([
+            {key:'item',label:'الصنف'},{key:'qty',label:'الكمية'},{key:'lastUpdate',label:'آخر تحديث'}
+          ], rows, 'stockTable')}</div>
+        `;
+      },
+
+      renderMovements() {
+        const rows = (this.state.data.stockMovements || this.state.data.movements || []);
+        return `
+          ${this.setPage('حركات المخزون','سجل الحركات مع إضافة حركة جديدة')}
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="App.openStockModal()">إضافة حركة</button>
+          </div>
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'branch',label:'الفرع'},{key:'type',label:'النوع'},
+            {key:'item',label:'الصنف'},{key:'qty',label:'الكمية'},{key:'balance',label:'الرصيد'},
+            {key:'user',label:'المستخدم'},{key:'notes',label:'ملاحظات'}
+          ], rows, 'movementsTable')}</div>
+        `;
+      },
+
+      renderReports() {
+        return `
+          ${this.setPage('التقارير','رسومات بيانية للمبيعات والمدفوعات')}
+          <div class="grid-2">
+            <div class="card"><div class="section-title"><h3>المبيعات حسب طريقة الدفع</h3></div><canvas id="salesChart" height="180"></canvas></div>
+            <div class="card"><div class="section-title"><h3>مؤشرات اليوم</h3></div>
+              <div class="mini-stats">
+                <div class="mini-card"><span class="muted">مبيعات</span><strong>${this.money(this.sum(this.todaySales(), 'total'))}</strong></div>
+                <div class="mini-card"><span class="muted">فواتير</span><strong>${this.todaySales().length}</strong></div>
+                <div class="mini-card"><span class="muted">مصروفات</span><strong>${this.money(this.sum(this.state.data.expenses,'amount'))}</strong></div>
+                <div class="mini-card"><span class="muted">مرتجعات</span><strong>${this.money(this.sum(this.state.data.returns,'amount'))}</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderComplaints() {
+        return `
+          ${this.setPage('الشكاوى','إضافة ومتابعة شكاوى العملاء')}
+          <div class="toolbar"><button class="btn btn-primary" onclick="App.openComplaintModal()">إضافة شكوى</button></div>
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'name',label:'الاسم'},{key:'phone',label:'الهاتف'},
+            {key:'type',label:'النوع'},{key:'description',label:'الوصف'},{key:'branch',label:'الفرع'},
+            {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)}
+          ], this.state.data.complaints || [], 'complaintsTable')}</div>
+        `;
+      },
+
+      renderLoyalty() {
+        return `
+          ${this.setPage('الولاء','بحث وإدارة نقاط العملاء')}
+          <div class="toolbar">
+            <input id="loyaltyPhone" class="input grow" placeholder="رقم الهاتف" />
+            <button class="btn btn-primary" onclick="App.searchCustomer()">بحث</button>
+          </div>
+          <div id="loyaltyResult" class="card empty">ابحث برقم الهاتف لعرض بيانات العميل ونقاطه</div>
+          <div class="card mt-16">${this.table([
+            {key:'phone',label:'الهاتف'},{key:'points',label:'النقاط'},{key:'lastUpdate',label:'آخر تحديث'},{key:'expiry',label:'الانتهاء'}
+          ], this.state.data.loyalty || [], 'loyaltyTable')}</div>
+        `;
+      },
+
+      renderForecast() {
+        return `
+          ${this.setPage('التوقعات','توقعات المبيعات حسب الفرع والتاريخ')}
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'branch',label:'الفرع'},{key:'expected',label:'المتوقع'},
+            {key:'actual',label:'الفعلي'},{key:'error',label:'الخطأ'},{key:'approved',label:'معتمد'}
+          ], this.state.data.forecast || [], 'forecastTable')}</div>
+        `;
+      },
+
+      renderExpenses() {
+        return `
+          ${this.setPage('المصروفات','إضافة ومراجعة مصروفات الفرع')}
+          <div class="toolbar"><button class="btn btn-primary" onclick="App.openExpenseModal()">إضافة مصروف</button></div>
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'branch',label:'الفرع'},{key:'type',label:'النوع'},
+            {key:'amount',label:'القيمة',fmt:v=>this.money(v)},{key:'user',label:'المستخدم'},{key:'notes',label:'ملاحظات'}
+          ], this.state.data.expenses || [], 'expensesTable')}</div>
+        `;
+      },
+
+      renderReturns() {
+        return `
+          ${this.setPage('المرتجعات','إضافة ومراجعة المرتجعات')}
+          <div class="toolbar"><button class="btn btn-primary" onclick="App.openReturnModal()">إضافة مرتجع</button></div>
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'branch',label:'الفرع'},{key:'originalSaleId',label:'الفاتورة الأصلية'},
+            {key:'amount',label:'القيمة',fmt:v=>this.money(v)},{key:'reason',label:'السبب'},{key:'username',label:'المستخدم'}
+          ], this.state.data.returns || [], 'returnsTable')}</div>
+        `;
+      },
+
+      renderSearch() {
+        return `
+          ${this.setPage('بحث سريع','بحث في الفواتير والعملاء والطلبات')}
+          <div class="toolbar">
+            <input id="searchQuery" class="input grow" placeholder="ابحث برقم فاتورة / هاتف / اسم عميل / طلب CRM" />
+            <button class="btn btn-primary" onclick="App.quickSearch(document.getElementById('searchQuery').value)">بحث</button>
+          </div>
+          <div id="searchResults" class="card empty">أدخل عبارة بحث لعرض النتائج</div>
+        `;
+      },
+
+      renderUsers() {
+        return `
+          ${this.setPage('المستخدمون','إضافة وتعديل وحذف المستخدمين')}
+          <div class="toolbar"><button class="btn btn-primary" onclick="App.openUserModal()">إضافة مستخدم</button></div>
+          <div class="card">${this.table([
+            {key:'username',label:'المستخدم'},{key:'branch',label:'الفرع'},{key:'pointType',label:'الدور'},
+            {key:'phone',label:'الهاتف'},{key:'active',label:'نشط'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=>`
+              <div class="actions">
+                <button class="btn btn-soft" data-action="edit-user" data-row="${r._row}">تعديل</button>
+                <button class="btn btn-danger" data-action="delete-user" data-row="${r._row}">حذف</button>
+              </div>`}
+          ], this.state.data.users || [], 'usersTable')}</div>
+        `;
+      },
+
+      renderAudit() {
+        return `
+          ${this.setPage('سجل العمليات','جميع العمليات الحساسة مع تصدير CSV')}
+          <div class="toolbar">
+            <button class="btn btn-soft" onclick="App.exportCSV('audit_log.csv', App.state.data.auditLog || [])">تصدير CSV</button>
+          </div>
+          <div class="card">${this.table([
+            {key:'date',label:'التاريخ'},{key:'user',label:'المستخدم'},{key:'role',label:'الدور'},
+            {key:'branch',label:'الفرع'},{key:'action',label:'الإجراء'},{key:'details',label:'التفاصيل'}
+          ], this.state.data.auditLog || [], 'auditTable')}</div>
+        `;
+      },
+
+      renderShifts() {
+        return `
+          ${this.setPage('الورديات','فتح وإغلاق ومراجعة الوردية')}
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="App.openShiftModal()">فتح وردية</button>
+          </div>
+          <div class="card">${this.table([
+            {key:'id',label:'الرقم'},{key:'branch',label:'الفرع'},{key:'cashier',label:'الكاشير'},
+            {key:'openTime',label:'وقت الفتح'},{key:'closeTime',label:'وقت الإغلاق'},
+            {key:'status',label:'الحالة',fmt:v=>this.statusBadge(v)},
+            {key:'totalSales',label:'المبيعات',fmt:v=>this.money(v)},{key:'invoiceCount',label:'الفواتير'},
+            {key:'actualCash',label:'النقد الفعلي'},
+            {key:'actions',label:'إجراء',fmt:(v,r)=> r.status==='مفتوح'
+              ? `<div class="actions">
+                   <button class="btn btn-success" data-action="close-shift" data-id="${r.id}">إغلاق</button>
+                   <button class="btn btn-soft" data-action="actual-cash" data-id="${r.id}">نقد فعلي</button>
+                 </div>`
+              : (this.role()==='إدارة' ? `<button class="btn btn-warning" data-action="reopen-shift" data-id="${r.id}">إعادة فتح</button>` : '-')
+            }
+          ], this.state.data.shifts || [], 'shiftsTable')}</div>
+        `;
+      },
+
+      kpiCard(label, value, icon) {
+        return `<div class="card kpi">
+          <div><div class="label">${label}</div><div class="value">${value}</div></div>
+          <div class="icon"><i class="fa-solid ${icon}"></i></div>
+        </div>`;
+      },
+
+      simpleList(items=[]) {
+        return items.length ? items.map(x => `<div class="msg">${x}</div>`).join('') : '<div class="empty">لا توجد بيانات</div>';
+      },
+
+      branchSummaryTable() {
+        const rows = {};
+        (this.state.data.sales || []).forEach(s => {
+          rows[s.branch] ||= {branch:s.branch,total:0,count:0};
+          rows[s.branch].total += Number(s.total || 0);
+          rows[s.branch].count++;
+        });
+        return this.table([
+          {key:'branch',label:'الفرع'},
+          {key:'count',label:'الفواتير'},
+          {key:'total',label:'المبيعات',fmt:v=>this.money(v)}
+        ], Object.values(rows), 'branchSummaryTable');
+      },
+
+      table(columns, rows, id='tbl') {
+        return `
+          <div class="table-wrap">
+            <table id="${id}">
+              <thead><tr>${columns.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${(rows||[]).length ? rows.map(r => `
+                  <tr>${columns.map(c => `<td>${c.fmt ? c.fmt(r[c.key], r) : (r[c.key] ?? '')}</td>`).join('')}</tr>
+                `).join('') : `<tr><td colspan="${columns.length}" class="empty">لا توجد بيانات</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `;
+      },
+
+      statusBadge(status='') {
+        let cls = 'b-info';
+        if (['مكتمل','نشط','مفتوح','true','TRUE'].includes(String(status))) cls = 'b-success';
+        else if (['ملغي','false','FALSE'].includes(String(status))) cls = 'b-danger';
+        else if (['جديد','معلق','قيد_التجهيز'].includes(String(status))) cls = 'b-warning';
+        return `<span class="badge ${cls}">${status || '-'}</span>`;
+      },
+
+      money(v) { return `${Number(v||0).toFixed(2)} ج.م`; },
+
+      showLoading(flag) {
+        this.el.loading.style.display = flag ? 'flex' : 'none';
+      },
+
+      toast(message, type='info') {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<strong>${type==='success'?'نجاح':type==='error'?'خطأ':'تنبيه'}</strong><div>${message}</div>`;
+        this.el.toastStack.appendChild(t);
+        setTimeout(()=>t.remove(), 3200);
+      },
+
+      openModal(title, body, modalClass='') {
+        this.el.modalBox.className = `modal ${modalClass}`;
+        this.el.modalBox.innerHTML = `
+          <div class="modal-head">
+            <h3>${title}</h3>
+            <button class="btn btn-soft btn-icon" onclick="App.closeModal()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          ${body}
+        `;
+        this.el.modalBackdrop.style.display = 'flex';
+      },
+
+      closeModal() {
+        this.el.modalBackdrop.style.display = 'none';
+        this.el.modalBox.innerHTML = '';
+      },
+
+      async apiGet(action, params={}) {
+        return new Promise((resolve, reject) => {
+          const cb = `jsonp_cb_${Date.now()}_${Math.floor(Math.random()*9999)}`;
+          window[cb] = (data) => {
+            resolve(data);
+            script.remove();
+            delete window[cb];
+          };
+          const query = new URLSearchParams({ action, callback: cb, token: this.state.token || '', ...params }).toString();
+          const script = document.createElement('script');
+          script.src = `${GAS_URL}?${query}`;
+          script.onerror = () => { reject(new Error('JSONP error')); delete window[cb]; };
+          document.body.appendChild(script);
+        });
+      },
+
+      async apiPost(action, payload={}) {
+        const body = new URLSearchParams({ action, payload: JSON.stringify({ token: this.state.token || '', ...payload }) });
+        const res = await fetch(GAS_URL, { method:'POST', body });
+        return res.json();
+      },
+
+      async safePost(action, payload={}) {
+        try { return await this.apiPost(action, payload); } catch (e) { return {ok:false,error:e.message}; }
+      },
+
+      async loadInitialData(silent=false) {
+        if (!silent) this.showLoading(true);
+        try {
+          const res = await this.apiGet('getInitialData', { userType: this.role(), branch: this.branch(), username: this.username() });
+          if (!res.ok) return this.toast(res.error || 'فشل تحميل البيانات', 'error');
+          this.state.data = { ...this.state.data, ...(res.data || {}) };
+          this.renderChat();
+          if (!silent) this.render();
+        } catch (e) {
+          this.toast('تعذر تحميل البيانات', 'error');
+        } finally {
+          if (!silent) this.showLoading(false);
+        }
+      },
+
+      startHeartbeat() {
+        clearInterval(this.state.heartbeatTimer);
+        this.safePost('setUserStatus', { status:'online', screen:this.state.route });
+        this.state.heartbeatTimer = setInterval(() => {
+          this.safePost('setUserStatus', { status:'online', screen:this.state.route });
+        }, 30000);
+      },
+
+      startPolling() {
+        clearInterval(this.state.pollTimer);
+        clearInterval(this.state.chatTimer);
+        this.state.pollTimer = setInterval(() => this.loadInitialData(true), 60000);
+        this.state.chatTimer = setInterval(() => this.refreshMessages(), 15000);
+      },
+
+      async refreshMessages() {
+        const res = await this.apiGet('getMessages', {});
+        if (res.ok) {
+          this.state.data.messages = res.data || [];
+          this.renderChat();
+        }
+      },
+
+      toggleChat(show=true) {
+        this.el.chatPanel.style.display = show ? 'block' : 'none';
+        if (show) this.renderChat();
+      },
+
+      renderChat() {
+        const all = this.state.data.messages || [];
+        const tab = this.state.selectedChatTab;
+        const user = this.username();
+        const branch = this.branch();
+
+        let list = [];
+        if (tab === 'private') {
+          const names = [...new Set(all.flatMap(m => [m.from_user, m.to_user]).filter(x => x && x !== user))];
+          list = names.map(n => ({id:n, label:n}));
+        } else {
+          list = [{id:branch, label:`غرفة ${branch}`}];
+        }
+
+        if (!this.state.selectedChatTarget && list.length) this.state.selectedChatTarget = list[0].id;
+        if (tab === 'branch') this.state.selectedChatTarget = branch;
+
+        this.el.chatList.innerHTML = list.map(item => `
+          <div class="chat-item" onclick="App.selectChatTarget('${item.id}')">
+            <strong>${item.label}</strong>
+          </div>
+        `).join('') || '<div class="empty">لا توجد محادثات</div>';
+
+        const msgs = all.filter(m => {
+          if (tab === 'branch') return m.type === 'branch' && (m.to_branch === branch || m.from_branch === branch);
+          return m.type === 'private' && [m.from_user, m.to_user].includes(user) && [m.from_user, m.to_user].includes(this.state.selectedChatTarget);
+        });
+
+        this.el.chatConv.innerHTML = msgs.length ? msgs.map(m => `
+          <div class="msg ${m.from_user===user ? 'self':''}">
+            <strong>${m.from_user || m.from_branch}</strong>
+            <div>${m.message}</div>
+            <small class="muted">${m.timestamp || ''}</small>
+          </div>
+        `).join('') : '<div class="empty">ابدأ المحادثة</div>';
+        this.el.chatConv.scrollTop = this.el.chatConv.scrollHeight;
+      },
+
+      selectChatTarget(id) {
+        this.state.selectedChatTarget = id;
+        this.renderChat();
+      },
+
+      async sendChatMessage() {
+        const message = this.el.chatMessageInput.value.trim();
+        if (!message) return;
+        const payload = this.state.selectedChatTab === 'branch'
+          ? { type:'branch', to_branch:this.branch(), message }
+          : { type:'private', to_user:this.state.selectedChatTarget, message };
+
+        const res = await this.apiPost('sendMessage', payload);
+        if (res.ok) {
+          this.el.chatMessageInput.value = '';
+          await this.refreshMessages();
+        } else this.toast(res.error || 'فشل الإرسال', 'error');
+      },
+
+      openQtyModal(item) {
+        this.openModal('إضافة للسلة', `
+          <div class="grid-2">
+            <div class="field"><label>الصنف</label><input class="input" value="${item.name}" disabled></div>
+            <div class="field"><label>الوحدة</label><input class="input" value="${item.unit || 'قطعة'}" disabled></div>
+            <div class="field"><label>الكمية</label><input id="qtyVal" class="input" type="number" min="0.001" step="0.001" value="1"></div>
+            <div class="field"><label>السعر</label><input id="qtyPrice" class="input" type="number" step="0.01" value="${item.price || 0}"></div>
+          </div>
+          <div class="field"><label>ملاحظة</label><textarea id="qtyNote" class="textarea" placeholder="اختياري"></textarea></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick='App.addToCart(${JSON.stringify(item).replace(/'/g,"&#39;")})'>إضافة</button>
+            <button class="btn btn-soft" onclick="App.closeModal()">إلغاء</button>
+          </div>
+        `);
+      },
+
+      addToCart(item) {
+        const qty = Number(document.getElementById('qtyVal').value || 0);
+        const price = Number(document.getElementById('qtyPrice').value || item.price || 0);
+        const note = document.getElementById('qtyNote').value.trim();
+        if (qty <= 0) return this.toast('أدخل كمية صحيحة', 'error');
+        this.state.cart.push({ name:item.name, unit:item.unit, qty, price, note, cat:item.cat });
+        this.closeModal();
+        this.render();
+      },
+
+      openPaymentModal() {
+        if (!this.state.cart.length) return this.toast('السلة فارغة', 'error');
+        const subtotal = this.state.cart.reduce((a,b)=>a+(Number(b.qty)*Number(b.price)),0);
+        this.openModal('الدفع', `
+          <div class="grid-2">
+            <div class="field"><label>اسم العميل</label><input id="payCustomer" class="input" placeholder="اختياري"></div>
+            <div class="field"><label>الهاتف</label><input id="payPhone" class="input" placeholder="اختياري"></div>
+            <div class="field"><label>العنوان</label><input id="payAddress" class="input"></div>
+            <div class="field"><label>طريقة الدفع</label>
+              <select id="payMethod" class="select">
+                <option>نقدي</option><option>فيزا</option><option>تحويل</option><option>مختلط</option>
+              </select>
+            </div>
+            <div class="field"><label>خصم</label><input id="payDiscount" class="input" type="number" step="0.01" value="0"></div>
+            <div class="field"><label>توصيل</label><input id="payDelivery" class="input" type="number" step="0.01" value="0"></div>
+            <div class="field"><label>مدفوع</label><input id="payAmount" class="input" type="number" step="0.01" value="${subtotal}"></div>
+            <div class="field"><label>نقاط مستبدلة</label><input id="payRedeem" class="input" type="number" step="1" value="0"></div>
+          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="payNotes" class="textarea"></textarea></div>
+          <div class="card" style="background:#fff8f3">
+            <div>إجمالي المنتجات: <strong>${this.money(subtotal)}</strong></div>
+          </div>
+          <div class="actions mt-16">
+            <button class="btn btn-primary" onclick="App.saveOrder()">تأكيد الدفع</button>
+            <button class="btn btn-soft" onclick="App.closeModal()">إلغاء</button>
+          </div>
+        `);
+      },
+
+      async saveOrder() {
+        const subtotal = this.state.cart.reduce((a,b)=>a+(Number(b.qty)*Number(b.price)),0);
+        const discount = Number(document.getElementById('payDiscount').value || 0);
+        const delivery = Number(document.getElementById('payDelivery').value || 0);
+        const total = subtotal - discount + delivery;
+
+        const payload = {
+          branch: this.branch(),
+          customer: document.getElementById('payCustomer').value.trim(),
+          phone: document.getElementById('payPhone').value.trim(),
+          address: document.getElementById('payAddress').value.trim(),
+          channel: 'POS',
+          status: 'مكتمل',
+          subtotal, discount, delivery, total,
+          cashier: this.username(),
+          username: this.username(),
+          notes: document.getElementById('payNotes').value.trim(),
+          paymentMethod: document.getElementById('payMethod').value,
+          paidAmount: Number(document.getElementById('payAmount').value || total),
+          loyaltyRedeemed: Number(document.getElementById('payRedeem').value || 0),
+          itemsJson: this.state.cart
+        };
+
+        this.showLoading(true);
+        const res = await this.apiPost('saveOrder', payload);
+        this.showLoading(false);
+        if (!res.ok) return this.toast(res.error || 'فشل حفظ الطلب', 'error');
+
+        this.toast('تم حفظ الفاتورة', 'success');
+        this.printInvoice(res.data);
+        this.state.cart = [];
+        this.closeModal();
+        await this.loadInitialData(true);
+        this.render();
+      },
+
+      printInvoice(order) {
+        const win = window.open('', '_blank', 'width=420,height=780');
+        if (!win) return;
+        const items = JSON.parse(order.itemsJson || '[]');
+        win.document.write(`
+          <html dir="rtl"><head><title>فاتورة</title>
+          <style>
+            body{font-family:Cairo,sans-serif;margin:0;padding:8px;width:80mm}
+            h3,p{margin:4px 0} table{width:100%;border-collapse:collapse;font-size:12px}
+            td,th{border-bottom:1px dashed #999;padding:4px;text-align:right}
+          </style></head><body>
+            <h3 style="text-align:center">سُكّر 33</h3>
+            <p style="text-align:center">فاتورة رقم ${order.saleId}</p>
+            <p>الفرع: ${order.branch}</p>
+            <p>العميل: ${order.customer || 'عميل نقدي'}</p>
+            <p>التاريخ: ${order.date}</p>
+            <table>
+              <thead><tr><th>الصنف</th><th>ك</th><th>سعر</th><th>إجمالي</th></tr></thead>
+              <tbody>
+                ${items.map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${Number(x.price).toFixed(2)}</td><td>${(Number(x.qty)*Number(x.price)).toFixed(2)}</td></tr>`).join('')}
+              </tbody>
+            </table>
+            <p><strong>الإجمالي: ${this.money(order.total)}</strong></p>
+            <p>الدفع: ${order.paymentMethod}</p>
+            <script>window.onload=()=>window.print()</script>
+          </body></html>
+        `);
+        win.document.close();
+      },
+
+      async saveParkedOrder() {
+        if (!this.state.cart.length) return this.toast('لا توجد عناصر لتعليقها', 'error');
+        const res = await this.apiPost('saveParkedOrder', { data: this.state.cart });
+        if (res.ok) {
+          this.toast('تم تعليق الفاتورة', 'success');
+          this.state.cart = [];
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل تعليق الفاتورة', 'error');
+      },
+
+      openParkedModal() {
+        const rows = this.state.data.parkedOrders || [];
+        this.openModal('الفواتير المعلقة', `
+          ${rows.length ? rows.map(r => `
+            <div class="msg">
+              <strong>${r.parkId}</strong>
+              <div class="muted">${r.timestamp}</div>
+              <div class="actions mt-10">
+                <button class="btn btn-primary" onclick="App.loadParked('${r.parkId}')">تحميل</button>
+                <button class="btn btn-danger" onclick="App.deleteParked('${r.parkId}')">حذف</button>
+              </div>
+            </div>
+          `).join('') : '<div class="empty">لا توجد فواتير معلقة</div>'}
+        `, 'modal-lg');
+      },
+
+      async loadParked(id) {
+        const res = await this.apiPost('loadParkedOrder', { parkId:id });
+        if (res.ok && res.data) {
+          this.state.cart = JSON.parse(res.data.data || '[]');
+          this.closeModal();
+          this.render();
+        } else this.toast(res.error || 'تعذر تحميل الفاتورة', 'error');
+      },
+
+      async deleteParked(id) {
+        const res = await this.apiPost('deleteParkedOrder', { parkId:id });
+        if (res.ok) {
+          this.toast('تم حذف الفاتورة المعلقة', 'success');
+          await this.loadInitialData(true);
+          this.openParkedModal();
+        }
+      },
+
+      async createQROrder() {
+        const payload = {
+          branch: this.branch(),
+          customer: document.getElementById('qrCustomer')?.value?.trim() || '',
+          phone: document.getElementById('qrPhone')?.value?.trim() || '',
+          address: document.getElementById('qrAddress')?.value?.trim() || '',
+          itemsJson: this.state.cart,
+          total: this.state.cart.reduce((a,b)=>a+(Number(b.qty)*Number(b.price)),0),
+          notes: document.getElementById('qrNotes')?.value?.trim() || '',
+          createdBy: this.username()
+        };
+        const res = await this.apiPost('createQROrder', payload);
+        if (!res.ok) return this.toast(res.error || 'فشل إنشاء الطلب', 'error');
+
+        const target = document.getElementById('qrPreview') || this.el.content;
+        target.innerHTML = `<div class="text-center"><div id="qrcodeBox"></div><p class="mt-10"><strong>${res.data.id}</strong></p></div>`;
+        new QRCode(document.getElementById('qrcodeBox'), { text: res.data.id, width: 220, height: 220 });
+        this.toast('تم إنشاء طلب QR', 'success');
+      },
+
+      async fetchQROrder(id) {
+        if (!id) return;
+        const res = await this.apiGet('getQROrder', { orderId:id });
+        const box = document.getElementById('qrPreview');
+        if (!res.ok) return box.innerHTML = `<div class="empty">${res.error || 'غير موجود'}</div>`;
+        box.innerHTML = `<div class="msg"><strong>${res.data.customer || 'بدون اسم'}</strong><div>${res.data.phone || ''}</div><div>${res.data.address || ''}</div><div>${this.money(res.data.total)}</div></div>`;
+      },
+
+      async startScanner() {
+        this.el.scannerBox.style.display = 'flex';
+        if (!window.Html5Qrcode) return this.toast('المكتبة غير متاحة', 'error');
+        this.state.scanner = new Html5Qrcode('reader');
+        try {
+          await this.state.scanner.start(
+            { facingMode: 'environment' },
+            { fps:10, qrbox:{ width:250, height:250 } },
+            async (decodedText) => {
+              await this.fetchQROrder(decodedText);
+              await this.stopScanner();
+              this.state.route = 'qr';
+              this.render();
+            }
+          );
+        } catch (e) {
+          this.toast('تعذر تشغيل الكاميرا', 'error');
+        }
+      },
+
+      async stopScanner() {
+        this.el.scannerBox.style.display = 'none';
+        if (this.state.scanner) {
+          try { await this.state.scanner.stop(); await this.state.scanner.clear(); } catch (e) {}
+          this.state.scanner = null;
+        }
+      },
+
+      openCrmOrderModal() {
+        const products = this.state.data.products || [];
+        this.openModal('طلب CRM جديد', `
+          <div class="grid-2">
+            <div class="field"><label>اسم العميل</label><input id="crmCustomer" class="input"></div>
+            <div class="field"><label>الهاتف</label><input id="crmPhone" class="input"></div>
+            <div class="field"><label>العنوان</label><input id="crmAddress" class="input"></div>
+            <div class="field"><label>الإجمالي</label><input id="crmTotal" class="input" type="number" step="0.01" value="0"></div>
+          </div>
+          <div class="field">
+            <label>المنتجات</label>
+            <div class="grid-3">
+              ${products.map((p,i)=>`
+                <label class="product-card" style="cursor:pointer">
+                  <input type="checkbox" class="crm-prod" data-name="${p.name}" data-price="${p.price}" data-unit="${p.unit||'قطعة'}"> ${p.name} - ${this.money(p.price)}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="crmNotes" class="textarea"></textarea></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveCrmOrder()">حفظ</button></div>
+        `, 'modal-lg');
+      },
+
+      async saveCrmOrder() {
+        const items = [...document.querySelectorAll('.crm-prod:checked')].map(ch => ({
+          name: ch.dataset.name, price:Number(ch.dataset.price), unit:ch.dataset.unit, qty:1
+        }));
+        const payload = {
+          branch: this.branch(),
+          customer: document.getElementById('crmCustomer').value.trim(),
+          phone: document.getElementById('crmPhone').value.trim(),
+          address: document.getElementById('crmAddress').value.trim(),
+          itemsJson: items,
+          total: Number(document.getElementById('crmTotal').value || 0),
+          notes: document.getElementById('crmNotes').value.trim(),
+          createdBy: this.username()
+        };
+        const res = await this.apiPost('saveCrmOrder', payload);
+        if (res.ok) {
+          this.toast('تم حفظ الطلب', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل حفظ الطلب', 'error');
+      },
+
+      openProductModal(row=null) {
+        const p = row || {};
+        this.openModal(row ? 'تعديل منتج' : 'إضافة منتج', `
+          <div class="grid-2">
+            <div class="field"><label>الاسم</label><input id="prodName" class="input" value="${p.name || ''}"></div>
+            <div class="field"><label>الفئة</label><input id="prodCat" class="input" value="${p.cat || ''}"></div>
+            <div class="field"><label>الوحدة</label><input id="prodUnit" class="input" value="${p.unit || 'قطعة'}"></div>
+            <div class="field"><label>السعر</label><input id="prodPrice" class="input" type="number" step="0.01" value="${p.price || 0}"></div>
+          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="prodNotes" class="textarea">${p.notes || ''}</textarea></div>
+          <div class="field"><label><input id="prodActive" type="checkbox" ${String(p.active)==='false'?'':'checked'}> نشط</label></div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="App.saveProduct(${p._row || 0})">حفظ</button>
+          </div>
+        `);
+      },
+
+      async saveProduct(row=0) {
+        const payload = {
+          _row: row || '',
+          name: document.getElementById('prodName').value.trim(),
+          cat: document.getElementById('prodCat').value.trim(),
+          unit: document.getElementById('prodUnit').value.trim(),
+          price: Number(document.getElementById('prodPrice').value || 0),
+          notes: document.getElementById('prodNotes').value.trim(),
+          active: document.getElementById('prodActive').checked
+        };
+        const res = await this.apiPost('saveProduct', payload);
+        if (res.ok) {
+          this.toast('تم حفظ المنتج', 'success');
+          this.closeModal();
+          await this.loadInitialData(true);
+          this.render();
+        } else this.toast(res.error || 'فشل الحفظ', 'error');
+      },
+
+      openStockModal() {
+        this.openModal('حركة مخزون', `
+          <div class="grid-2">
+            <div class="field"><label>الفرع</label><input id="stockBranch" class="input" value="${this.branch()}"></div>
+            <div class="field"><label>الصنف</label><input id="stockItem" class="input"></div>
+            <div class="field"><label>النوع</label>
+              <select id="stockType" class="select"><option value="add">إضافة</option><option value="subtract">خصم</option><option value="adjust">تعديل</option></select>
+            </div>
+            <div class="field"><label>الكمية</label><input id="stockQty" class="input" type="number" step="0.001"></div>
+          </div>
+          <div class="field"><label>ملاحظات</label><textarea id="stockNotes" class="textarea"></textarea></div>
+          <div class="actions"><button class="btn btn-primary" onclick="App.saveStockMovement()">حفظ</button></div>
+        `);
+      },
+
+      async saveStockMovement() {
+        const payload = {
+          branch: document.getElementById('stockBranch').value.trim(),
+          item: document.getElementById('stockItem').value.trim(),
+          type: document.getElementById('stockType').value,
+          qty: Number(document.getElementById('stockQty').value ||e ||
