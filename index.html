@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -14,6 +14,7 @@
   <script defer src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
+    /* نفس الأنماط السابقة بدون تغيير (تم حذفها للاختصار ولكن ستبقى كما هي) */
     :root{
       --bg:#fff8f6; --bg2:#fff1ee; --surface:#ffffff; --surface2:#fff8f3;
       --primary:#c96b8e; --primary-dark:#9c4e6c; --secondary:#8b5e4d;
@@ -234,20 +235,20 @@
               <option value="admin">Admin</option>
             </select>
           </div>
-    <div class="field">
-  <label>الفرع</label>
-  <select id="loginBranch" class="select" required>
-    <option value="">اختر الفرع</option>
-    <option value="1">فرع 1</option>
-    <option value="2">فرع 2</option>
-    <option value="3">فرع 3</option>
-    <option value="4">فرع 4</option>
-    <option value="5">فرع 5</option>
-    <option value="6">فرع 6</option>
-    <option value="7">فرع 7</option>
-    <option value="8">فرع 8</option>
-  </select>
-</div>
+          <div class="field">
+            <label>الفرع</label>
+            <select id="loginBranch" class="select" required>
+              <option value="">اختر الفرع</option>
+              <option value="1">فرع 1</option>
+              <option value="2">فرع 2</option>
+              <option value="3">فرع 3</option>
+              <option value="4">فرع 4</option>
+              <option value="5">فرع 5</option>
+              <option value="6">فرع 6</option>
+              <option value="7">فرع 7</option>
+              <option value="8">فرع 8</option>
+            </select>
+          </div>
         </div>
         <div class="field">
           <label>كلمة المرور</label>
@@ -325,7 +326,7 @@
   </div>
 
   <script>
-    const GASURL = 'https://script.google.com/macros/s/AKfycbymV734Uwj25hX-mJmFlZ2Au4q-3mTc7wU4sMYhbjab4burll9vBpHQbf4NfEJHKsgb/exec';
+    const GASURL = 'https://script.google.com/macros/s/AKfycbxAAfgCwoXEO9KWzImaG7DGQkfGQC-kCxeksG9mlyivSlBBut5LLPqok7d4SdPIoJcu/exec';
 
     const App = {
       state: {
@@ -568,7 +569,6 @@
       async startApp() {
         this.el.authScreen.classList.add('hidden');
         this.el.appShell.classList.remove('hidden');
-        this.el.chatWidget.classList.remove('hidden');
         this.buildSidebar();
         await this.loadInitialData();
         this.startHeartbeat();
@@ -684,7 +684,7 @@
           card.addEventListener('click', () => {
             const idx = Number(card.dataset.item);
             const item = this.filteredProducts()[idx];
-            this.openQtyModal(item);
+            if (item) this.openQtyModal(item);
           });
         });
 
@@ -730,12 +730,14 @@
 
       filteredProducts() {
         const products = (this.state.data.products || []).filter(p => String(p.active).toLowerCase() !== 'false' && String(p.active) !== '0');
+        if (!products.length) return [];
         if (this.state.activeCategory === 'الكل') return products;
         return products.filter(p => p.cat === this.state.activeCategory);
       },
 
       productStock(name) {
-        const row = (this.state.data.stock || []).find(s => String(s.branch) === String(this.branch()) && s.item === name);
+        const stock = this.state.data.stock || [];
+        const row = stock.find(s => String(s.branch) === String(this.branch()) && s.item === name);
         return Number(row?.qty || 0);
       },
 
@@ -743,7 +745,8 @@
 
       todaySales() {
         const today = new Date().toISOString().slice(0,10);
-        return (this.state.data.sales || []).filter(x => String(x.date || '').startsWith(today));
+        const sales = this.state.data.sales || [];
+        return sales.filter(x => String(x.date || '').startsWith(today));
       },
 
       renderDashboard() {
@@ -783,7 +786,7 @@
           grouped[s.branch].total += Number(s.total || 0);
           grouped[s.branch].count += 1;
         });
-        const branches = [...new Set([this.branch(), ...Object.keys(grouped), ...(this.state.data.users||[]).map(u => u.branch)])].filter(Boolean);
+        const branches = [...new Set([this.branch(), ...Object.keys(grouped), ...((this.state.data.users || []).map(u => u.branch))])].filter(Boolean);
 
         return `
           ${this.setPage('مراقبة الفروع','عرض سريع لأداء كل فرع')}
@@ -1291,12 +1294,18 @@
           token: this.state.token || '',
           ...payload
         });
-        const res = await fetch(GASURL, { method:'POST', body });
-        return res.json();
+        try {
+          const res = await fetch(GASURL, { method:'POST', body });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          return json;
+        } catch (e) {
+          return { ok: false, error: e.message };
+        }
       },
 
       async safePost(action, payload={}) {
-        try { return await this.apiPost(action, payload); } catch (e) { return {ok:false,error:e.message}; }
+        try { return await this.apiPost(action, payload); } catch (e) { return {ok:false, error:e.message}; }
       },
 
       async loadInitialData(silent=false) {
@@ -1401,10 +1410,10 @@
           : { type:'private', touser:this.state.selectedChatTarget, message };
 
         const res = await this.apiPost('sendMessage', payload);
-        if (res.ok) {
+        if (res && res.ok) {
           this.el.chatMessageInput.value = '';
           await this.refreshMessages();
-        } else this.toast(res.error || 'فشل الإرسال', 'error');
+        } else this.toast(res?.error || 'فشل الإرسال', 'error');
       },
 
       openQtyModal(item) {
@@ -1417,22 +1426,23 @@
           </div>
           <div class="field"><label>ملاحظة</label><textarea id="qtyNote" class="textarea" placeholder="اختياري"></textarea></div>
           <div class="actions">
-            <button class="btn btn-primary" onclick="App.addToCartByCurrent()">إضافة</button>
+            <button class="btn btn-primary" onclick="App.addToCartByCurrent('${item.name}')">إضافة</button>
             <button class="btn btn-soft" onclick="App.closeModal()">إلغاء</button>
           </div>
         `);
-        this._selectedItem = item;
+        this._tempItem = item;
       },
 
-      addToCartByCurrent() {
-        const item = this._selectedItem;
-        if (!item) return;
+      addToCartByCurrent(name) {
+        const item = this._tempItem;
+        if (!item || item.name !== name) return this.toast('حدث خطأ، حاول مرة أخرى', 'error');
         const qty = Number(document.getElementById('qtyVal').value || 0);
         const price = Number(document.getElementById('qtyPrice').value || item.price || 0);
         const note = document.getElementById('qtyNote').value.trim();
         if (qty <= 0) return this.toast('أدخل كمية صحيحة', 'error');
         this.state.cart.push({ name:item.name, unit:item.unit, qty, price, note, cat:item.cat });
         this.closeModal();
+        delete this._tempItem;
         this.render();
       },
 
@@ -1530,9 +1540,11 @@
       async loadParked(id) {
         const res = await this.apiPost('loadParkedOrder', { parkId:id });
         if (res.ok && res.data) {
-          this.state.cart = JSON.parse(res.data.data || '[]');
-          this.closeModal();
-          this.render();
+          try {
+            this.state.cart = typeof res.data.data === 'string' ? JSON.parse(res.data.data) : (res.data.data || []);
+            this.closeModal();
+            this.render();
+          } catch(e) { this.toast('بيانات غير صالحة', 'error'); }
         } else this.toast(res.error || 'تعذر تحميل الفاتورة', 'error');
       },
 
@@ -1561,7 +1573,11 @@
 
         const target = document.getElementById('qrPreview') || this.el.content;
         target.innerHTML = `<div class="text-center"><div id="qrcodeBox"></div><p class="mt-10"><strong>${res.data.id}</strong></p></div>`;
-        new QRCode(document.getElementById('qrcodeBox'), { text: res.data.id, width: 220, height: 220 });
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(document.getElementById('qrcodeBox'), { text: res.data.id, width: 220, height: 220 });
+        } else {
+          this.toast('مكتبة QR غير متاحة', 'error');
+        }
         this.toast('تم إنشاء طلب QR', 'success');
       },
 
@@ -1575,7 +1591,11 @@
 
       async startScanner() {
         this.el.scannerBox.style.display = 'flex';
-        if (!window.Html5Qrcode) return this.toast('المكتبة غير متاحة', 'error');
+        if (typeof Html5Qrcode === 'undefined') {
+          this.toast('المكتبة غير متاحة، تأكد من اتصال الإنترنت', 'error');
+          return;
+        }
+        if (this.state.scanner) await this.stopScanner();
         this.state.scanner = new Html5Qrcode('reader');
         try {
           await this.state.scanner.start(
@@ -1872,9 +1892,20 @@
         if (!box) return;
         if (!q) return box.innerHTML = `<div class="empty">أدخل عبارة بحث</div>`;
 
-        const sales = (this.state.data.sales || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
-        const crm = (this.state.data.crmOrders || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
-        const users = (this.state.data.users || []).filter(x => JSON.stringify(x).toLowerCase().includes(q));
+        const sales = (this.state.data.sales || []).filter(x => 
+          (x.saleId && x.saleId.toLowerCase().includes(q)) ||
+          (x.customer && x.customer.toLowerCase().includes(q)) ||
+          (x.phone && x.phone.toLowerCase().includes(q))
+        );
+        const crm = (this.state.data.crmOrders || []).filter(x => 
+          (x.id && x.id.toLowerCase().includes(q)) ||
+          (x.customer && x.customer.toLowerCase().includes(q)) ||
+          (x.phone && x.phone.toLowerCase().includes(q))
+        );
+        const users = (this.state.data.users || []).filter(x => 
+          (x.username && x.username.toLowerCase().includes(q)) ||
+          (x.branch && x.branch.toLowerCase().includes(q))
+        );
 
         box.innerHTML = `
           <div class="grid-3">
